@@ -731,6 +731,178 @@
           }
         }
       }
+    },
+    "asset-management": {
+      "projectType": "application",
+      "root": "projects/asset-management",
+      "sourceRoot": "projects/asset-management/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "ngx-build-plus:browser",
+          "options": {
+            "outputPath": "dist/asset-management",
+            "index": "projects/asset-management/src/index.html",
+            "main": "projects/asset-management/src/main.ts",
+            "polyfills": [
+              "zone.js",
+              "projects/asset-management/src/polyfills.ts"
+            ],
+            "tsConfig": "projects/asset-management/tsconfig.app.json",
+            "assets": [
+              "projects/asset-management/src/favicon.ico",
+              "projects/asset-management/src/assets"
+            ],
+            "styles": [
+              "projects/asset-management/src/styles.css",
+              "node_modules/ngx-toastr/toastr.css",
+              "node_modules/ag-grid-community/styles/ag-grid.css",
+              "node_modules/ag-grid-community/styles/ag-theme-alpine.css"
+            ],
+            "scripts": [],
+            "extraWebpackConfig": "projects/asset-management/webpack.config.js",
+            "commonChunk": false
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "600kb",
+                  "maximumError": "2mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "20kb",
+                  "maximumError": "100kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "projects/asset-management/src/environments/environment.ts",
+                  "with": "projects/asset-management/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all",
+              "extraWebpackConfig": "projects/asset-management/webpack.prod.config.js"
+            },
+            "demo": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "projects/asset-management/src/environments/environment.ts",
+                  "with": "projects/asset-management/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all",
+              "extraWebpackConfig": "projects/asset-management/webpack.prod.config.js"
+            },
+            "local-server": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "4mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4mb",
+                  "maximumError": "8mb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "projects/asset-management/src/environments/environment.ts",
+                  "with": "projects/asset-management/src/environments/environment.local-server.prod.ts"
+                }
+              ],
+              "outputHashing": "all",
+              "extraWebpackConfig": "projects/asset-management/webpack.config.js"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "fileReplacements": [
+                {
+                  "replace": "projects/asset-management/src/environments/environment.ts",
+                  "with": "projects/asset-management/src/environments/environment.dev.ts"
+                }
+              ],
+              "extraWebpackConfig": "projects/asset-management/webpack.dev.config.js"
+            },
+            "local": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "ngx-build-plus:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "asset-management:build:production",
+              "extraWebpackConfig": "projects/asset-management/webpack.prod.config.js"
+            },
+            "development": {
+              "browserTarget": "asset-management:build:development"
+            },
+            "local": {
+              "browserTarget": "asset-management:build:local"
+            }
+          },
+          "defaultConfiguration": "local",
+          "options": {
+            "port": 4205,
+            "publicHost": "http://localhost:4205",
+            "extraWebpackConfig": "projects/asset-management/webpack.config.js"
+          }
+        },
+        "extract-i18n": {
+          "builder": "ngx-build-plus:extract-i18n",
+          "options": {
+            "browserTarget": "asset-management:build",
+            "extraWebpackConfig": "projects/asset-management/webpack.config.js"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "projects/asset-management/tsconfig.spec.json",
+            "assets": [
+              "projects/asset-management/src/favicon.ico",
+              "projects/asset-management/src/assets"
+            ],
+            "styles": [
+              "projects/asset-management/src/styles.css"
+            ],
+            "scripts": []
+          }
+        }
+      }
     }
   },
   "cli": {

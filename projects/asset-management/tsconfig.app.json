@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../out-tsc/app",
+    "types": []
+  },
+  "files": [
+    "src/main.ts",
+    "src/polyfills.ts",
+    "src/app/modules/asset-dashboard/asset-dashboard.module.ts",
+    "src/app/modules/view-assets/view-assets.module.ts",
+    "src/app/modules/return-log/return-log.module.ts",
+    "src/app/modules/reports/reports.module.ts",
+    "src/app/modules/issue-asset/issue-asset.module.ts",
+    "src/app/modules/create-asset-tag/create-asset-tag.module.ts",
+    "src/app/modules/create-asset/create-asset.module.ts",
+    "src/app/modules/issue-log/issue-log.module.ts",
+    "src/app/modules/return-asset/return-asset.module.ts",
+    "src/app/modules/edit-asset/edit-asset.module.ts"
+  ],
+  "include": [
+    "src/**/*.d.ts"
+  ]
+}
