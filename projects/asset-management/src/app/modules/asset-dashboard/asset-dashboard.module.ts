@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { AssetDashboardModuleRoutingModule } from './asset-dashboard-routing.module';
 import { AssetDashboardComponent } from './asset-dashboard.component';
+import { BreadcrumbsTitleComponent } from '@libs/shared-ui';
 
 
 @NgModule({
@@ -11,7 +12,8 @@ import { AssetDashboardComponent } from './asset-dashboard.component';
   ],
   imports: [
     CommonModule,
-    AssetDashboardModuleRoutingModule
+    AssetDashboardModuleRoutingModule,
+    BreadcrumbsTitleComponent
   ]
 })
 export class AssetDashboardModule { }

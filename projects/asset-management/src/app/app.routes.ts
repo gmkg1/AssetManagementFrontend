@@ -5,7 +5,7 @@ import { NavigationComponent } from './modules/navigation/navigation.component';
 export const APP_ROUTES: Routes = [
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'kjusys/asset-dashboard',
     pathMatch: 'full',
   },
   {

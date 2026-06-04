@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { BreadcrumbsTitleComponent } from '@libs/shared-ui';
 
 import { ViewAssetsModuleRoutingModule } from './view-assets-routing.module';
 import { ViewAssetsComponent } from './view-assets.component';
@@ -11,7 +13,9 @@ import { ViewAssetsComponent } from './view-assets.component';
   ],
   imports: [
     CommonModule,
-    ViewAssetsModuleRoutingModule
+    FormsModule,
+    ViewAssetsModuleRoutingModule,
+    BreadcrumbsTitleComponent
   ]
 })
 export class ViewAssetsModule { }
