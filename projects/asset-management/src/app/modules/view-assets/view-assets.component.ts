@@ -43,10 +43,29 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   view: 'list' | 'detail' = 'list';
   selectedAsset: Asset | null = null;
   detailTab: 'info'|'licenses'|'components'|'assets'|'history'|'maintenances'|'files' = 'info';
+  moduleTabs = [
+    { id: 'asset-dashboard', label: 'Dashboard' },
+    { id: 'view-assets', label: 'View Assets' },
+    { id: 'issue-asset', label: 'Issue Asset' },
+    { id: 'issue-log', label: 'Issue Log' },
+    { id: 'return-log', label: 'Return Log' },
+    { id: 'reports', label: 'Reports' },
+  ];
+  activeModuleTabId = 'view-assets';
 
   // â”€â”€ list state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   searchQuery = '';
-  selectedCategory = 'All';
+  searchField = 'all';
+  searchFieldLabel = 'All Fields';
+  selectedSearchField = [{ value: 'all', label: 'All Fields' }];
+  searchFieldOptions = [
+    { value: 'all', label: 'All Fields' },
+    { value: 'name', label: 'Name' },
+    { value: 'id', label: 'Asset ID' },
+    { value: 'assignedTo', label: 'Assigned To' },
+    { value: 'department', label: 'Department' },
+    { value: 'category', label: 'Category' }
+  ];  selectedCategory = 'All';
   selectedStatus = 'All';
   categories = ['All', 'I.T', 'Electricals', 'Sound', 'Stationery', 'Housekeeping', 'Furniture'];
   statuses   = ['All', 'Available', 'Deployed', 'Under Maintenance', 'Retired'];
@@ -101,11 +120,36 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   get filteredAssets(): Asset[] {
     return this.assets.filter(a => {
       const q = this.searchQuery.toLowerCase();
-      const matchesSearch = !q || a.name.toLowerCase().includes(q) || a.id.toLowerCase().includes(q) || a.assignedTo.toLowerCase().includes(q) || a.department.toLowerCase().includes(q);
+      const matchesSearch = !q || this.matchesSearchField(a, q);
       const matchesCategory = this.selectedCategories.length === 0 || this.selectedCategories.includes(a.category);
       const matchesStatus   = this.selectedStatuses.length === 0   || this.selectedStatuses.includes(a.status);
       return matchesSearch && matchesCategory && matchesStatus;
     });
+  }
+
+  onSearchFieldChange(selection: any[]): void {
+    const selected = selection?.[0] ?? { value: 'all', label: 'All Fields' };
+    this.searchField = selected.value;
+    this.searchFieldLabel = selected.label;
+    this.selectedSearchField = [selected];
+    this.searchQuery = '';
+  }
+
+  private matchesSearchField(asset: Asset, query: string): boolean {
+    switch (this.searchField) {
+      case 'name': return asset.name.toLowerCase().includes(query);
+      case 'id': return asset.id.toLowerCase().includes(query);
+      case 'assignedTo': return asset.assignedTo.toLowerCase().includes(query);
+      case 'department': return asset.department.toLowerCase().includes(query);
+      case 'category': return asset.category.toLowerCase().includes(query);
+      default: return (
+        asset.name.toLowerCase().includes(query) ||
+        asset.id.toLowerCase().includes(query) ||
+        asset.assignedTo.toLowerCase().includes(query) ||
+        asset.department.toLowerCase().includes(query) ||
+        asset.category.toLowerCase().includes(query)
+      );
+    }
   }
 
   toggleCategory(cat: string): void {
@@ -163,6 +207,11 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   goToCreateAssetTag(): void { this.router.navigate(['/kjusys/create-asset-tag']); }
 
   goToCreateAsset(): void { this.router.navigate(['/kjusys/create-asset']); }
+
+  onModuleTabChange(tabId: string): void {
+    this.activeModuleTabId = tabId;
+    this.router.navigate(['/kjusys', tabId]);
+  }
 
   issueAsset(asset: Asset): void {
     this.router.navigate(['/kjusys/issue-asset'], {

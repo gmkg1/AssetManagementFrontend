@@ -36,7 +36,27 @@ export class ReturnLogComponent implements OnInit, OnDestroy {
   departments = ['I.T', 'Electrical', 'Sound', 'Stationery', 'Housekeeping', 'Furnitures'];
   activeDept = 'I.T';
 
+  moduleTabs = [
+    { id: 'asset-dashboard', label: 'Dashboard' },
+    { id: 'view-assets', label: 'View Assets' },
+    { id: 'issue-asset', label: 'Issue Asset' },
+    { id: 'issue-log', label: 'Issue Log' },
+    { id: 'return-log', label: 'Return Log' },
+    { id: 'reports', label: 'Reports' },
+  ];
+  activeModuleTabId = 'return-log';
+
   searchQuery = '';
+  searchField = 'all';
+  searchFieldLabel = 'All Fields';
+  selectedSearchField = [{ value: 'all', label: 'All Fields' }];
+  searchFieldOptions = [
+    { value: 'all', label: 'All Fields' },
+    { value: 'name', label: 'Name' },
+    { value: 'assetTag', label: 'Asset Tag' },
+    { value: 'classification', label: 'Classification' },
+    { value: 'department', label: 'Department' },
+  ];
   currentPage = 1;
 
   // â”€â”€ Form fields (detail view) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -90,10 +110,33 @@ export class ReturnLogComponent implements OnInit, OnDestroy {
     const q = this.searchQuery.toLowerCase();
     return this.allRecords.filter(r => {
       const matchesDept   = r.department === this.activeDept;
-      const matchesSearch = !q || r.assetName.toLowerCase().includes(q) || r.assetTag.toLowerCase().includes(q) || r.classification.toLowerCase().includes(q);
+      const matchesSearch = !q || this.matchesSearchField(r, q);
       const matchesClass  = this.filterClassifications.length === 0 || this.filterClassifications.includes(r.classification);
       return matchesDept && matchesSearch && matchesClass;
     });
+  }
+
+  onSearchFieldChange(selection: any[]): void {
+    const selected = selection?.[0] ?? { value: 'all', label: 'All Fields' };
+    this.searchField = selected.value;
+    this.searchFieldLabel = selected.label;
+    this.selectedSearchField = [selected];
+    this.searchQuery = '';
+  }
+
+  private matchesSearchField(record: ReturnRecord, query: string): boolean {
+    switch (this.searchField) {
+      case 'name': return record.assetName.toLowerCase().includes(query);
+      case 'assetTag': return record.assetTag.toLowerCase().includes(query);
+      case 'classification': return record.classification.toLowerCase().includes(query);
+      case 'department': return record.department.toLowerCase().includes(query);
+      default: return (
+        record.assetName.toLowerCase().includes(query) ||
+        record.assetTag.toLowerCase().includes(query) ||
+        record.classification.toLowerCase().includes(query) ||
+        record.department.toLowerCase().includes(query)
+      );
+    }
   }
 
   get totalPages(): number { return Math.max(1, Math.ceil(this.filteredRecords.length / PAGE_SIZE)); }
@@ -200,6 +243,11 @@ export class ReturnLogComponent implements OnInit, OnDestroy {
   goToIssueAsset(): void { this.router.navigate(['/kjusys/issue-asset']); }
   goToIssueLog():   void { this.router.navigate(['/kjusys/issue-log']); }
   goToReports(): void    { this.router.navigate(['/kjusys/reports']); }
+
+  onModuleTabChange(tabId: string): void {
+    this.activeModuleTabId = tabId;
+    this.router.navigate(['/kjusys', tabId]);
+  }
 
   // â”€â”€ Row click â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   openDetail(row: ReturnRecord): void {

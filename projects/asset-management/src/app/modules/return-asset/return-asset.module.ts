@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { TabsModule } from '@libs/tabs';
 
 import { ReturnAssetModuleRoutingModule } from './return-asset-routing.module';
 import { ReturnAssetComponent } from './return-asset.component';
@@ -11,6 +13,8 @@ import { ReturnAssetComponent } from './return-asset.component';
   ],
   imports: [
     CommonModule,
+    FormsModule,
+    TabsModule,
     ReturnAssetModuleRoutingModule
   ]
 })

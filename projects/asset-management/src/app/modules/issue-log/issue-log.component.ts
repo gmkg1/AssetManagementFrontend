@@ -100,7 +100,17 @@ export class IssueLogComponent implements OnInit, OnDestroy {
   filterClassifications: string[] = [];
   readonly classificationFilterOptions = ['Asset', 'Component', 'Consumable', 'Accessory'];
 
-  // â”€â”€ Tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  moduleTabs = [
+    { id: 'asset-dashboard', label: 'Dashboard' },
+    { id: 'view-assets', label: 'View Assets' },
+    { id: 'issue-asset', label: 'Issue Asset' },
+    { id: 'issue-log', label: 'Issue Log' },
+    { id: 'return-log', label: 'Return Log' },
+    { id: 'reports', label: 'Reports' },
+  ];
+  activeModuleTabId = 'issue-log';
+
+  // â”€â”€ Tabs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   tabs      = ['IT', 'Electrical', 'Sound', 'Stationery', 'Housekeeping', 'Furnitures'];
   activeTab = 'IT';
 
@@ -109,9 +119,9 @@ export class IssueLogComponent implements OnInit, OnDestroy {
   currentPage  = 1;
 
   // â”€â”€ Search field selector â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  searchFieldOpen  = false;
   searchField      = 'all';
   searchFieldLabel = 'All Fields';
+  selectedSearchField = [{ value: 'all', label: 'All Fields' }];
   readonly searchFieldOptions = [
     { value: 'all',        label: 'All Fields'  },
     { value: 'name',       label: 'Name'        },
@@ -122,6 +132,15 @@ export class IssueLogComponent implements OnInit, OnDestroy {
   ];
 
   constructor(private route: ActivatedRoute, public router: Router) {}
+
+  onSearchFieldChange(selection: any[]): void {
+    const selected = selection?.[0] ?? { value: 'all', label: 'All Fields' };
+    this.searchField = selected.value;
+    this.searchFieldLabel = selected.label;
+    this.selectedSearchField = [selected];
+    this.searchQuery = '';
+    this.currentPage = 1;
+  }
 
   // â”€â”€ Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   ngOnInit(): void {
@@ -139,7 +158,7 @@ export class IssueLogComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {}
 
   @HostListener('document:click')
-  onDocumentClick(): void { this.filterOpen = false; this.searchFieldOpen = false; }
+  onDocumentClick(): void { this.filterOpen = false; }
 
   // â”€â”€ Generic getters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   get allItems(): IssueLogItem[] {
@@ -369,4 +388,10 @@ export class IssueLogComponent implements OnInit, OnDestroy {
   goToIssueAsset(): void { this.router.navigate(['/kjusys/issue-asset']); }
   goToReturnLog():  void { this.router.navigate(['/kjusys/return-log']); }
   goToReports():    void { this.router.navigate(['/kjusys/reports']); }
+
+  onModuleTabChange(tabId: string): void {
+    this.activeModuleTabId = tabId;
+    this.router.navigate(['/kjusys', tabId]);
+  }
 }
+

@@ -5,6 +5,15 @@
     [title]="'Asset Dashboard'">
   </lib-breadcrumbs-title>
 
+  <div class="mb-4">
+    <lib-tabs
+      [tabs]="moduleTabs"
+      [activeTabId]="activeModuleTabId"
+      [autoWidth]="true"
+      (tabChange)="onModuleTabChange($event)">
+    </lib-tabs>
+  </div>
+
   <!-- Main Content -->
   <div class="px-5 pb-5">
     <!-- Department cards -->

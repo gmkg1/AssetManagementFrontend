@@ -26,10 +26,28 @@ export class ReportsComponent implements OnInit, OnDestroy {
   departments = ['I.T', 'Electrical', 'Sound', 'Stationery', 'Housekeeping', 'Furnitures'];
   activeDept  = 'I.T';
   searchQuery = '';
+  searchField = 'all';
+  searchFieldLabel = 'All Fields';
+  selectedSearchField = [{ value: 'all', label: 'All Fields' }];
+  searchFieldOptions = [
+    { value: 'all', label: 'All Fields' },
+    { value: 'name', label: 'Name' },
+    { value: 'id', label: 'ID' },
+    { value: 'type', label: 'Type' },
+  ];
+  moduleTabs = [
+    { id: 'asset-dashboard', label: 'Dashboard' },
+    { id: 'view-assets', label: 'View Assets' },
+    { id: 'issue-asset', label: 'Issue Asset' },
+    { id: 'issue-log', label: 'Issue Log' },
+    { id: 'return-log', label: 'Return Log' },
+    { id: 'reports', label: 'Reports' },
+  ];
+  activeModuleTabId = 'reports';
   currentPage = 1;
   allChecked  = false;
 
-  // â”€â”€ Filter state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â”€â”€ Filter state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   filterOpen = false;
   filterTypes: string[] = [];
   readonly typeFilterOptions = ['Asset', 'Component', 'Consumable', 'Accessory'];
@@ -76,7 +94,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
     const list = this.allAssets[this.activeDept] || [];
     const q = this.searchQuery.toLowerCase().trim();
     return list.filter(a => {
-      const matchesSearch = !q || a.name.toLowerCase().includes(q) || a.type.toLowerCase().includes(q);
+      const matchesSearch = !q || this.matchesSearchField(a, q);
       const matchesType   = this.filterTypes.length === 0 || this.filterTypes.includes(a.type);
       return matchesSearch && matchesType;
     });
@@ -97,6 +115,33 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {}
   ngOnDestroy(): void {}
+
+  onSearchFieldChange(selection: any[]): void {
+    const selected = selection?.[0] ?? { value: 'all', label: 'All Fields' };
+    this.searchField = selected.value;
+    this.searchFieldLabel = selected.label;
+    this.selectedSearchField = [selected];
+    this.searchQuery = '';
+    this.currentPage = 1;
+  }
+
+  onModuleTabChange(tabId: string): void {
+    this.activeModuleTabId = tabId;
+    this.router.navigate(['/kjusys', tabId]);
+  }
+
+  private matchesSearchField(asset: ReportAsset, query: string): boolean {
+    switch (this.searchField) {
+      case 'name': return asset.name.toLowerCase().includes(query);
+      case 'id': return asset.id.toLowerCase().includes(query);
+      case 'type': return asset.type.toLowerCase().includes(query);
+      default: return (
+        asset.name.toLowerCase().includes(query) ||
+        asset.id.toLowerCase().includes(query) ||
+        asset.type.toLowerCase().includes(query)
+      );
+    }
+  }
 
   @HostListener('document:click')
   onDocumentClick(): void { this.filterOpen = false; }

@@ -8,31 +8,13 @@
           <span class="text-blue-600 font-medium">Asset Management</span>
         </div>
         <h1 class="text-sm font-semibold text-slate-800 mb-3">Asset Management</h1>
-        <div class="flex gap-3">
-          <div class="flex flex-col justify-between px-4 py-3 rounded-xl bg-white text-slate-700 w-44 cursor-pointer shadow-sm hover:shadow-md transition-shadow duration-150" (click)="goToDashboard()">
-            <span class="text-xs font-semibold">Dashboard</span>
-            <span class="text-[10px] text-slate-400 mt-1">Overview &amp; Summary</span>
-          </div>
-          <div class="flex flex-col justify-between px-4 py-3 rounded-xl bg-white text-slate-700 w-44 cursor-pointer shadow-sm hover:shadow-md transition-shadow duration-150" (click)="goToViewAssets()">
-            <span class="text-xs font-semibold">View Assets</span>
-            <span class="text-[10px] text-slate-400 mt-1">Browse all assets</span>
-          </div>
-          <div class="flex flex-col justify-between px-4 py-3 rounded-xl bg-white text-slate-700 w-44 cursor-pointer shadow-sm hover:shadow-md transition-shadow duration-150" (click)="goToIssueAsset()">
-            <span class="text-xs font-semibold">Issue Asset</span>
-            <span class="text-[10px] text-slate-400 mt-1">Assign to a user</span>
-          </div>
-          <div class="flex flex-col justify-between px-4 py-3 rounded-xl bg-white text-slate-700 w-44 cursor-pointer shadow-sm hover:shadow-md transition-shadow duration-150" (click)="goToIssueLog()">
-            <span class="text-xs font-semibold">Issue Log</span>
-            <span class="text-[10px] text-slate-400 mt-1">Track issued assets</span>
-          </div>
-          <div class="flex flex-col justify-between px-4 py-3 rounded-xl bg-blue-700 text-white w-44 cursor-pointer shadow-sm">
-            <span class="text-xs font-bold">Return Log</span>
-            <span class="text-[10px] text-blue-200 mt-1">Track returns</span>
-          </div>
-          <div class="flex flex-col justify-between px-4 py-3 rounded-xl bg-white text-slate-700 w-44 cursor-pointer shadow-sm hover:shadow-md transition-shadow duration-150" (click)="goToReports()">
-            <span class="text-xs font-semibold">Reports</span>
-            <span class="text-[10px] text-slate-400 mt-1">Asset analytics</span>
-          </div>
+        <div class="mb-4">
+          <lib-tabs
+            [tabs]="moduleTabs"
+            [activeTabId]="activeModuleTabId"
+            [autoWidth]="true"
+            (tabChange)="onModuleTabChange($event)">
+          </lib-tabs>
         </div>
       </div>
 
@@ -53,12 +35,26 @@
 
         <!-- Toolbar -->
         <div class="flex items-center gap-2 px-4 py-2.5 border-b border-slate-100">
+          <div class="min-w-[220px]">
+            <lib-dropdown-lib
+              label="Search by"
+              placeholder="All Fields"
+              [singleSelection]="true"
+              [data]="searchFieldOptions"
+              idField="value"
+              textField="label"
+              [selectedItems]="selectedSearchField"
+              triggerHeight="34px"
+              triggerWidth="220px"
+              (selectionChange)="onSearchFieldChange($event)">
+            </lib-dropdown-lib>
+          </div>
           <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-3 h-7 flex-1 max-w-xs">
             <svg fill="none" viewBox="0 0 24 24" stroke="#AEAEAE" stroke-width="2" class="w-3 h-3 flex-shrink-0">
               <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
             </svg>
             <input class="flex-1 bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-400" type="text"
-              placeholder="Search by name, ID..." [(ngModel)]="searchQuery"/>
+              [placeholder]="'Search by ' + searchFieldLabel.toLowerCase() + '...'" [(ngModel)]="searchQuery"/>
           </div>
           <button class="flex items-center gap-1.5 h-7 px-3 rounded-lg border border-slate-200 text-[10px] font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all duration-150 active:scale-95"
             (click)="exportCSV()">

@@ -76,6 +76,16 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
   readyToDeploy = 500;
   deployed      = 9500;
 
+  moduleTabs = [
+    { id: 'asset-dashboard', label: 'Dashboard' },
+    { id: 'view-assets', label: 'View Assets' },
+    { id: 'issue-asset', label: 'Issue Asset' },
+    { id: 'issue-log', label: 'Issue Log' },
+    { id: 'return-log', label: 'Return Log' },
+    { id: 'reports', label: 'Reports' },
+  ];
+  activeModuleTabId = 'asset-dashboard';
+
   // Small donut: r=46, circumference = 2Ï€Ã—46 â‰ˆ 289.03
   readonly circumferenceSmall = 2 * Math.PI * 46;
 
@@ -86,6 +96,11 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {}
   ngOnDestroy(): void {}
+
+  onModuleTabChange(tabId: string): void {
+    this.activeModuleTabId = tabId;
+    this.router.navigate(['/kjusys', tabId]);
+  }
 
   viewMoreIssues(): void { this.router.navigate(['/kjusys/view-assets']); }
   navigateTo(path: string): void { this.router.navigate([path]); }

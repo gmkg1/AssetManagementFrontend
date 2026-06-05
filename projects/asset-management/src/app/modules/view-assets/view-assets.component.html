@@ -8,32 +8,13 @@
   <!-- Main Content -->
   <div class="px-5 pb-5">
     
-    <!-- Navigation Cards -->
-    <div class="flex gap-3 mb-4">
-      <div class="flex flex-col justify-between px-4 py-3 rounded-xl bg-white text-slate-700 w-44 cursor-pointer shadow-sm hover:shadow-md transition-shadow duration-150" (click)="goToDashboard()">
-        <span class="text-xs font-semibold">Dashboard</span>
-        <span class="text-[10px] text-slate-400 mt-1">Overview &amp; Summary</span>
-      </div>
-      <div class="flex flex-col justify-between px-4 py-3 rounded-xl bg-blue-700 text-white w-44 cursor-pointer shadow-sm">
-        <span class="text-xs font-bold">View Assets</span>
-        <span class="text-[10px] text-blue-200 mt-1">Browse all assets</span>
-      </div>
-      <div class="flex flex-col justify-between px-4 py-3 rounded-xl bg-white text-slate-700 w-44 cursor-pointer shadow-sm hover:shadow-md transition-shadow duration-150" (click)="goToIssueAsset()">
-        <span class="text-xs font-semibold">Issue Asset</span>
-        <span class="text-[10px] text-slate-400 mt-1">Assign to a user</span>
-      </div>
-      <div class="flex flex-col justify-between px-4 py-3 rounded-xl bg-white text-slate-700 w-44 cursor-pointer shadow-sm hover:shadow-md transition-shadow duration-150" (click)="goToIssueLog()">
-        <span class="text-xs font-semibold">Issue Log</span>
-        <span class="text-[10px] text-slate-400 mt-1">Track issued assets</span>
-      </div>
-      <div class="flex flex-col justify-between px-4 py-3 rounded-xl bg-white text-slate-700 w-44 cursor-pointer shadow-sm hover:shadow-md transition-shadow duration-150" (click)="goToReturnLog()">
-        <span class="text-xs font-semibold">Return Log</span>
-        <span class="text-[10px] text-slate-400 mt-1">Track returns</span>
-      </div>
-      <div class="flex flex-col justify-between px-4 py-3 rounded-xl bg-white text-slate-700 w-44 cursor-pointer shadow-sm hover:shadow-md transition-shadow duration-150" (click)="goToReports()">
-        <span class="text-xs font-semibold">Reports</span>
-        <span class="text-[10px] text-slate-400 mt-1">Asset analytics</span>
-      </div>
+    <div class="mb-4">
+      <lib-tabs
+        [tabs]="moduleTabs"
+        [activeTabId]="activeModuleTabId"
+        [autoWidth]="true"
+        (tabChange)="onModuleTabChange($event)">
+      </lib-tabs>
     </div>
 
       <!-- â•â• LIST VIEW â•â• -->
@@ -104,6 +85,22 @@
 
           <!-- Filter toolbar -->
           <div class="flex flex-wrap items-center gap-3 px-4 py-3 border-b border-slate-100">
+
+            <!-- Search field selector -->
+            <div class="min-w-[220px]">
+              <lib-dropdown-lib
+                label="Search by"
+                placeholder="All Fields"
+                [singleSelection]="true"
+                [data]="searchFieldOptions"
+                idField="value"
+                textField="label"
+                [selectedItems]="selectedSearchField"
+                triggerHeight="34px"
+                triggerWidth="220px"
+                (selectionChange)="onSearchFieldChange($event)">
+              </lib-dropdown-lib>
+            </div>
 
             <!-- Search -->
             <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 h-8 w-56 hover:border-blue-400 transition-colors duration-150">
