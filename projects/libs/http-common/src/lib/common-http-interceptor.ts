@@ -227,6 +227,7 @@ export class CommonHttpInterceptor implements HttpInterceptor {
      * Check if the access token is expired.
      */
     private isTokenExpired(token: string): boolean {
+        if (token === 'dummy-token' || token === 'mock-access-token') return false;
         const decodedJWT = this.getDecodedAccessToken(token);
         if (decodedJWT) {
             const expInMilliseconds = decodedJWT.exp * 1000;

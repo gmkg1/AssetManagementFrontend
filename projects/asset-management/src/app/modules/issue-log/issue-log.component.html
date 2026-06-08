@@ -1,322 +1,104 @@
-<div class="flex flex-col min-h-full bg-[#F0F2F5] font-inter text-xs">
-  <div class="p-4">
-
-        <!-- Page header -->
+<div class="flex flex-col h-screen w-screen overflow-hidden bg-[#F0F2F5] font-inter text-xs">
+  <header class="h-12 bg-white border-b border-slate-200 flex items-center px-4 flex-shrink-0 gap-4">
+    <div class="flex flex-col leading-none w-36 flex-shrink-0">
+      <span class="text-[8px] text-slate-400 uppercase tracking-widest">Kristu Jayanti</span>
+      <img src="assets/usys-logo.png" alt="USYS" class="h-5 object-contain object-left mt-0.5" />
+    </div>
+    <div class="flex-1 flex justify-center">
+      <img src="assets/kjc-banner.png" alt="Kristu Jayanti University" class="h-7 object-contain" />
+    </div>
+    <span class="text-[10px] text-slate-400 w-36 text-right flex-shrink-0">Hi, Abin Xavier</span>
+  </header>
+  <div class="flex flex-1 overflow-hidden">
+    <aside class="bg-white border-r border-slate-200 flex flex-col flex-shrink-0 transition-all duration-200 overflow-hidden"
+      [class.w-12]="!sidebarOpen" [class.w-44]="sidebarOpen" (click)="$event.stopPropagation()">
+      <div *ngIf="!sidebarOpen" class="flex flex-col items-center py-3">
+        <button class="flex flex-col items-center gap-1 w-10 py-2 rounded-lg bg-black text-white hover:bg-slate-800 transition-colors duration-150" (click)="sidebarOpen = true">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 0 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 9 15.553Z"/></svg>
+          <span class="text-[8px] font-medium leading-none">Assets</span>
+        </button>
+      </div>
+      <ng-container *ngIf="sidebarOpen">
+        <div class="flex items-center justify-between px-3 py-3 border-b border-slate-100">
+          <span class="text-xs font-semibold text-slate-800 whitespace-nowrap">Assets</span>
+          <button class="text-slate-400 hover:text-slate-700 transition-colors" (click)="sidebarOpen = false">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+          </button>
+        </div>
+        <nav class="flex flex-col px-2 py-2 gap-0.5">
+          <button class="flex items-center gap-2 px-2 py-2 rounded-md text-[11px] font-medium w-full text-left text-slate-600" (click)="goToDashboard()">Dashboard</button>
+          <button class="flex items-center gap-2 px-2 py-2 rounded-md text-[11px] font-medium w-full text-left text-slate-600" (click)="goToViewAssets()">View Assets</button>
+          <button class="flex items-center gap-2 px-2 py-2 rounded-md text-[11px] font-medium w-full text-left text-slate-600" (click)="goToIssueAsset()">Issue Asset</button>
+          <button class="flex items-center gap-2 px-2 py-2 rounded-md text-[11px] font-medium w-full text-left bg-blue-600 text-white">Issue Log</button>
+          <button class="flex items-center gap-2 px-2 py-2 rounded-md text-[11px] font-medium w-full text-left text-slate-600" (click)="goToReturnLog()">Return Log</button>
+          <button class="flex items-center gap-2 px-2 py-2 rounded-md text-[11px] font-medium w-full text-left text-slate-600" (click)="goToReports()">Reports</button>
+        </nav>
+      </ng-container>
+    </aside>
+    <div class="flex flex-col flex-1 overflow-hidden">
+      <div class="flex-1 overflow-y-auto p-4">
         <div class="mb-4">
-          <div class="flex items-center gap-1.5 text-[10px] text-slate-400 mb-1">
-            <span>Apps</span>
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-2.5 h-2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
-            </svg>
-            <span class="text-blue-600 font-medium">Asset Management</span>
-          </div>
           <h1 class="text-sm font-semibold text-slate-800 mb-3">Asset Management</h1>
-
-          <div class="mb-4">
-            <lib-tabs
-              [tabs]="moduleTabs"
-              [activeTabId]="activeModuleTabId"
-              [autoWidth]="true"
-              (tabChange)="onModuleTabChange($event)">
-            </lib-tabs>
-          </div>
         </div>
-
-        <!-- Main card -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-
-          <!-- Department tabs -->
-          <div class="flex border-b border-slate-200 px-4 overflow-x-auto">
-            <button *ngFor="let tab of tabs"
-              class="px-3 py-2.5 text-[11px] font-medium border-b-2 -mb-px whitespace-nowrap transition-colors duration-150"
-              [class.border-slate-800]="activeTab === tab"
-              [class.text-slate-800]="activeTab === tab"
-              [class.border-transparent]="activeTab !== tab"
-              [class.text-slate-400]="activeTab !== tab"
-              (click)="setTab(tab)">{{ tab }}</button>
+          <div class="grid gap-3 px-4 py-3 border-b border-slate-100 md:grid-cols-2 xl:grid-cols-5">
+            <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs" type="text" placeholder="Asset name" [(ngModel)]="assetNameQuery" (ngModelChange)="onFilterChange()" />
+            <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs" type="text" placeholder="Category" [(ngModel)]="categoryQuery" (ngModelChange)="onFilterChange()" />
+            <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs" type="text" placeholder="Issued to" [(ngModel)]="issuedToQuery" (ngModelChange)="onFilterChange()" />
+            <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs" [(ngModel)]="selectedType" (change)="onFilterChange()">
+              <option value="">All types</option>
+              <option value="Location">Location</option>
+              <option value="Asset">Asset</option>
+              <option value="Person">Person</option>
+            </select>
+            <div class="flex items-center gap-2">
+              <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs" type="date" [(ngModel)]="issueDate" (change)="onFilterChange()" />
+              <button type="button" class="h-8 px-3 rounded-lg border border-slate-200 bg-white text-xs text-slate-600" (click)="clearFilters()">Clear</button>
+            </div>
           </div>
-
-          <!-- Toolbar -->
-          <div class="flex items-center gap-2 px-4 py-2.5 border-b border-slate-100">
-            <!-- Search: field selector + input -->
-            <div class="flex items-center bg-slate-50 border border-slate-200 rounded-lg h-7 flex-1 max-w-sm overflow-hidden focus-within:border-blue-400 transition-colors">
-              <!-- Search field selector -->
-            <div class="min-w-[210px]">
-              <lib-dropdown-lib
-                label="Search by"
-                placeholder="All Fields"
-                [singleSelection]="true"
-                [data]="searchFieldOptions"
-                idField="value"
-                textField="label"
-                [selectedItems]="selectedSearchField"
-                triggerHeight="34px"
-                triggerWidth="210px"
-                (selectionChange)="onSearchFieldChange($event)">
-              </lib-dropdown-lib>
+          <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+            <div>
+              <h2 class="text-xs font-semibold text-slate-800">Issue Log</h2>
+              <p class="text-[10px] text-slate-400 mt-0.5">{{ totalRecords }} record{{ totalRecords !== 1 ? 's' : '' }} total</p>
             </div>
-            <!-- Text input -->
-              <div class="flex items-center gap-1.5 flex-1 px-2.5">
-                <svg fill="none" viewBox="0 0 24 24" stroke="#AEAEAE" stroke-width="2" class="w-3 h-3 flex-shrink-0">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
-                </svg>
-                <input class="flex-1 bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-400"
-                  type="text" [placeholder]="'Search by ' + searchFieldLabel.toLowerCase() + '...'"
-                  [(ngModel)]="searchQuery" (ngModelChange)="currentPage = 1"/>
-                <button *ngIf="searchQuery" class="text-slate-300 hover:text-slate-500 transition-colors flex-shrink-0"
-                  (click)="searchQuery = ''; currentPage = 1">
-                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="w-2.5 h-2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <button class="flex items-center gap-1.5 h-7 px-3 rounded-lg border border-slate-200 text-[10px] font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all duration-150 active:scale-95"
-              (click)="exportCSV()">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" class="w-3 h-3">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
-              </svg>
-              Export
-            </button>
-
-            <!-- Filter (generic tabs only) -->
-            <div *ngIf="activeTab !== 'Electrical'" class="relative" (click)="$event.stopPropagation()">
-              <button class="flex items-center gap-1.5 h-7 px-3 rounded-lg border text-[10px] font-medium transition-all duration-150 active:scale-95"
-                [class.border-blue-500]="filterOpen || filterClassifications.length > 0"
-                [class.bg-blue-50]="filterOpen || filterClassifications.length > 0"
-                [class.text-blue-700]="filterOpen || filterClassifications.length > 0"
-                [class.border-slate-200]="!filterOpen && filterClassifications.length === 0"
-                [class.text-slate-600]="!filterOpen && filterClassifications.length === 0"
-                (click)="toggleFilterPanel($event)">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" class="w-3 h-3">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
-                </svg>
-                Filter
-                <span *ngIf="filterClassifications.length > 0" class="ml-0.5 bg-blue-600 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">{{ filterClassifications.length }}</span>
-              </button>
-              <!-- Filter dropdown -->
-              <div *ngIf="filterOpen" class="absolute top-full right-0 mt-1 w-44 bg-white border border-slate-200 rounded-xl shadow-lg z-50 py-1">
-                <div class="flex items-center justify-between px-3 py-1.5 border-b border-slate-100">
-                  <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Classification</span>
-                  <button class="text-[10px] text-blue-600 hover:text-blue-800 font-medium" (click)="clearFilters()">Clear</button>
-                </div>
-                <div *ngFor="let c of classificationFilterOptions"
-                  class="flex items-center gap-2 px-3 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
-                  (click)="toggleClassFilter(c)">
-                  <div class="w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0 transition-all"
-                    [class.bg-blue-600]="filterClassifications.includes(c)"
-                    [class.border-blue-600]="filterClassifications.includes(c)"
-                    [class.border-slate-300]="!filterClassifications.includes(c)">
-                    <svg *ngIf="filterClassifications.includes(c)" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="3" class="w-2.5 h-2.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-                    </svg>
-                  </div>
-                  <span class="text-xs text-slate-700"
-                    [class.font-medium]="filterClassifications.includes(c)"
-                    [class.text-blue-700]="filterClassifications.includes(c)">{{ c }}</span>
-                </div>
-              </div>
-            </div>
-
-            <button class="flex items-center gap-1.5 h-7 px-3 rounded-lg bg-blue-600 text-white text-[10px] font-medium hover:bg-blue-700 transition-all duration-150 active:scale-95"
-              (click)="goToIssueAsset()">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-3 h-3">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-              </svg>
-              Issue Asset
-            </button>
           </div>
-
-          <!-- â”€â”€ ELECTRICAL TABLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-          <ng-container *ngIf="activeTab === 'Electrical'">
-            <!-- Header -->
-            <div class="grid elec-cols px-4 py-2 bg-slate-50 border-b border-slate-200">
-              <div class="flex items-center gap-2">
-                <div class="w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0 cursor-pointer transition-all"
-                  [class.bg-blue-600]="allChecked" [class.border-blue-600]="allChecked" [class.border-slate-300]="!allChecked"
-                  (click)="toggleAll()">
-                  <svg *ngIf="allChecked" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="3" class="w-2.5 h-2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-                  </svg>
-                  <svg *ngIf="someChecked && !allChecked" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="3" class="w-2.5 h-2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"/>
-                  </svg>
-                </div>
-                <span class="text-[10px] text-slate-400 font-medium">Name</span>
-              </div>
-              <span class="text-[10px] text-slate-400 font-medium">Issued To</span>
-              <span class="text-[10px] text-slate-400 font-medium">Department</span>
-              <span class="text-[10px] text-slate-400 font-medium">Date Issued</span>
-              <span class="text-[10px] text-slate-400 font-medium">Due Date</span>
-              <span class="text-[10px] text-slate-400 font-medium">Status</span>
-              <span class="text-[10px] text-slate-400 font-medium">Condition</span>
-              <span class="text-[10px] text-slate-400 font-medium">Actions</span>
+          <div *ngIf="apiError" class="px-4 py-3 text-xs text-red-600 bg-red-50">{{ apiError }}</div>
+          <div *ngIf="isLoading && !apiError" class="flex items-center justify-center py-16 gap-2 text-slate-400">
+            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+            <span class="text-xs">Loading issue log...</span>
+          </div>
+          <div *ngIf="!isLoading" class="grid grid-cols-5 px-4 py-2 border-b border-slate-100 bg-slate-50">
+            <span class="text-[10px] font-medium text-slate-500">Asset Name</span>
+            <span class="text-[10px] font-medium text-slate-500">Category</span>
+            <span class="text-[10px] font-medium text-slate-500">Issued To</span>
+            <span class="text-[10px] font-medium text-slate-500">Type</span>
+            <span class="text-[10px] font-medium text-slate-500">Issue Date</span>
+          </div>
+          <div *ngIf="!isLoading && issueLog.length === 0" class="flex flex-col items-center justify-center py-16 gap-2 text-slate-400">
+            <span class="text-xs">No issued assets found.</span>
+          </div>
+          <ng-container *ngIf="!isLoading">
+            <div *ngFor="let row of issueLog; let i = index" class="grid grid-cols-5 px-4 py-2.5 border-b border-slate-50 last:border-0 hover:bg-blue-50 transition-colors" [class.bg-white]="i % 2 === 0" [class.bg-slate-50]="i % 2 !== 0">
+              <span class="text-xs font-medium text-slate-800 truncate pr-2">{{ row.assetName }}</span>
+              <span class="text-xs text-slate-500">{{ row.assetCategory }}</span>
+              <span class="text-xs text-slate-700 truncate pr-2">{{ row.receiverName }}</span>
+              <span><span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold" [ngClass]="getReceiverTypeClass(row.receiverType)">{{ row.receiverType }}</span></span>
+              <span class="text-xs text-slate-400">{{ row.issueDate }}</span>
             </div>
-            <!-- Bulk action bar -->
-            <div *ngIf="selectedCount > 0" class="flex items-center gap-3 px-4 py-2 bg-blue-50 border-b border-blue-100">
-              <span class="text-[10px] font-medium text-blue-700">{{ selectedCount }} selected</span>
-              <button class="flex items-center gap-1 h-6 px-2.5 rounded-lg bg-blue-600 text-white text-[10px] font-medium hover:bg-blue-700 transition-colors active:scale-95"
-                (click)="bulkExportSelected()">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-3 h-3">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
-                </svg>
-                Export Selected
-              </button>
-              <button class="text-[10px] text-slate-500 hover:text-slate-700 transition-colors" (click)="clearSelection()">Clear</button>
-            </div>
-            <!-- Empty state -->
-            <div *ngIf="pagedElectricalItems.length === 0" class="flex flex-col items-center justify-center py-12 gap-2 text-slate-400">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" class="w-8 h-8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z"/>
-              </svg>
-              <span class="text-xs">No electrical issue records found.</span>
-            </div>
-            <!-- Rows -->
-            <ng-container *ngFor="let item of pagedElectricalItems; let i = index">
-              <div class="grid elec-cols px-4 py-2.5 border-b border-slate-50 last:border-0 transition-colors hover:bg-blue-50"
-                [class.bg-white]="i % 2 === 0 && !item.selected"
-                [class.bg-slate-50]="i % 2 !== 0 && !item.selected"
-                [class.bg-blue-50]="item.selected">
-                <div class="flex items-center gap-2">
-                  <div class="w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0 cursor-pointer transition-all"
-                    [class.bg-blue-600]="item.selected" [class.border-blue-600]="item.selected" [class.border-slate-300]="!item.selected"
-                    (click)="toggleRow(item); $event.stopPropagation()">
-                    <svg *ngIf="item.selected" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="3" class="w-2.5 h-2.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-                    </svg>
-                  </div>
-                  <div class="flex flex-col gap-0.5">
-                    <span class="text-xs font-medium text-slate-800">{{ item.assetName }}</span>
-                    <span class="text-[10px] text-slate-400">{{ item.assetTag }}</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[9px] font-bold flex-shrink-0">
-                    {{ getInitials(item.issuedTo) }}
-                  </div>
-                  <span class="text-xs text-slate-700 truncate">{{ item.issuedTo }}</span>
-                </div>
-                <span class="text-xs text-slate-600">{{ item.department }}</span>
-                <span class="text-xs text-slate-600">{{ item.dateIssued }}</span>
-                <span class="text-xs text-slate-600">{{ item.dueDate }}</span>
-                <span>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium" [ngClass]="getStatusClass(item.status)">{{ item.status }}</span>
-                </span>
-                <span class="text-xs text-slate-600">{{ item.condition }}</span>
-                <button class="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors">
-                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"/>
-                  </svg>
-                </button>
-              </div>
-            </ng-container>
           </ng-container>
-
-          <!-- â”€â”€ GENERIC TABLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-          <ng-container *ngIf="activeTab !== 'Electrical'">
-            <!-- Header -->
-            <div class="grid generic-cols px-4 py-2 bg-slate-50 border-b border-slate-200">
-              <div class="flex items-center gap-2">
-                <div class="w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0 cursor-pointer transition-all"
-                  [class.bg-blue-600]="allChecked" [class.border-blue-600]="allChecked" [class.border-slate-300]="!allChecked"
-                  (click)="toggleAll()">
-                  <svg *ngIf="allChecked" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="3" class="w-2.5 h-2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-                  </svg>
-                  <svg *ngIf="someChecked && !allChecked" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="3" class="w-2.5 h-2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14"/>
-                  </svg>
-                </div>
-                <span class="text-[10px] text-slate-400 font-medium">Name</span>
-              </div>
-              <span class="text-[10px] text-slate-400 font-medium">Classification</span>
-              <span class="text-[10px] text-slate-400 font-medium">Total</span>
-              <span class="text-[10px] text-slate-400 font-medium">Issue Type</span>
-              <span class="text-[10px] text-slate-400 font-medium">Issued To</span>
-              <span class="text-[10px] text-slate-400 font-medium">Issued Date</span>
-            </div>
-            <!-- Bulk action bar -->
-            <div *ngIf="selectedCount > 0" class="flex items-center gap-3 px-4 py-2 bg-blue-50 border-b border-blue-100">
-              <span class="text-[10px] font-medium text-blue-700">{{ selectedCount }} selected</span>
-              <button class="flex items-center gap-1 h-6 px-2.5 rounded-lg bg-blue-600 text-white text-[10px] font-medium hover:bg-blue-700 transition-colors active:scale-95"
-                (click)="bulkExportSelected()">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-3 h-3">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
-                </svg>
-                Export Selected
-              </button>
-              <button class="text-[10px] text-slate-500 hover:text-slate-700 transition-colors" (click)="clearSelection()">Clear</button>
-            </div>
-            <!-- Empty state -->
-            <div *ngIf="pagedItems.length === 0" class="flex flex-col items-center justify-center py-12 gap-2 text-slate-400">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" class="w-8 h-8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z"/>
-              </svg>
-              <span class="text-xs">No issue records for {{ activeTab }}.</span>
-            </div>
-            <!-- Rows -->
-            <ng-container *ngFor="let item of pagedItems; let i = index">
-              <div class="grid generic-cols px-4 py-2.5 border-b border-slate-50 last:border-0 transition-colors hover:bg-blue-50"
-                [class.bg-white]="i % 2 === 0 && !item.selected"
-                [class.bg-slate-50]="i % 2 !== 0 && !item.selected"
-                [class.bg-blue-50]="item.selected">
-                <div class="flex items-center gap-2">
-                  <div class="w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0 cursor-pointer transition-all"
-                    [class.bg-blue-600]="item.selected" [class.border-blue-600]="item.selected" [class.border-slate-300]="!item.selected"
-                    (click)="toggleRow(item); $event.stopPropagation()">
-                    <svg *ngIf="item.selected" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="3" class="w-2.5 h-2.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-                    </svg>
-                  </div>
-                  <div class="flex flex-col gap-0.5">
-                    <span class="text-xs font-medium text-slate-800">{{ item.name }}</span>
-                    <span class="text-[10px] text-slate-400">{{ item.assetId }}</span>
-                  </div>
-                </div>
-                <span>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-700" [ngClass]="getClassClass(item.classification)">{{ item.classification }}</span>
-                </span>
-                <span class="text-xs text-slate-600">{{ item.total }}</span>
-                <span class="text-xs text-slate-400">{{ item.issueType || 'â€”' }}</span>
-                <span class="text-xs text-slate-400">{{ item.issuedTo || 'â€”' }}</span>
-                <span class="text-xs text-slate-400">{{ item.issuedDate || 'â€”' }}</span>
-              </div>
-            </ng-container>
-          </ng-container>
-
-          <!-- â”€â”€ PAGINATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
-          <div class="flex items-center justify-between px-4 py-2.5 border-t border-slate-100">
-            <button class="flex items-center gap-1.5 h-7 px-3 rounded-lg border border-slate-200 text-[10px] font-medium text-slate-600 hover:border-slate-400 transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-              [disabled]="currentPage === 1" (click)="prevPage()">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-3 h-3">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/>
-              </svg>
-              Previous
-            </button>
+          <div *ngIf="!isLoading && totalPages > 1" class="flex items-center justify-between px-4 py-3 border-t border-slate-100">
+            <span class="text-[10px] text-slate-400">Page {{ currentPage }} of {{ totalPages }} · {{ totalRecords }} total</span>
             <div class="flex items-center gap-1">
-              <button *ngFor="let p of visiblePages"
-                class="w-7 h-7 rounded-lg text-[10px] font-medium transition-colors"
-                [class.bg-slate-100]="p === currentPage"
-                [class.text-slate-800]="p === currentPage"
-                [class.text-slate-400]="p !== currentPage"
-                [class.hover:bg-slate-50]="p !== currentPage && p !== -1"
-                [class.cursor-default]="p === -1"
-                [disabled]="p === -1"
-                (click)="p !== -1 && goToPage(p)">{{ p === -1 ? '...' : p }}</button>
+              <button class="h-7 px-2 rounded-md text-[11px] border border-slate-200 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="currentPage === 1" (click)="prevPage()">‹ Prev</button>
+              <ng-container *ngFor="let p of pageNumbers">
+                <button *ngIf="p !== -1" class="h-7 w-7 rounded-md text-[11px] border" [class.bg-blue-600]="p === currentPage" [class.text-white]="p === currentPage" [class.border-blue-600]="p === currentPage" [class.border-slate-200]="p !== currentPage" [class.text-slate-600]="p !== currentPage" (click)="goToPage(p)">{{ p }}</button>
+                <span *ngIf="p === -1" class="text-slate-400 text-[11px] px-1">…</span>
+              </ng-container>
+              <button class="h-7 px-2 rounded-md text-[11px] border border-slate-200 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="currentPage === totalPages" (click)="nextPage()">Next ›</button>
             </div>
-            <button class="flex items-center gap-1.5 h-7 px-3 rounded-lg border border-slate-200 text-[10px] font-medium text-slate-600 hover:border-slate-400 transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-              [disabled]="currentPage === totalPages" (click)="nextPage()">
-              Next
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-3 h-3">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
-              </svg>
-            </button>
           </div>
-
         </div>
-
-      <footer class="h-6 bg-[#434B57] flex items-center justify-center flex-shrink-0">
-        <span class="text-[10px] text-white">Â© Developed by : Software Development Centre, Kristu Jayanti (Deemed to be University), Bangalore</span>
-      </footer>
+      </div>
+    </div>
   </div>
 </div>

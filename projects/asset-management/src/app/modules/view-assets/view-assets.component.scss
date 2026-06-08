@@ -1,0 +1,34 @@
+// View Assets – Tailwind-first, Mac Mini screen (~1280px)
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+}
+
+// Table column grid
+.table-cols {
+  display: grid;
+  grid-template-columns: 80px 160px 100px 100px 130px 130px 110px 1fr;
+  align-items: center;
+  gap: 0 8px;
+}
+
+// Status badge colours (used via ngClass)
+.status-available   { background: rgba(0,186,43,0.10);  color: #00BA2B; }
+.status-deployed    { background: rgba(87,168,223,0.12); color: #2B7FFF; }
+.status-maintenance { background: rgba(246,204,13,0.12); color: #B08A00; }
+.status-retired     { background: rgba(174,174,174,0.14); color: #888888; }
+
+// Condition dot colours (used via ngClass)
+.condition-good { background: #00BA2B; }
+.condition-fair { background: #F6CC0D; }
+.condition-poor { background: #FF7E86; }
+
+// Row hover – Tailwind's hover:bg-blue-50 handles it, but keep a fallback
+.hover\:bg-blue-50:hover { background-color: #eff6ff; }
+
+// Action button hover – icon stroke colour swap
+.group:hover svg { stroke: white; }

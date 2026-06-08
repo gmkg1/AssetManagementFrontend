@@ -1,0 +1,13 @@
+:host { display: block; width: 100%; height: 100%; font-family: 'Inter', sans-serif; }
+
+.return-cols {
+  display: grid;
+  grid-template-columns: 2fr 1fr 60px 1.5fr 1.5fr 1fr;
+  align-items: center;
+  gap: 0 8px;
+}
+
+.class-asset      { background: #EEF2FF; color: #4338CA; }
+.class-component  { background: #F0FDF4; color: #15803D; }
+.class-consumable { background: #FFF7ED; color: #C2410C; }
+.class-accessory  { background: #FDF4FF; color: #9333EA; }

@@ -1,8 +1,6 @@
 export const environment = {
-  production: true,
-  project: 'asset-management',
-  baseRoute: 'kjusys',
-  local: false,
-  baseUrl: 'https://kjusys.kristujayanti.edu.in/kjusys-api',
-  //apirefreshUrl:'http://kjusys.kristujayanti.edu.in/kjusys-api/authnauthz/refresh-access-token',
+    production: true,
+    apiUrl: 'https://api.wellbeingcentre.com/api/v1',
+    appName: 'Wellbeing Centre',
+    version: '1.0.0'
 };

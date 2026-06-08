@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+
 import { AssetDashboardComponent } from './asset-dashboard.component';
 
 describe('AssetDashboardComponent', () => {
@@ -9,7 +11,10 @@ describe('AssetDashboardComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [AssetDashboardComponent],
-      imports: [RouterTestingModule],
+      imports: [
+        RouterTestingModule,
+        HttpClientTestingModule
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(AssetDashboardComponent);
@@ -25,26 +30,27 @@ describe('AssetDashboardComponent', () => {
     expect(component.departments.length).toBe(6);
   });
 
-  it('should calculate readyDash correctly', () => {
-    const expected = ((component.readyToDeploy / component.totalAssets) * component.circumference).toFixed(2);
-    expect(component.readyDash).toBe(expected);
+  it('should calculate readyDashSmall correctly', () => {
+    const expected =
+      ((component.readyToDeploy / component.totalAssets) *
+        component.circumferenceSmall).toFixed(2);
+
+    expect(component.readyDashSmall).toBe(expected);
   });
 
-  it('should calculate deployedDash correctly', () => {
-    const expected = ((component.deployed / component.totalAssets) * component.circumference).toFixed(2);
-    expect(component.deployedDash).toBe(expected);
+  it('should calculate deployedDashSmall correctly', () => {
+    const expected =
+      ((component.deployed / component.totalAssets) *
+        component.circumferenceSmall).toFixed(2);
+
+    expect(component.deployedDashSmall).toBe(expected);
   });
 
-  it('should toggle assets dropdown', () => {
-    expect(component.assetsDropdownOpen).toBeFalse();
-    component.toggleAssetsDropdown();
-    expect(component.assetsDropdownOpen).toBeTrue();
-    component.toggleAssetsDropdown();
-    expect(component.assetsDropdownOpen).toBeFalse();
-  });
+  it('should close sidebar on document click', () => {
+    component.sidebarOpen = true;
 
-  it('should update activeTab on selectTab', () => {
-    component.selectTab('issues');
-    expect(component.activeTab).toBe('issues');
+    component.onDocumentClick();
+
+    expect(component.sidebarOpen).toBeFalse();
   });
 });
