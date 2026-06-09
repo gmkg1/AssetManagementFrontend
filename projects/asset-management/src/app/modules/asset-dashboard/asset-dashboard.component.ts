@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
 
@@ -105,7 +105,8 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private assetService: AssetService
+    private assetService: AssetService,
+    private cdr :ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -136,6 +137,7 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
           };
         });
         this.totalAssets = this.departments.reduce((sum, d) => sum + d.count, 0);
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Failed to load category counts:', err);
@@ -147,6 +149,7 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
     this.assetService.getIssuedAssets({ page: 1, pageSize: 3 }).subscribe({
       next: (response: any) => {
         const issued: any[] = response?.responseData?.data?.assets ?? [];
+        this.cdr.detectChanges();
         this.issueHistory = issued.slice(0, 3).map(item => ({
           receiverName: item.receiverName ?? 'Unknown',
           department:   item.receiverType ?? '—',
@@ -173,6 +176,7 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
         });
         this.totalAssets = this.readyToDeploy + this.deployed;
         this.isLoading   = false;
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error('Failed to load status summary:', err);
@@ -187,7 +191,8 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
   }
 
   viewMoreIssues(): void {
-    this.router.navigate(['/assets/issue-log']);
+    this.router.navigate(['/kjusys/asset-management/issue-log']);
+    
   }
 
   navigateTo(path: string): void {
@@ -195,8 +200,8 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
   }
 
   navigateToDeptAssets(deptId: string): void {
-    this.router.navigate(['/assets/view'], { queryParams: { category: deptId } });
+    this.router.navigate(['/kjusys/asset-management/view-assets'], { queryParams: { category: deptId } });
   }
 
-  goToIssueLog(): void { this.router.navigate(['/assets/issue-log']); }
+  goToIssueLog(): void { this.router.navigate(['/kjusys/asset-management/issue-log']); }
 }

@@ -131,6 +131,11 @@ import { CustomManifest } from './config';
 import { ManifestResolver } from './manifestResolver';
 import { NavigationComponent } from '../navigation/navigation.component';
 import { AuthGuard } from '@libs/shared-auth';
+import { NgZone } from '@angular/core';
+
+export class RouteZone {
+  static zone: NgZone | null = null;
+}
 
 // One silent retry for transient remoteEntry fetch failures (network blips).
 // Waits 1s before retrying — enough for most transient conditions to resolve
@@ -152,24 +157,34 @@ export function buildRoutes(): Routes {
       if (Array.isArray(value.subModule)) {
         return value.subModule.map((res) => {
           // console.log(`Submodule for ${key}:`, res);
-          return {
+
+          const baseRoute = {
             path: res.subPath,
             loadChildren: () =>
-              withRetry(() =>
-                loadRemoteModule({
-                  type: 'manifest',
-                  remoteName: key,
-                  exposedModule: res.exposedModule,
-                })
-              )
-                .then((m) => {
-                  // console.log(`Loaded module ${res.ngModuleName} from ${key}`);
-                  return m[res.ngModuleName!];
-                })
-                .catch((error) => {
-                  console.error(`Failed to load module ${res.ngModuleName} from ${key}:`, error);
-                  throw error;
-                }),
+              new Promise<any>((resolve, reject) => {
+                withRetry(() =>
+                  loadRemoteModule({
+                    type: 'manifest',
+                    remoteName: key,
+                    exposedModule: res.exposedModule,
+                  })
+                )
+                  .then((m) => {
+                    if (RouteZone.zone) {
+                      RouteZone.zone.run(() => resolve(m[res.ngModuleName!]));
+                    } else {
+                      resolve(m[res.ngModuleName!]);
+                    }
+                  })
+                  .catch((error) => {
+                    console.error(`Failed to load module ${res.ngModuleName} from ${key}:`, error);
+                    if (RouteZone.zone) {
+                      RouteZone.zone.run(() => reject(error));
+                    } else {
+                      reject(error);
+                    }
+                  });
+              }),
             canActivate: [AuthGuard],
             data: {
               breadcrumb: {
@@ -179,13 +194,25 @@ export function buildRoutes(): Routes {
               },
             },
           };
+
+          if (res.subPath.endsWith('edit-asset')) {
+            return [
+              baseRoute,
+              {
+                ...baseRoute,
+                path: `${res.subPath}/:id`,
+              }
+            ];
+          }
+
+          return [baseRoute];
         });
       } else {
         console.log(`subModule is not an array for ${key}:`, value.subModule);
         return [];
       }
     })
-    .flat();
+    .flat(2);
 
   const notFound = [
     {

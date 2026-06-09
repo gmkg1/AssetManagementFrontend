@@ -49,12 +49,12 @@ export class ReturnAssetComponent {
     this.issueDropdownOpen = !this.issueDropdownOpen;
   }
 
-  goToDashboard(): void { this.router.navigate(['/kjusys/asset-dashboard']); }
-  goToViewAssets(): void { this.router.navigate(['/kjusys/view-assets']); }
-  goToIssueAsset(): void { this.router.navigate(['/kjusys/issue-asset']); }
-  goToIssueLog(): void { this.router.navigate(['/kjusys/issue-log']); }
-  goToReturnLog(): void { this.router.navigate(['/kjusys/return-log']); }
-  goToReports(): void { this.router.navigate(['/kjusys/reports']); }
+  goToDashboard(): void { this.router.navigate(['/kjusys/asset-management/asset-dashboard']); }
+  goToViewAssets(): void { this.router.navigate(['/kjusys/asset-management/view-assets']); }
+  goToIssueAsset(): void { this.router.navigate(['/kjusys/asset-management/issue-asset']); }
+  goToIssueLog(): void { this.router.navigate(['/kjusys/asset-management/issue-log']); }
+  goToReturnLog(): void { this.router.navigate(['/kjusys/asset-management/return-log']); }
+  goToReports(): void { this.router.navigate(['/kjusys/asset-management/reports']); }
 
   onIssueSelect(option: IssueOption): void {
     this.selectedIssueId = option.value;
@@ -68,7 +68,7 @@ export class ReturnAssetComponent {
   }
 
   onCancel(): void {
-    this.router.navigate(['/kjusys/return-log']);
+    this.router.navigate(['/kjusys/asset-management/return-log']);
   }
 
   onReturnAsset(): void {
@@ -78,7 +78,7 @@ export class ReturnAssetComponent {
       return;
     }
 
-    this.router.navigate(['/kjusys/return-log']);
+    this.router.navigate(['/kjusys/asset-management/return-log']);
   }
 
   onModuleTabChange(tabId: string): void {

@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
-import { buildRoutes } from './routes';
+import { buildRoutes, RouteZone } from './routes';
 import { ToastrService } from 'ngx-toastr';
 import { loadRemoteModule } from '@angular-architects/module-federation';
 import { SpinnerStateService } from '@libs/shared-auth';
@@ -16,8 +16,11 @@ export class MfeCommonService {
   constructor(
     public router: Router,
     public toastr: ToastrService,
-    private spinnerStateService: SpinnerStateService
-  ) {}
+    private spinnerStateService: SpinnerStateService,
+    private zone: NgZone
+  ) {
+    RouteZone.zone = zone;
+  }
 
   async getManifest(): Promise<any> {
     if (!this.manifest) {

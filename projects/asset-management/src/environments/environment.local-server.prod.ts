@@ -13,8 +13,12 @@ export const environment = {
         'asset-management': 'http://localhost:4205',
     },
     publicPath: 'http://localhost:4200/',
+<<<<<<< HEAD
     baseUrl: 'https://complimentary-shortcuts-artwork-collaboration.trycloudflare.com/api/',
+=======
+    baseUrl: 'https://favour-stable-finals-tee.trycloudflare.com/api/',
+>>>>>>> 56ba250801a1d6d0e321b50b623961903bf64d3e
     project: 'shell',
     baseRoute: 'kjusys',
     local: true,
-  };
+};

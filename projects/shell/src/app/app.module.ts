@@ -1,6 +1,5 @@
 import { APP_INITIALIZER, ErrorHandler, NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { StoreModule } from '@ngrx/store';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
@@ -65,14 +64,11 @@ const routes: Routes = [];
     BrowserModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
-    AppRoutingModule,
     RouterModule.forRoot(APP_ROUTES, {}),
     FormsModule,
     ZXingScannerModule,
-    RouterModule,
     FormlyModule.forRoot({}),
     FormlyBootstrapModule,
-    RouterModule.forChild(routes),
     StoreModule.forRoot(
       {},
       {

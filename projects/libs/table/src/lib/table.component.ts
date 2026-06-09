@@ -151,7 +151,7 @@ export class TableComponent implements OnInit, OnChanges {
   @Input() pagination: PaginationConfig = {
     currentPage: 1,
     totalPages: 1,
-    itemsPerPage: 10,
+    itemsPerPage: 8,
     totalItems: 0,
   };
 

@@ -39,7 +39,7 @@
           <div *ngIf="modulesList.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div *ngFor="let mod of modulesList"
               class="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-md border border-gray-100 hover:border-blue-500/30 transition-all duration-300 flex flex-col justify-between cursor-pointer"
-              [routerLink]="[mod.firstSubPath]">
+              [routerLink]="'/kjusys/' + mod.firstSubPath">
               <div>
                 <div
                   class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm">
