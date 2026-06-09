@@ -20,6 +20,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Ensure page content is scrollable past the footer bar (~24px) on all module pages */
+.flex-1.p-4 {
+  padding-bottom: 4rem !important;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: #f5f5f4; }

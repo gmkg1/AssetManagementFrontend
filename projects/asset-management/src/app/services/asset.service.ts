@@ -149,4 +149,25 @@ export class AssetService {
     const params = new HttpParams().set('page', page.toString()).set('size', size.toString());
     return this.http.get<any>(`${this.baseUrl}/asset-status-summary`, { params });
   }
+
+  getAssetTags() {
+    return this.http.get<any>(`${this.baseUrl}/asset-tags-list`);
+  }
+
+  createAsset(payload: any) {
+    return this.http.post<any>(`${this.baseUrl}/create-asset`, payload);
+  }
+
+  createAssetTag(payload: any) {
+    return this.http.post<any>(`${this.baseUrl}/create-asset-tag`, payload);
+  }
+
+  getAssetDetails(id: string) {
+    const params = new HttpParams().set('id', id);
+    return this.http.get<any>(`${this.baseUrl}/asset-details`, { params });
+  }
+
+  updateAsset(payload: any) {
+    return this.http.put<any>(`${this.baseUrl}/edit-asset`, payload);
+  }
 }

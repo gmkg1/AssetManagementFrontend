@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, NgZone } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd, NavigationStart } from '@angular/router';
 // import { LeftMenuLibService } from '@libs/left-menu-lib';
 // import { MenuHeaderLibService } from '@libs/menu-header-lib';
@@ -53,6 +53,7 @@ export class AppComponent {
         private spinner: NgxSpinnerService,
         private versionCheckService: VersionCheckService,
         private toastr: ToastrService,
+        private zone: NgZone,
     ) { }
     async ngOnInit(): Promise<void> {
         this.spinner.show();
@@ -65,11 +66,13 @@ export class AppComponent {
         this.router.events
             .pipe(filter(event => event instanceof NavigationStart))
             .subscribe(() => {
-                const now = Date.now();
-                if (now - this.lastVersionCheck > this.VERSION_CHECK_INTERVAL_MS) {
-                    this.lastVersionCheck = now;
-                    this.versionCheckService.reloadIfNewVersion();
-                }
+                this.zone.run(() => {
+                    const now = Date.now();
+                    if (now - this.lastVersionCheck > this.VERSION_CHECK_INTERVAL_MS) {
+                        this.lastVersionCheck = now;
+                        this.versionCheckService.reloadIfNewVersion();
+                    }
+                });
             });
 
         this.router.events
@@ -93,26 +96,28 @@ export class AppComponent {
                 })
             )
             .subscribe((data: any) => {
-                this.spinner.hide();
-                this.menuHeaderLibService.breadcrumbs = data;
-                this.leftMenuLibService.breadcrumbs = data;
-                const state = history.state;
-                if (!data.submenu && state?.back) {
-                    setTimeout(() => {
-                        const element = this.el.nativeElement;
-                        const activeMenuItem = element.querySelector('.side-menu>li>a.active');
-                        if (activeMenuItem) {
-                            const scrollContainer = element.querySelector('ul.side-menu.show');
-                            const activeMenuItemTop =
-                                activeMenuItem.getBoundingClientRect().top -
-                                scrollContainer.getBoundingClientRect().top;
-                            scrollContainer.scrollTop = activeMenuItemTop - 100;
-                        }
-                    }, 100);
-                    delete this.router.getCurrentNavigation()?.extras.state;
-                } else {
-                    //this.menuHeaderLibService.breadcrumbs = data;
-                }
+                this.zone.run(() => {
+                    this.spinner.hide();
+                    this.menuHeaderLibService.breadcrumbs = data;
+                    this.leftMenuLibService.breadcrumbs = data;
+                    const state = history.state;
+                    if (!data.submenu && state?.back) {
+                        setTimeout(() => {
+                            const element = this.el.nativeElement;
+                            const activeMenuItem = element.querySelector('.side-menu>li>a.active');
+                            if (activeMenuItem) {
+                                const scrollContainer = element.querySelector('ul.side-menu.show');
+                                const activeMenuItemTop =
+                                    activeMenuItem.getBoundingClientRect().top -
+                                    scrollContainer.getBoundingClientRect().top;
+                                scrollContainer.scrollTop = activeMenuItemTop - 100;
+                            }
+                        }, 100);
+                        delete this.router.getCurrentNavigation()?.extras.state;
+                    } else {
+                        //this.menuHeaderLibService.breadcrumbs = data;
+                    }
+                });
             });
             // this.authService.setupIdleTimeout();
     }

@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
 
@@ -12,7 +12,7 @@ export interface IssueRecord {
 
 type OptionItem = { _id: string; label: string };
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 8;
 
 @Component({
   selector: 'app-issue-asset',
@@ -98,7 +98,8 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
     private hostElement: ElementRef<HTMLElement>,
     private router: Router,
     private route: ActivatedRoute,
-    private assetService: AssetService
+    private assetService: AssetService,
+    private cdr : ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -151,7 +152,7 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
     this.isLoadingLog = true;
     this.logError = null;
 
-    this.assetService.getIssuedAssets({ page: this.currentPage, pageSize: PAGE_SIZE }).subscribe({
+    this.assetService.getIssuedAssets({ page: this.currentPage, pageSize: 3 }).subscribe({
       next: (response: any) => {
         const data = response?.responseData?.data ?? {};
         const raw: any[] = data.assets ?? [];
@@ -171,11 +172,13 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
         }));
 
         this.isLoadingLog = false;
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error('Failed to load issue log:', err);
         this.logError = 'Could not load issue log from server.';
         this.isLoadingLog = false;
+        
       },
     });
   }
@@ -252,12 +255,12 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
     this.assetDropdownOpen = false;
   }
 
-  goBack(): void { this.router.navigate(['/assets/view']); }
-  goToDashboard(): void { this.router.navigate(['/']); }
-  goToViewAssets(): void { this.router.navigate(['/assets/view']); }
-  goToIssueLog(): void { this.router.navigate(['/assets/issue-log']); }
-  goToReturnLog(): void { this.router.navigate(['/assets/return-log']); }
-  goToReports(): void { this.router.navigate(['/assets/reports']); }
+  goBack(): void { this.router.navigate(['/kjusys/asset-management/view-assets']); }
+  goToDashboard(): void { this.router.navigate(['/kjusys/asset-management/asset-dashboard']); }
+  goToViewAssets(): void { this.router.navigate(['/kjusys/asset-management/view-assets']); }
+  goToIssueLog(): void { this.router.navigate(['/kjusys/asset-management/issue-log']); }
+  goToReturnLog(): void { this.router.navigate(['/kjusys/asset-management/return-log']); }
+  goToReports(): void { this.router.navigate(['/kjusys/asset-management/reports']); }
 
   onSubmit(): void {
     this.submitted = true;

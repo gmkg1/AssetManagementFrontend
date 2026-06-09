@@ -1,41 +1,50 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AssetService } from '../../services/asset.service';
 
 @Component({
   selector: 'app-create-asset-tag',
   templateUrl: './create-asset-tag.component.html',
   styleUrls: ['./create-asset-tag.component.css'],
 })
-export class CreateAssetTagComponent {
+export class CreateAssetTagComponent implements OnInit {
 
-  // â”€â”€ Form fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Form fields
   category      = '';
-  assetTypeName = '';
+  categoryName  = '';
+  assetTagName  = '';
   displayId     = '';
   classification = '';
   assetImageFile: File | null = null;
   assetImagePreview: string | null = null;
 
-  // â”€â”€ Dropdown options â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  categories      = ['IT â€“ Information Technology', 'Electricals', 'Sound', 'Stationery', 'Housekeeping', 'Furniture'];
-  assetTypeNames  = ['Mouse', 'Keyboard', 'Monitor', 'Laptop', 'Printer', 'Scanner', 'Projector'];
+  // Dropdown options
+  categories      : any[] = [];
   displayIds      = ['MSE', 'KBD', 'MON', 'LPT', 'PRN', 'SCN', 'PRJ'];
   classifications = ['Returnable', 'Non-Returnable', 'Consumable'];
 
-  // â”€â”€ Dropdown open states â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Dropdown open states
   catOpen    = false;
   typeOpen   = false;
   dispOpen   = false;
   classOpen  = false;
 
-  // â”€â”€ UI state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
+  // UI state
   showSuccess  = false;
   isLoading    = false;
   errorMessage = '';
   isDragOver   = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private assetService: AssetService) {}
+
+  ngOnInit(): void {
+    this.assetService.getCategories().subscribe({
+      next: (res: any) => {
+        const rows = res?.responseData?.data?.assets ?? [];
+        this.categories = rows.map((r: any) => ({ id: r.categoryId, name: r.categoryName }));
+      }
+    });
+  }
 
   @HostListener('document:click')
   onDocumentClick(): void {
@@ -65,13 +74,18 @@ export class CreateAssetTagComponent {
     if (name === 'class') this.classOpen = !wasOpen;
   }
 
-  selectOption(field: 'category' | 'assetTypeName' | 'displayId' | 'classification', value: string, event: Event): void {
+  selectOption(field: 'category' | 'assetTagName' | 'displayId' | 'classification', value: any, event: Event): void {
     event.stopPropagation();
-    (this as any)[field] = value;
+    if (field === 'category') {
+      this.category = value.id;
+      this.categoryName = value.name;
+    } else {
+      (this as any)[field] = value;
+    }
     this.closeAllDropdowns();
   }
 
-  // â”€â”€ Image upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Image upload
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
@@ -113,19 +127,19 @@ export class CreateAssetTagComponent {
     this.assetImagePreview = null;
   }
 
-  // â”€â”€ Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  goBack(): void         { this.router.navigate(['/kjusys/view-assets']); }
-  goToDashboard(): void  { this.router.navigate(['/kjusys/asset-dashboard']); }
-  goToIssueAsset(): void { this.router.navigate(['/kjusys/issue-asset']); }
-  goToIssueLog(): void   { this.router.navigate(['/kjusys/issue-log']); }
-  goToReturnLog(): void  { this.router.navigate(['/kjusys/return-log']); }
-  goToReports(): void    { this.router.navigate(['/kjusys/reports']); }
+  // Navigation
+  goBack(): void         { this.router.navigate(['/kjusys/asset-management/create-asset']); }
+  goToDashboard(): void  { this.router.navigate(['/kjusys/asset-management/asset-dashboard']); }
+  goToIssueAsset(): void { this.router.navigate(['/kjusys/asset-management/issue-asset']); }
+  goToIssueLog(): void   { this.router.navigate(['/kjusys/asset-management/issue-log']); }
+  goToReturnLog(): void  { this.router.navigate(['/kjusys/asset-management/return-log']); }
+  goToReports(): void    { this.router.navigate(['/kjusys/asset-management/reports']); }
 
-  // â”€â”€ Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Submit
   onSubmit(): void {
     this.errorMessage = '';
 
-    if (!this.category || !this.assetTypeName || !this.displayId || !this.classification) {
+    if (!this.category || !this.assetTagName || !this.displayId || !this.classification) {
       this.errorMessage = 'Please fill in all required fields.';
       return;
     }
@@ -134,25 +148,30 @@ export class CreateAssetTagComponent {
 
     const payload = {
       category:       this.category,
-      assetTypeName:  this.assetTypeName,
-      displayId:      this.displayId,
+      assetTagName:   this.assetTagName.trim(),
+      displayId:      this.displayId.trim(),
       classification: this.classification,
-      assetImage:     this.assetImageFile?.name ?? null,
     };
 
     console.log('Create Asset Tag payload:', payload);
 
-    // TODO: replace with real API call via AssetService
-    setTimeout(() => {
-      this.isLoading   = false;
-      this.showSuccess = true;
-    }, 600);
+    this.assetService.createAssetTag(payload).subscribe({
+      next: (res: any) => {
+        this.isLoading   = false;
+        this.showSuccess = true;
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        this.errorMessage = err?.error?.responseData?.errors?.[0] || err?.error?.error || 'Failed to create asset tag.';
+      }
+    });
   }
 
   createAnother(): void {
     this.showSuccess       = false;
     this.category          = '';
-    this.assetTypeName     = '';
+    this.categoryName      = '';
+    this.assetTagName      = '';
     this.displayId         = '';
     this.classification    = '';
     this.assetImageFile    = null;

@@ -30,7 +30,7 @@
                 style="height: 34px; border: 1px solid #DFE2E6; border-radius: 6.74px;"
                 (click)="toggleDropdown('cat', $event)">
                 <span style="font-size: 12px;" [style.color]="category ? '#243757' : '#98A1B0'">
-                  {{ category || 'Select category' }}
+                  {{ categoryName || 'Select category' }}
                 </span>
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-3 h-3 flex-shrink-0 transition-transform" [class.rotate-180]="catOpen" style="color: #8993A4;">
                   <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
@@ -40,31 +40,17 @@
                 <button *ngFor="let c of categories"
                   class="block w-full text-left px-3 py-2 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                   style="font-size: 12px; color: #243757;"
-                  [class.bg-blue-50]="category === c" [class.text-blue-600]="category === c"
-                  (click)="selectOption('category', c, $event)">{{ c }}</button>
+                  [class.bg-blue-50]="category === c.id" [class.text-blue-600]="category === c.id"
+                  (click)="selectOption('category', c, $event)">{{ c.name }}</button>
               </div>
             </div>
 
-            <!-- Asset Type Name -->
-            <div class="flex flex-col gap-1 relative" (click)="$event.stopPropagation()">
-              <label class="font-medium" style="font-size: 12px; color: #243757;">Asset Type Name</label>
-              <div class="px-3 flex items-center justify-between cursor-pointer bg-white transition-colors"
-                style="height: 34px; border: 1px solid #DFE2E6; border-radius: 6.74px;"
-                (click)="toggleDropdown('type', $event)">
-                <span style="font-size: 12px;" [style.color]="assetTypeName ? '#243757' : '#98A1B0'">
-                  {{ assetTypeName || 'Select asset type' }}
-                </span>
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-3 h-3 flex-shrink-0 transition-transform" [class.rotate-180]="typeOpen" style="color: #8993A4;">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
-                </svg>
-              </div>
-              <div *ngIf="typeOpen" class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 overflow-hidden">
-                <button *ngFor="let t of assetTypeNames"
-                  class="block w-full text-left px-3 py-2 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                  style="font-size: 12px; color: #243757;"
-                  [class.bg-blue-50]="assetTypeName === t" [class.text-blue-600]="assetTypeName === t"
-                  (click)="selectOption('assetTypeName', t, $event)">{{ t }}</button>
-              </div>
+            <!-- Asset Tag Name -->
+            <div class="flex flex-col gap-1">
+              <label class="font-medium" style="font-size: 12px; color: #243757;">Asset Tag Name</label>
+              <input type="text" [(ngModel)]="assetTagName" placeholder="e.g. KBD-IT-001"
+                class="px-3 h-8 border border-slate-200 rounded-lg text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors placeholder:text-slate-400"
+                style="border-radius: 6.74px; border: 1px solid #DFE2E6;"/>
             </div>
 
             <!-- Display ID -->
@@ -208,7 +194,7 @@
           </div>
           <h2 class="font-bold mb-1" style="font-size: 14px; color: #091E42;">Asset Tag Created</h2>
           <p class="mb-5" style="font-size: 11px; color: #7A8699;">
-            <strong style="color: #243757;">{{ assetTypeName }}</strong> tag has been created successfully.
+            <strong style="color: #243757;">{{ assetTagName }}</strong> tag has been created successfully.
           </p>
           <div class="flex gap-2 w-full">
             <button class="flex-1 h-8 rounded-lg border border-slate-200 font-medium hover:border-slate-400 transition-all active:scale-95" style="font-size: 12px; color: #42526D;" (click)="createAnother()">Create Another</button>

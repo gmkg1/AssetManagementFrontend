@@ -110,7 +110,7 @@ export const APP_ROUTES: Routes = [
             }),
       },
       {
-        path: 'edit-asset',
+        path: 'edit-asset/:id',
         loadChildren: () =>
           import('./modules/edit-asset/edit-asset.module')
             .then((m) => m.EditAssetModule)
