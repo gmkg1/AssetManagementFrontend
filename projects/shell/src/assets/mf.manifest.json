@@ -73,6 +73,20 @@
         "subPath": "asset-management/edit-asset",
         "ngModuleName": "EditAssetModule",
         "pinned": false
+      },
+      {
+        "exposedModule": "./EditAssetTagModule",
+        "displayName": "Edit Asset Tag",
+        "subPath": "asset-management/edit-asset-tag",
+        "ngModuleName": "EditAssetTagModule",
+        "pinned": false
+      },
+      {
+        "exposedModule": "./ViewAssetTagModule",
+        "displayName": "View Asset Tag",
+        "subPath": "asset-management/view-asset-tag",
+        "ngModuleName": "ViewAssetTagModule",
+        "pinned": false
       }
     ]
   }

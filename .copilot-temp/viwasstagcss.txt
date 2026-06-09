@@ -1,0 +1,2880 @@
+/* Group 237769 */
+
+position: absolute;
+width: 1280px;
+height: 832px;
+left: 4314px;
+top: 4161px;
+
+
+
+/* Group 237692 */
+
+position: absolute;
+width: 1280px;
+height: 832px;
+left: 4314px;
+top: 4161px;
+
+
+
+/* Group 237690 */
+
+position: absolute;
+width: 1280px;
+height: 832px;
+left: 4314px;
+top: 4161px;
+
+
+
+/* Landing */
+
+position: absolute;
+width: 1280px;
+height: 832px;
+left: 4314px;
+top: 4161px;
+
+background: #F5F5F5;
+
+
+/* Sidebar/Yes */
+
+position: absolute;
+width: 92px;
+height: 790px;
+left: 0px;
+top: 42px;
+
+background: #FFFFFF;
+box-shadow: 0px 19.5339px 53.7181px rgba(0, 0, 0, 0.07);
+border-radius: 0px;
+
+
+/* Upgrade */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 0px 29.3008px;
+gap: 12.21px;
+
+position: absolute;
+visibility: hidden;
+width: 341.84px;
+height: 269.81px;
+left: 0px;
+top: 814.32px;
+
+
+
+/* Main */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 29.3px;
+
+position: absolute;
+width: 92.79px;
+height: 996.23px;
+left: 0px;
+top: 30.83px;
+
+
+
+/* Nav */
+
+width: 92.79px;
+height: 288.12px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Nav item 1 */
+
+position: absolute;
+width: 48.45px;
+height: 48.45px;
+left: 22.02px;
+top: 2.94px;
+
+background: #000000;
+border-radius: 5.87252px;
+
+
+/* Inner */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+gap: 14.65px;
+isolation: isolate;
+
+position: absolute;
+width: 24.42px;
+height: 24.42px;
+left: 11.71px;
+top: 11.71px;
+
+
+
+/* Icon  */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+gap: 12.21px;
+
+width: 24.42px;
+height: 24.42px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+z-index: 0;
+
+
+/* Icon */
+
+width: 24.42px;
+height: 24.42px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon */
+
+position: absolute;
+left: 16.67%;
+right: 16.67%;
+top: 16.67%;
+bottom: 16.67%;
+
+border: 1.8313px solid #FFFFFF;
+
+
+/* Badge */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 4.88346px;
+gap: 12.21px;
+
+position: absolute;
+display: none;
+width: 7.33px;
+height: 7.33px;
+left: 0px;
+top: 17.09px;
+
+background: #F97316;
+border: 1.22087px solid #FFFFFF;
+border-radius: 120.866px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+z-index: 1;
+
+
+/* Nav item 2 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 14.6504px;
+gap: 14.65px;
+
+position: absolute;
+width: 53.72px;
+height: 53.72px;
+left: 19.53px;
+top: 58.6px;
+
+border-radius: 120.866px;
+
+
+/* Inner */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+gap: 14.65px;
+isolation: isolate;
+
+width: 24.42px;
+height: 24.42px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon  */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+gap: 12.21px;
+
+width: 24.42px;
+height: 24.42px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+z-index: 0;
+
+
+/* Icon */
+
+width: 24.42px;
+height: 24.42px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon */
+
+position: absolute;
+left: 16.67%;
+right: 16.67%;
+top: 16.67%;
+bottom: 16.67%;
+
+border: 1.8313px solid #64748B;
+
+
+/* Badge */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 4.88346px;
+gap: 12.21px;
+
+position: absolute;
+display: none;
+width: 7.33px;
+height: 7.33px;
+left: 0px;
+top: 17.09px;
+
+background: #F97316;
+border: 1.22087px solid #FFFFFF;
+border-radius: 120.866px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+z-index: 1;
+
+
+/* Nav item 3 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 14.6504px;
+gap: 14.65px;
+
+position: absolute;
+width: 53.72px;
+height: 53.72px;
+left: 19.53px;
+top: 117.2px;
+
+border-radius: 120.866px;
+
+
+/* Inner */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+gap: 14.65px;
+isolation: isolate;
+
+width: 24.42px;
+height: 24.42px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon  */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+gap: 12.21px;
+
+width: 24.42px;
+height: 24.42px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+z-index: 0;
+
+
+/* Icon */
+
+width: 24.42px;
+height: 24.42px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 12.5%;
+bottom: 12.5%;
+
+border: 1.8313px solid #64748B;
+
+
+/* Badge */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 4.88346px;
+gap: 12.21px;
+
+position: absolute;
+display: none;
+width: 7.33px;
+height: 7.33px;
+left: 0px;
+top: 17.09px;
+
+background: #F97316;
+border: 1.22087px solid #FFFFFF;
+border-radius: 120.866px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+z-index: 1;
+
+
+/* Nav item 6 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 14.6504px;
+gap: 14.65px;
+
+position: absolute;
+width: 53.72px;
+height: 53.72px;
+left: 19.53px;
+top: 175.8px;
+
+border-radius: 120.866px;
+
+
+/* Inner */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+gap: 14.65px;
+isolation: isolate;
+
+width: 24.42px;
+height: 24.42px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon  */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+gap: 12.21px;
+
+width: 24.42px;
+height: 24.42px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+z-index: 0;
+
+
+/* Icon */
+
+width: 24.42px;
+height: 24.42px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 12.5%;
+bottom: 12.5%;
+
+border: 1.8313px solid #64748B;
+
+
+/* Badge */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 4.88346px;
+gap: 12.21px;
+
+position: absolute;
+display: none;
+width: 7.33px;
+height: 7.33px;
+left: 0px;
+top: 17.09px;
+
+background: #F97316;
+border: 1.22087px solid #FFFFFF;
+border-radius: 120.866px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+z-index: 1;
+
+
+/* Nav item 5 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 14.6504px;
+gap: 14.65px;
+
+position: absolute;
+width: 53.72px;
+height: 53.72px;
+left: 19.53px;
+top: 234.41px;
+
+border-radius: 120.866px;
+
+
+/* Inner */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+gap: 14.65px;
+isolation: isolate;
+
+width: 24.42px;
+height: 24.42px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon  */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+gap: 12.21px;
+
+width: 24.42px;
+height: 24.42px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+z-index: 0;
+
+
+/* Icon */
+
+width: 24.42px;
+height: 24.42px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 16.67%;
+bottom: 12.5%;
+
+border: 1.8313px solid #64748B;
+
+
+/* Badge */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 4.88346px;
+gap: 12.21px;
+
+position: absolute;
+display: none;
+width: 7.33px;
+height: 7.33px;
+left: 0px;
+top: 17.09px;
+
+background: #F97316;
+border: 1.22087px solid #FFFFFF;
+border-radius: 120.866px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+z-index: 1;
+
+
+/* Group 237685 */
+
+position: absolute;
+width: 1113px;
+height: 634px;
+left: 122px;
+top: 132px;
+
+
+
+/* Checkbox group item */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 759px;
+height: 632px;
+left: 122px;
+top: 134px;
+
+/* Base/White */
+background: #FFFFFF;
+/* Foundation/Blue/B30 */
+border: 0.99115px solid #F0F2F5;
+box-shadow: 0px 3.9646px 0px rgba(0, 0, 0, 0.02);
+border-radius: 7.9292px;
+
+
+/* Frame 25 */
+
+position: absolute;
+width: 522.42px;
+height: 74.3px;
+left: 11px;
+top: 0px;
+
+
+
+/* Header  */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 7.74px;
+
+position: absolute;
+width: 482.94px;
+height: 39.74px;
+left: 7.74px;
+top: 17.8px;
+
+
+
+/* -- */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 7.74px;
+
+width: 86px;
+height: 18px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Frame 77 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 0px;
+gap: 6.19px;
+
+display: none;
+width: 72.75px;
+height: 13.93px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Shape */
+
+width: 5.42px;
+height: 9.63px;
+
+/* Gray/500 */
+background: #81899E;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Martha Craig */
+
+width: 62px;
+height: 14px;
+
+font-family: 'DM Sans';
+font-style: normal;
+font-weight: 400;
+font-size: 10.8353px;
+line-height: 14px;
+
+/* Foundation /Blue/B100 */
+color: #7A8699;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* MSE -IT-001 */
+
+width: 86px;
+height: 18px;
+
+font-family: 'DM Sans';
+font-style: normal;
+font-weight: 900;
+font-size: 14px;
+line-height: 18px;
+display: flex;
+align-items: center;
+
+color: #091E42;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Logitech Mouse */
+
+width: 503.84px;
+height: 14px;
+
+font-family: 'DM Sans';
+font-style: normal;
+font-weight: 400;
+font-size: 10.8353px;
+line-height: 14px;
+display: flex;
+align-items: center;
+
+color: #7A8699;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Buttons */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 6.19px;
+
+position: absolute;
+visibility: hidden;
+width: 223.67px;
+height: 34.05px;
+left: 667.14px;
+top: 27.86px;
+
+
+
+/* Actions */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 9.29px;
+
+width: 135.44px;
+height: 34.05px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Button 04 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+
+display: none;
+width: 65.79px;
+height: 30.96px;
+
+border-radius: 6.1916px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Button 03 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+
+display: none;
+width: 81.26px;
+height: 30.96px;
+
+border-radius: 6.1916px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Button 02 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+
+width: 135.44px;
+height: 37.15px;
+
+border-radius: 10.8353px;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* _Button base */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 7.7395px 12.3832px;
+gap: 6.19px;
+
+width: 135.44px;
+height: 37.15px;
+
+/* Base/White */
+background: #FFFFFF;
+/* Gray/300 */
+border: 0.77395px solid #D0D5DD;
+box-shadow: 0px 0.77395px 1.5479px rgba(16, 24, 40, 0.05);
+border-radius: 23.9924px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* plus */
+
+width: 15.48px;
+height: 15.48px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Text */
+
+width: 89px;
+height: 14px;
+
+font-family: 'DM Sans';
+font-style: normal;
+font-weight: 400;
+font-size: 10.8353px;
+line-height: 14px;
+
+/* Foundation /Blue/B500 */
+color: #42526D;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* _Button Medium */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px 6.1916px 6.1916px;
+gap: 6.19px;
+
+width: 106.03px;
+height: 34.05px;
+
+/* Foundation /Blue/B900 */
+background: #091E42;
+border-radius: 26.3143px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Vector 1 */
+
+position: absolute;
+width: 703px;
+height: 0px;
+left: 18px;
+top: 74px;
+
+/* Foundation/Blue/B30 */
+border: 0.99115px solid #F0F2F5;
+
+
+/* Badge */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px 10px 0px 0px;
+
+position: absolute;
+width: 106px;
+height: 24px;
+left: 625px;
+top: 341px;
+
+mix-blend-mode: multiply;
+
+
+/* Group 237679 */
+
+position: absolute;
+width: 288px;
+height: 20px;
+left: 50px;
+top: 181px;
+
+
+
+/* Asset Type Name */
+
+position: absolute;
+width: 118px;
+height: 20px;
+left: 50px;
+top: 181px;
+
+/* Body 2/Medium */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+
+/* Grey/grey-400 */
+color: #858D9D;
+
+
+
+/* Mouse */
+
+position: absolute;
+width: 46px;
+height: 20px;
+left: 292px;
+top: 181px;
+
+/* Body 2/Medium */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+
+/* Grey/grey-600 */
+color: #5D6679;
+
+
+
+/* Group 237680 */
+
+position: absolute;
+width: 273px;
+height: 20px;
+left: 50px;
+top: 259px;
+
+
+
+/* Display ID */
+
+position: absolute;
+width: 67px;
+height: 20px;
+left: 50px;
+top: 259px;
+
+/* Body 2/Medium */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+
+/* Grey/grey-400 */
+color: #858D9D;
+
+
+
+/* MSE */
+
+position: absolute;
+width: 31px;
+height: 20px;
+left: 292px;
+top: 259px;
+
+/* Body 2/Medium */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+
+/* Grey/grey-600 */
+color: #5D6679;
+
+
+
+/* Group 237681 */
+
+position: absolute;
+width: 255px;
+height: 20px;
+left: 50px;
+top: 338px;
+
+
+
+/* Category */
+
+position: absolute;
+width: 63px;
+height: 20px;
+left: 50px;
+top: 338px;
+
+/* Body 2/Medium */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+
+/* Grey/grey-400 */
+color: #858D9D;
+
+
+
+/* IT */
+
+position: absolute;
+width: 13px;
+height: 20px;
+left: 292px;
+top: 338px;
+
+/* Body 2/Medium */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+
+/* Grey/grey-600 */
+color: #5D6679;
+
+
+
+/* Group 237682 */
+
+position: absolute;
+width: 315px;
+height: 20px;
+left: 50px;
+top: 417px;
+
+
+
+/* Classification */
+
+position: absolute;
+width: 91px;
+height: 20px;
+left: 50px;
+top: 417px;
+
+/* Body 2/Medium */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+
+/* Grey/grey-400 */
+color: #858D9D;
+
+
+
+/* Returnable */
+
+position: absolute;
+width: 73px;
+height: 20px;
+left: 292px;
+top: 417px;
+
+/* Body 2/Medium */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+
+/* Grey/grey-600 */
+color: #5D6679;
+
+
+
+/* Group 237683 */
+
+position: absolute;
+width: 322px;
+height: 20px;
+left: 50px;
+top: 102px;
+
+
+
+/* Generated Asset Tag */
+
+position: absolute;
+width: 141px;
+height: 20px;
+left: 50px;
+top: 102px;
+
+/* Body 2/Medium */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+
+/* Grey/grey-400 */
+color: #858D9D;
+
+
+
+/* MSE-IT-001 */
+
+position: absolute;
+width: 80px;
+height: 20px;
+left: 292px;
+top: 102px;
+
+/* Body 2/Medium */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+
+/* Grey/grey-600 */
+color: #5D6679;
+
+
+
+/* Ellipse 62 */
+
+position: absolute;
+width: 23px;
+height: 23px;
+left: 607px;
+top: 25px;
+
+/* Iris/100 */
+background: #5D5FEF;
+opacity: 0.1;
+
+
+/* edit */
+
+position: absolute;
+width: 23px;
+height: 23px;
+left: 703px;
+top: 25px;
+
+
+
+/* Ellipse 61 */
+
+position: absolute;
+width: 23px;
+height: 23px;
+left: 703px;
+top: 25px;
+
+background: #EFBE5D;
+opacity: 0.1;
+
+
+/* fi-ss-copy-alt */
+
+position: absolute;
+width: 12px;
+height: 12px;
+left: 708px;
+top: 30px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.33%;
+top: 0%;
+bottom: 0%;
+
+background: #E7A500;
+
+
+/* Edit */
+
+position: absolute;
+width: nanpx;
+height: nanpx;
+left: 714.93px;
+top: 38.87px;
+
+
+
+/* Edit */
+
+position: absolute;
+left: inf%;
+right: nan%;
+top: inf%;
+bottom: nan%;
+
+/* Iris/100 */
+background: #5D5FEF;
+transform: matrix(nan, nan, nan, nan, -nan, -nan);
+
+
+/* delete */
+
+position: absolute;
+width: 23px;
+height: 23px;
+left: 655px;
+top: 25px;
+
+
+
+/* Group 237643 */
+
+position: absolute;
+width: 23px;
+height: 23px;
+left: 655px;
+top: 25px;
+
+
+
+/* Ellipse 62 */
+
+position: absolute;
+width: 23px;
+height: 23px;
+left: 655px;
+top: 25px;
+
+background: #FF0000;
+opacity: 0.05;
+
+
+/* Delete */
+
+position: absolute;
+width: 12px;
+height: 12px;
+left: 660px;
+top: 30px;
+
+
+
+/* Delete */
+
+position: absolute;
+left: 86.96%;
+right: 11.46%;
+top: 4.75%;
+bottom: 93.35%;
+
+background: #FF0000;
+
+
+/* Fill 1 */
+
+position: absolute;
+left: 87.08%;
+right: 11.58%;
+top: 5.38%;
+bottom: 93.35%;
+
+background: #230B34;
+
+
+/* Fill 3 */
+
+position: absolute;
+left: 86.96%;
+right: 11.46%;
+top: 4.75%;
+bottom: 94.77%;
+
+background: #230B34;
+
+
+/* Edit */
+
+position: absolute;
+left: 80.76%;
+right: 17.65%;
+top: 4.75%;
+bottom: 93.35%;
+
+/* Iris/100 */
+background: #5D5FEF;
+
+
+/* Fill 1 */
+
+position: absolute;
+left: 81.67%;
+right: 17.65%;
+top: 6.43%;
+bottom: 93.35%;
+
+background: #230B34;
+
+
+/* Fill 3 */
+
+position: absolute;
+left: 80.76%;
+right: 17.86%;
+top: 4.75%;
+bottom: 93.37%;
+
+background: #230B34;
+
+
+/* Frame 47 */
+
+position: absolute;
+width: 310px;
+height: 632px;
+left: 925px;
+top: 132px;
+
+background: #FFFFFF;
+border-radius: 6.30258px;
+
+
+/* productImages */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 6.3px;
+
+position: absolute;
+width: 288px;
+height: 159px;
+left: 10px;
+top: 11px;
+
+
+
+/* Upload Image */
+
+box-sizing: border-box;
+
+width: 288px;
+height: 159px;
+
+/* White */
+background: #FFFFFF;
+/* Grey */
+border: 0.525215px solid #E1E2E9;
+border-radius: 6.30258px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* delete */
+
+position: absolute;
+width: 16.81px;
+height: 16.81px;
+left: 245px;
+top: 8px;
+
+background: #EDEDED;
+border-radius: 4.20172px;
+
+
+/* fi:upload-cloud */
+
+position: absolute;
+width: 10.5px;
+height: 10.5px;
+left: 3.15px;
+top: 3.15px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 50%;
+bottom: 33.33%;
+
+/* Black/100 */
+border: 1.05043px solid #1C1D22;
+
+
+/* Vector */
+
+position: absolute;
+left: 50%;
+right: 50%;
+top: 50%;
+bottom: 12.5%;
+
+/* Black/100 */
+border: 1.05043px solid #1C1D22;
+
+
+/* Vector */
+
+position: absolute;
+left: 4.15%;
+right: 4.18%;
+top: 12.51%;
+bottom: 23.38%;
+
+/* Black/100 */
+border: 1.05043px solid #1C1D22;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 50%;
+bottom: 33.33%;
+
+/* Black/100 */
+border: 1.05043px solid #1C1D22;
+
+
+/* uplload */
+
+position: absolute;
+width: 16.81px;
+height: 16.81px;
+left: 264.43px;
+top: 8px;
+
+background: #EDEDED;
+border-radius: 4.20172px;
+
+
+/* Iconly/Light/Delete */
+
+position: absolute;
+width: 10.5px;
+height: 10.5px;
+left: 3.15px;
+top: 3.15px;
+
+
+
+/* Delete */
+
+position: absolute;
+width: 7.42px;
+height: 8.1px;
+left: 1.64px;
+top: 1.2px;
+
+
+
+/* Stroke 1 */
+
+position: absolute;
+left: 21.39%;
+right: 19.48%;
+top: 39.45%;
+bottom: 11.46%;
+
+border: 0.787823px solid #130F26;
+
+
+/* Stroke 3 */
+
+position: absolute;
+left: 15.63%;
+right: 13.71%;
+top: 23.91%;
+bottom: 71.92%;
+
+border: 0.787823px solid #130F26;
+
+
+/* Stroke 5 */
+
+position: absolute;
+left: 29.24%;
+right: 27.33%;
+top: 11.46%;
+bottom: 74%;
+
+border: 0.787823px solid #130F26;
+
+
+/* Avatar */
+
+position: absolute;
+width: 135px;
+height: 114px;
+left: 77px;
+top: 23px;
+
+background: url(61hzuoXwjqL.jpg), url(61hzuoXwjqL.jpg), url(61hzuoXwjqL.jpg);
+
+
+/* Frame 51409 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 47px;
+
+position: absolute;
+width: 286px;
+height: 392px;
+left: 15px;
+top: 187px;
+
+
+
+/* Group 237779 */
+
+width: 286px;
+height: 158px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Frame 51406 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 6.35px;
+
+position: absolute;
+width: 286px;
+height: 158px;
+left: 0px;
+top: 0px;
+
+
+
+/* ACTIONS */
+
+width: 286px;
+height: 12px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 9.5231px;
+line-height: 12px;
+/* identical to box height */
+display: flex;
+align-items: center;
+letter-spacing: -0.396796px;
+
+color: #344054;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Frame 51401 */
+
+width: 286px;
+height: 150px;
+
+background: #F4F6F9;
+border-radius: 9.5231px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Frame 51392 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 6.35px;
+
+position: absolute;
+width: 260.3px;
+height: 16px;
+left: 12.7px;
+top: 15.87px;
+
+
+
+/* fi-ss-file-edit */
+
+width: 13.05px;
+height: 13.05px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: #CB0000;
+
+
+/* Edit Asset */
+
+width: 221.86px;
+height: 16px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 8.72951px;
+line-height: 16px;
+/* identical to box height, or 182% */
+
+color: #4F5464;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* arrow-right */
+
+width: 12.7px;
+height: 12.7px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* vuesax/linear/arrow-right */
+
+position: absolute;
+width: 12.7px;
+height: 12.7px;
+left: 0px;
+top: 0px;
+
+
+
+/* arrow-right */
+
+position: absolute;
+width: 12.7px;
+height: 12.7px;
+left: 0px;
+top: 0px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 37.12%;
+right: 33.3%;
+top: 17%;
+bottom: 17%;
+
+border: 1.19039px solid #B6C2D7;
+
+
+/* Vector */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+opacity: 0;
+transform: rotate(-180deg);
+
+
+/* Frame 51394 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 6.35px;
+
+position: absolute;
+width: 260.3px;
+height: 16px;
+left: 14px;
+top: 50.65px;
+
+
+
+/* fi-sr-inbox-out */
+
+width: 12.51px;
+height: 12.51px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: #009617;
+
+
+/* Issue Asset */
+
+width: 222.39px;
+height: 16px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 8.72951px;
+line-height: 16px;
+/* identical to box height, or 182% */
+
+color: #4F5464;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* arrow-right */
+
+width: 12.7px;
+height: 12.7px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* vuesax/linear/arrow-right */
+
+position: absolute;
+width: 12.7px;
+height: 12.7px;
+left: 0px;
+top: 0px;
+
+
+
+/* arrow-right */
+
+position: absolute;
+width: 12.7px;
+height: 12.7px;
+left: 0px;
+top: 0px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 37.12%;
+right: 33.3%;
+top: 17%;
+bottom: 17%;
+
+border: 1.19039px solid #B6C2D7;
+
+
+/* Vector */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+opacity: 0;
+transform: rotate(-180deg);
+
+
+/* Frame 51393 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 6.35px;
+
+position: absolute;
+width: 260.3px;
+height: 16px;
+left: 13px;
+top: 85.65px;
+
+
+
+/* message-text */
+
+width: 14.28px;
+height: 14.28px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* vuesax/bold/message-text */
+
+position: absolute;
+width: 14.28px;
+height: 14.28px;
+left: 0px;
+top: 0px;
+
+
+
+/* message-text */
+
+position: absolute;
+width: 14.28px;
+height: 14.28px;
+left: 0px;
+top: 0px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+opacity: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.33%;
+top: 8.33%;
+bottom: 8.33%;
+
+background: #57A8DF;
+
+
+/* Add Note */
+
+width: 220.62px;
+height: 16px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 8.72951px;
+line-height: 16px;
+/* identical to box height, or 182% */
+
+color: #4F5464;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* arrow-right */
+
+width: 12.7px;
+height: 12.7px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* vuesax/linear/arrow-right */
+
+position: absolute;
+width: 12.7px;
+height: 12.7px;
+left: 0px;
+top: 0px;
+
+
+
+/* arrow-right */
+
+position: absolute;
+width: 12.7px;
+height: 12.7px;
+left: 0px;
+top: 0px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 37.12%;
+right: 33.3%;
+top: 17%;
+bottom: 17%;
+
+border: 1.19039px solid #B6C2D7;
+
+
+/* Vector */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+opacity: 0;
+transform: rotate(-180deg);
+
+
+/* Frame 51395 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 6.35px;
+
+position: absolute;
+width: 260.3px;
+height: 16px;
+left: 12.7px;
+top: 121.44px;
+
+
+
+/* fi-sr-copy-alt */
+
+width: 14px;
+height: 14px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.34%;
+right: 8.33%;
+top: 0%;
+bottom: 0%;
+
+background: #8E8E8E;
+
+
+/* Clone Asset */
+
+width: 220.9px;
+height: 16px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 8.72951px;
+line-height: 16px;
+/* identical to box height, or 182% */
+
+color: #4F5464;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* arrow-right */
+
+width: 12.7px;
+height: 12.7px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* vuesax/linear/arrow-right */
+
+position: absolute;
+width: 12.7px;
+height: 12.7px;
+left: 0px;
+top: 0px;
+
+
+
+/* arrow-right */
+
+position: absolute;
+width: 12.7px;
+height: 12.7px;
+left: 0px;
+top: 0px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 37.12%;
+right: 33.3%;
+top: 17%;
+bottom: 17%;
+
+border: 1.19039px solid #B6C2D7;
+
+
+/* Vector */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+opacity: 0;
+transform: rotate(-180deg);
+
+
+/* Frame 51408 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 6.35px;
+
+width: 286px;
+height: 187px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Currently Issued To */
+
+width: 83px;
+height: 12px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 9.5231px;
+line-height: 12px;
+/* identical to box height */
+display: flex;
+align-items: center;
+letter-spacing: -0.396796px;
+
+color: #344054;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Frame 51404 */
+
+width: 286px;
+height: 169px;
+
+background: #F4F6F9;
+border-radius: 9.5231px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Frame 51392 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 6.35px;
+
+position: absolute;
+width: 260.3px;
+height: 16px;
+left: 12.7px;
+top: 15.87px;
+
+
+
+/* fi-ss-circle-user */
+
+width: 13.05px;
+height: 13.05px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: #8E8E8E;
+
+
+/* Amal Martin (KJ24F0923) */
+
+width: 240.9px;
+height: 16px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 8.72951px;
+line-height: 16px;
+/* identical to box height, or 182% */
+
+color: #4F5464;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* Frame 51393 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 6.35px;
+
+position: absolute;
+width: 260.3px;
+height: 16px;
+left: 11px;
+top: 40.65px;
+
+
+
+/* location-tick */
+
+width: 14.28px;
+height: 14.28px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* vuesax/bold/location-tick */
+
+position: absolute;
+width: 14.28px;
+height: 14.28px;
+left: 0px;
+top: 0px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 13.02%;
+right: 13.04%;
+top: 8.33%;
+bottom: 6.21%;
+
+background: #8E8E8E;
+
+
+/* Vector */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+opacity: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+opacity: 0;
+transform: rotate(-180deg);
+
+
+/* SDC */
+
+width: 239.66px;
+height: 16px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 8.72951px;
+line-height: 16px;
+/* identical to box height, or 182% */
+
+color: #4F5464;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* Frame 51394 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 6.35px;
+
+position: absolute;
+width: 260.3px;
+height: 16px;
+left: 13px;
+top: 64.65px;
+
+
+
+/* Vector */
+
+width: 11px;
+height: 9.35px;
+
+background: #B683FD;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* amal.m@gmail.com */
+
+width: 242.95px;
+height: 16px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 8.72951px;
+line-height: 16px;
+/* identical to box height, or 182% */
+
+color: #4F5464;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* Frame 51395 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 6.35px;
+
+position: absolute;
+width: 260.3px;
+height: 16px;
+left: 13px;
+top: 88.65px;
+
+
+
+/* fi-ss-phone-call */
+
+width: 10px;
+height: 10px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: #0452A6;
+
+
+/* +91 6273645367 */
+
+width: 243.95px;
+height: 16px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 8.72951px;
+line-height: 16px;
+/* identical to box height, or 182% */
+
+color: #4F5464;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* Frame 51396 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 6.35px;
+
+position: absolute;
+width: 260.3px;
+height: 16px;
+left: 13px;
+top: 113.65px;
+
+
+
+/* fi-ss-calendar */
+
+width: 10px;
+height: 10px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: #009617;
+
+
+/* Issue Date : 27 May 2026 */
+
+width: 243.95px;
+height: 16px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 8.72951px;
+line-height: 16px;
+/* identical to box height, or 182% */
+
+color: #4F5464;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* Frame 51397 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 6.35px;
+
+position: absolute;
+width: 260.3px;
+height: 16px;
+left: 13px;
+top: 138.65px;
+
+
+
+/* fi-ss-calendar-check */
+
+width: 10px;
+height: 10px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: #DD9A19;
+
+
+/* Return Date : N/A */
+
+width: 243.95px;
+height: 16px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 8.72951px;
+line-height: 16px;
+/* identical to box height, or 182% */
+
+color: #4F5464;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* / Assets / View Asset Tag */
+
+position: absolute;
+width: 145px;
+height: 15px;
+left: 141px;
+top: 82px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 15px;
+/* identical to box height */
+
+color: #898989;
+
+
+
+/* Group 237686 */
+
+position: absolute;
+width: 14px;
+height: 15px;
+left: 122px;
+top: 82px;
+
+
+
+/* I.T */
+
+position: absolute;
+width: 14px;
+height: 15px;
+left: 122px;
+top: 82px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 15px;
+/* identical to box height */
+
+/* primary/dark 1 */
+color: #242731;
+
+
+
+/* Group 237688 */
+
+position: absolute;
+width: 1280px;
+height: 46.29px;
+left: 0px;
+top: 2px;
+
+
+
+/* Header */
+
+position: absolute;
+width: 1280px;
+height: 46.29px;
+left: 0px;
+top: 2px;
+
+
+
+/* Rectangle 229 */
+
+position: absolute;
+width: 1280px;
+height: 45.38px;
+left: 0px;
+top: 2px;
+
+background: #FFFFFF;
+border-radius: 5.87px 5.87px 0px 0px;
+
+
+/* Rectangle 42 */
+
+position: absolute;
+width: 1280px;
+height: 0.91px;
+left: 0px;
+top: 47.38px;
+
+background: #E8EEF7;
+border-radius: 5.87px 5.87px 0px 0px;
+
+
+/* Group 21862 */
+
+position: absolute;
+width: 108.12px;
+height: 15.77px;
+left: 1163.38px;
+top: 15.29px;
+
+
+
+/* Hi, Abin Xavier */
+
+position: absolute;
+left: 90.89%;
+right: 0.66%;
+top: 1.84%;
+bottom: 96.27%;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 27px;
+/* or 194% */
+display: flex;
+align-items: center;
+
+color: rgba(21, 29, 72, 0.62);
+
+
+
+/* MacBook Air - 5 (1) 1 */
+
+position: absolute;
+width: 42.5px;
+height: 16.09px;
+left: 18.82px;
+top: 15.29px;
+
+background: url(MacBook Air - 5 (1).png);
+border-radius: 5.87px 5.87px 0px 0px;
+
+
+/* KJU-kjusys_flag 1 */
+
+position: absolute;
+width: 120.79px;
+height: 21.14px;
+left: calc(50% - 120.79px/2 + 0.38px);
+top: 12.77px;
+
+background: url(KJU-kjusys_flag.png);
+border-radius: 5.87px 5.87px 0px 0px;
+
+
+/* Group 237635 */
+
+position: absolute;
+width: 32.39px;
+height: 1280px;
+left: 0px;
+top: 800px;
+
+transform: rotate(-90deg);
+
+
+/* Rectangle 504 */
+
+position: absolute;
+width: 1280px;
+height: 32.39px;
+left: 0px;
+top: 800px;
+
+background: #434B57;
+
+
+/* © Developed by : Software Development Centre, Kristu Jayanti (Deemed to be University), Bangalore */
+
+position: absolute;
+width: 731px;
+height: 17.26px;
+left: calc(50% - 731px/2 + 10.5px);
+top: 806.71px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 15px;
+line-height: 119.1%;
+/* identical to box height, or 18px */
+text-align: center;
+
+color: #FFFFFF;
+
+

@@ -1,4 +1,4 @@
-<div class="flex flex-col h-screen w-screen overflow-hidden bg-[#F0F2F5] font-inter text-xs">
+<div class="flex flex-col h-screen w-screen overflow-hidden bg-[#F0F2F5] text-xs" style="font-family: 'DM Sans', 'Inter', sans-serif;">
 
   <!-- BELOW HEADER: sidebar + content -->
   <div class="flex flex-1 overflow-hidden">
@@ -40,16 +40,16 @@
         <!-- Department cards -->
         <div *ngIf="!isLoading" class="grid grid-cols-6 gap-3 mb-4">
           <div *ngFor="let dept of departments"
-            class="bg-white rounded-xl p-3 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-150"
+            class="bg-white rounded-xl p-3 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all duration-150"
             (click)="navigateToDeptAssets(dept.id)">
             <p class="text-xs font-bold text-[#242731] mb-3">{{ dept.name }}</p>
             <p class="text-lg font-semibold text-[#242731]">{{ dept.count }}</p>
             <div class="flex items-center justify-between mt-1">
-              <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded" [style.background]="dept.iconBgHex"
+              <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded"
+                [style.background]="dept.iconBgHex"
                 [style.color]="dept.iconStroke">{{ dept.unit }}</span>
               <div class="w-7 h-7 rounded-full flex items-center justify-center" [style.background]="dept.iconBgHex">
-                <svg fill="none" viewBox="0 0 24 24" [attr.stroke]="dept.iconStroke" stroke-width="2"
-                  class="w-3.5 h-3.5">
+                <svg fill="none" viewBox="0 0 24 24" [attr.stroke]="dept.iconStroke" stroke-width="2" class="w-3.5 h-3.5">
                   <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="dept.iconPath" />
                 </svg>
               </div>
@@ -65,7 +65,7 @@
             <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
               <span class="text-xs font-medium text-slate-700">Issue History</span>
               <button
-                class="text-[10px] px-3 py-1 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 active:scale-95 transition-all duration-150"
+                class="text-[10px] px-3 py-1 rounded-full bg-[#155DFC] text-white font-medium hover:bg-[#1147c8] active:scale-95 transition-all duration-150"
                 (click)="viewMoreIssues()">
                 View More
               </button>
@@ -93,9 +93,7 @@
               <!-- Donut -->
               <div class="relative flex-shrink-0">
                 <svg viewBox="0 0 120 120" class="w-28 h-28 -rotate-90">
-                  <!-- background = majority colour -->
                   <circle cx="60" cy="60" r="46" fill="none" stroke="#F2F8FC" stroke-width="20" />
-                  <!-- small segment = ready to deploy -->
                   <circle cx="60" cy="60" r="46" fill="none" stroke="#57A8DF" stroke-width="20"
                     [attr.stroke-dasharray]="readyDashSmall + ' ' + circumferenceSmall" stroke-dashoffset="0" />
                 </svg>
@@ -114,8 +112,7 @@
                 </div>
                 <div>
                   <div class="flex items-center gap-1.5 mb-0.5">
-                    <span class="w-4 h-1.5 rounded-full inline-block"
-                      style="background:#F2F8FC; border:1px solid #D0E8F5"></span>
+                    <span class="w-4 h-1.5 rounded-full inline-block" style="background:#F2F8FC; border:1px solid #D0E8F5"></span>
                     <span class="text-[10px] text-slate-400">Deployed</span>
                   </div>
                   <span class="text-xs font-semibold text-slate-700">{{ deployed | number }} assets</span>
@@ -130,10 +127,9 @@
 
       <!-- FOOTER -->
       <footer class="h-6 bg-[#434B57] flex items-center justify-center flex-shrink-0">
-        <span class="text-[10px] text-white">© Developed by : Software Development Centre, Kristu Jayanti (Deemed to be
-          University), Bangalore</span>
+        <span class="text-[10px] text-white">© Developed by : Software Development Centre, Kristu Jayanti (Deemed to be University), Bangalore</span>
       </footer>
 
     </div>
-    <!-- /BELOW HEADER -->
   </div>
+</div>

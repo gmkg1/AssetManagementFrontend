@@ -119,6 +119,26 @@ export const APP_ROUTES: Routes = [
                throw error;
             }),
       },
+      {
+        path: 'edit-asset-tag',
+        loadChildren: () =>
+          import('./modules/edit-asset-tag/edit-asset-tag.module')
+            .then((m) => m.EditAssetTagModule)
+            .catch((error) => {
+               console.error('Error loading EditAssetTagModule', error);
+               throw error;
+            }),
+      },
+      {
+        path: 'view-asset-tag',
+        loadChildren: () =>
+          import('./modules/view-asset-tag/view-asset-tag.module')
+            .then((m) => m.ViewAssetTagModule)
+            .catch((error) => {
+               console.error('Error loading ViewAssetTagModule', error);
+               throw error;
+            }),
+      },
 
 
 

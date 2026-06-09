@@ -48,6 +48,8 @@ module.exports = {
           './IssueLogModule': './projects/asset-management/src/app/modules/issue-log/issue-log.module.ts',
           './ReturnAssetModule': './projects/asset-management/src/app/modules/return-asset/return-asset.module.ts',
           './EditAssetModule': './projects/asset-management/src/app/modules/edit-asset/edit-asset.module.ts',
+          './EditAssetTagModule': './projects/asset-management/src/app/modules/edit-asset-tag/edit-asset-tag.module.ts',
+          './ViewAssetTagModule': './projects/asset-management/src/app/modules/view-asset-tag/view-asset-tag.module.ts',
 
 
 

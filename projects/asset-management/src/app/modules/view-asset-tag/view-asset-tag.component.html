@@ -1,0 +1,359 @@
+<div class="flex flex-col h-screen w-screen overflow-hidden bg-[#F0F2F5] text-xs" style="font-family: 'DM Sans', 'Inter', sans-serif;">
+
+  <!-- BODY -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- MAIN CONTENT -->
+    <div class="flex flex-col flex-1 overflow-hidden">
+
+      <!-- SCROLLABLE BODY -->
+      <div class="flex-1 overflow-y-auto overflow-x-hidden p-4">
+
+        <!-- Breadcrumbs + page title -->
+        <lib-breadcrumbs-title
+          [title]="'Asset Management'"
+          [breadcrumbs]="[{ label: 'Apps' }, { label: 'Asset Management' }]"
+        ></lib-breadcrumbs-title>
+
+        <!-- Navigation tabs -->
+        <lib-tabs
+          [tabs]="tabsConfig"
+          [activeTabId]="'asset-tags'"
+          (tabChange)="onTabClick($event)"
+        ></lib-tabs>
+
+        <!-- ══ LIST VIEW ══ -->
+        <ng-container *ngIf="view === 'list'">
+
+          <!-- Page title row -->
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-sm font-semibold text-slate-800 mb-0.5">Asset Tags</h2>
+              <p class="text-[10px] text-slate-400">Asset Department — I.T</p>
+            </div>
+            <button
+              class="flex items-center gap-1.5 h-8 px-4 text-xs font-semibold text-white rounded bg-[#155DFC] hover:bg-[#1147c8] active:scale-95 transition-all duration-150"
+              (click)="goToCreateTag()">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+              </svg>
+              Create Asset Tag
+            </button>
+          </div>
+
+          <!-- Stats cards -->
+          <div class="grid grid-cols-4 gap-3 mb-4">
+
+            <div class="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-[10px] text-slate-400">Total Tags</p>
+                <p class="text-xl font-bold text-[#242731]">{{ tags.length }}</p>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
+                <svg fill="none" viewBox="0 0 24 24" stroke="#155DFC" stroke-width="1.8" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L9.568 3ZM6 6h.008v.008H6V6Z"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-[10px] text-slate-400">Returnable</p>
+                <p class="text-xl font-bold text-[#242731]">{{ returnableCount }}</p>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
+                <svg fill="none" viewBox="0 0 24 24" stroke="#15803D" stroke-width="1.8" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-[10px] text-slate-400">Non-Returnable</p>
+                <p class="text-xl font-bold text-[#242731]">{{ nonReturnableCount }}</p>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-yellow-50 flex items-center justify-center">
+                <svg fill="none" viewBox="0 0 24 24" stroke="#A16207" stroke-width="1.8" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-[10px] text-slate-400">Consumable</p>
+                <p class="text-xl font-bold text-[#242731]">{{ consumableCount }}</p>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center">
+                <svg fill="none" viewBox="0 0 24 24" stroke="#B91C1C" stroke-width="1.8" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
+                </svg>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Table via lib-table -->
+          <lib-table
+            [columns]="tableColumns"
+            [data]="tags"
+            [primaryActions]="tableActions"
+            [clientPagination]="true"
+            [showSearch]="true"
+            [searchPlaceholder]="'Search by type name or display ID…'"
+            (onPrimaryAction)="onAction($event)"
+            (onRowClick)="onRowClick($event)"
+          ></lib-table>
+
+        </ng-container>
+        <!-- /LIST VIEW -->
+
+        <!-- ══ DETAIL VIEW ══ -->
+        <ng-container *ngIf="view === 'detail' && selectedTag as tag">
+
+          <!-- Back button row -->
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <button
+              class="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 transition-colors duration-150 group"
+              (click)="backToList()">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5 transition-transform duration-150 group-hover:-translate-x-0.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/>
+              </svg>
+              Back to Asset Tags
+            </button>
+            <button
+              class="flex items-center gap-1.5 h-8 px-4 text-xs font-semibold text-white rounded bg-[#155DFC] hover:bg-[#1147c8] active:scale-95 transition-all duration-150"
+              (click)="editTag(tag)">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"/>
+              </svg>
+              Edit Tag
+            </button>
+          </div>
+
+          <!-- Detail layout -->
+          <div class="flex gap-4 items-start min-w-0">
+
+            <!-- LEFT: detail card -->
+            <div class="flex-1 bg-white rounded-xl shadow-sm p-4 min-w-0 overflow-hidden">
+
+              <!-- Tag header -->
+              <div class="flex items-center gap-3 mb-4 min-w-0">
+                <div class="flex items-center justify-center rounded-lg bg-blue-50 flex-shrink-0 overflow-hidden" style="width:42px;height:42px;min-width:42px;">
+                  <img [src]="tag.imageUrl || defaultTagImage" alt="Asset tag" class="w-full h-full object-cover" />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <h2 class="text-xs font-semibold text-slate-800 truncate">{{ tag.assetTypeName }}</h2>
+                  <p class="text-[10px] text-slate-400 truncate">{{ tag.category }}</p>
+                </div>
+                <div class="ml-auto flex-shrink-0">
+                  <span class="inline-flex items-center px-3 py-1 rounded-full font-semibold text-[10px] whitespace-nowrap"
+                    [style.background]="getClassBadgeStyle(tag.classification).bg"
+                    [style.color]="getClassBadgeStyle(tag.classification).color">
+                    {{ tag.classification }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Detail rows -->
+              <div class="divide-y divide-slate-100">
+                <div class="flex items-center py-2.5">
+                  <span class="text-[10px] text-slate-400 w-40 flex-shrink-0">Tag ID</span>
+                  <span class="font-mono text-xs text-slate-800">#{{ tag.id }}</span>
+                </div>
+                <div class="flex items-center py-2.5">
+                  <span class="text-[10px] text-slate-400 w-40 flex-shrink-0">Asset Type Name</span>
+                  <span class="text-xs text-slate-800">{{ tag.assetTypeName }}</span>
+                </div>
+                <div class="flex items-center py-2.5">
+                  <span class="text-[10px] text-slate-400 w-40 flex-shrink-0">Category</span>
+                  <span class="text-xs text-slate-800">{{ tag.category }}</span>
+                </div>
+                <div class="flex items-center py-2.5">
+                  <span class="text-[10px] text-slate-400 w-40 flex-shrink-0">Display ID</span>
+                  <span class="font-mono font-semibold text-xs text-blue-600">{{ tag.displayId }}</span>
+                </div>
+                <div class="flex items-center py-2.5">
+                  <span class="text-[10px] text-slate-400 w-40 flex-shrink-0">Classification</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full font-semibold text-[10px]"
+                    [style.background]="getClassBadgeStyle(tag.classification).bg"
+                    [style.color]="getClassBadgeStyle(tag.classification).color">
+                    {{ tag.classification }}
+                  </span>
+                </div>
+                <div class="flex items-center py-2.5">
+                  <span class="text-[10px] text-slate-400 w-40 flex-shrink-0">Total Assets</span>
+                  <span class="font-bold text-xs text-slate-800">{{ tag.totalAssets }}</span>
+                </div>
+                <div class="flex items-center py-2.5">
+                  <span class="text-[10px] text-slate-400 w-40 flex-shrink-0">Created On</span>
+                  <span class="text-xs text-slate-800">{{ tag.createdOn }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT: actions sidebar -->
+            <div class="flex flex-col gap-4 flex-shrink-0 w-56">
+
+              <!-- ACTIONS panel -->
+              <div class="bg-[#F0F2F5] rounded-2xl p-1 flex flex-col">
+
+                <!-- Edit Tag -->
+                <button class="flex items-center justify-between w-full rounded-xl px-3 py-3 hover:bg-white hover:shadow-sm active:scale-95 transition-all duration-150"
+                  (click)="editTag(tag)">
+                  <div class="flex items-center gap-3">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%23FDEAEA'/%3E%3Cpath d='M25.5 12.5a2.12 2.12 0 0 1 3 3L16 28l-4 1 1-4 12.5-12.5Z' fill='%23E53935' stroke='%23C62828' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E" class="w-9 h-9 flex-shrink-0" alt="">
+                    <span class="text-xs font-medium text-slate-700">Edit Tag</span>
+                  </div>
+                  <svg fill="none" viewBox="0 0 24 24" stroke="#B6C2D7" stroke-width="2.5" class="w-4 h-4 flex-shrink-0">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
+                  </svg>
+                </button>
+
+                <!-- Issue Asset -->
+                <button class="flex items-center justify-between w-full rounded-xl px-3 py-3 hover:bg-white hover:shadow-sm active:scale-95 transition-all duration-150"
+                  (click)="onTabClick('issue-asset')">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-[#E6F9E8] flex items-center justify-center flex-shrink-0">
+                      <svg viewBox="0 0 24 24" fill="none" class="w-5 h-5">
+                        <rect x="3" y="13" width="18" height="8" rx="2" fill="#009617"/>
+                        <path d="M12 3v8M8 7l4-4 4 4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                    <span class="text-xs font-medium text-slate-700">Issue Asset</span>
+                  </div>
+                  <svg fill="none" viewBox="0 0 24 24" stroke="#B6C2D7" stroke-width="2.5" class="w-4 h-4 flex-shrink-0">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
+                  </svg>
+                </button>
+
+                <!-- Add Note -->
+                <button class="flex items-center justify-between w-full rounded-xl px-3 py-3 hover:bg-white hover:shadow-sm active:scale-95 transition-all duration-150"
+                  (click)="goToDashboard()">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-[#E6EEFF] flex items-center justify-center flex-shrink-0">
+                      <svg fill="none" viewBox="0 0 24 24" class="w-5 h-5">
+                        <rect x="4" y="6" width="16" height="3" rx="1.5" fill="#4B7BEC"/>
+                        <rect x="4" y="11" width="16" height="3" rx="1.5" fill="#4B7BEC"/>
+                        <rect x="4" y="16" width="10" height="3" rx="1.5" fill="#4B7BEC"/>
+                      </svg>
+                    </div>
+                    <span class="text-xs font-medium text-slate-700">Add Note</span>
+                  </div>
+                  <svg fill="none" viewBox="0 0 24 24" stroke="#B6C2D7" stroke-width="2.5" class="w-4 h-4 flex-shrink-0">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
+                  </svg>
+                </button>
+
+                <!-- Clone Asset -->
+                <button class="flex items-center justify-between w-full rounded-xl px-3 py-3 hover:bg-white hover:shadow-sm active:scale-95 transition-all duration-150"
+                  (click)="goToCreateTag()">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-[#EFEFEF] flex items-center justify-center flex-shrink-0">
+                      <svg fill="none" viewBox="0 0 24 24" class="w-5 h-5">
+                        <rect x="9" y="9" width="11" height="13" rx="2" fill="#8E8E8E"/>
+                        <rect x="4" y="4" width="11" height="13" rx="2" fill="#B0B0B0" stroke="white" stroke-width="1"/>
+                      </svg>
+                    </div>
+                    <span class="text-xs font-medium text-slate-700">Clone Asset</span>
+                  </div>
+                  <svg fill="none" viewBox="0 0 24 24" stroke="#B6C2D7" stroke-width="2.5" class="w-4 h-4 flex-shrink-0">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
+                  </svg>
+                </button>
+
+              </div>
+              <!-- /ACTIONS panel -->
+
+              <!-- Currently Issued To -->
+              <div>
+                <p class="text-xs font-bold text-slate-800 mb-2 px-1">Currently Issued To</p>
+                <div class="bg-[#F0F2F5] rounded-2xl p-1 flex flex-col gap-0.5">
+
+                  <!-- Person -->
+                  <div class="flex items-center gap-3 px-3 py-2.5">
+                    <div class="w-8 h-8 rounded-full bg-slate-300 flex items-center justify-center flex-shrink-0">
+                      <svg fill="none" viewBox="0 0 24 24" stroke="#6B7280" stroke-width="1.8" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
+                      </svg>
+                    </div>
+                    <span class="text-xs font-medium text-slate-700">—</span>
+                  </div>
+
+                  <!-- Department -->
+                  <div class="flex items-center gap-3 px-3 py-2.5">
+                    <div class="w-8 h-8 rounded-full bg-slate-300 flex items-center justify-center flex-shrink-0">
+                      <svg fill="none" viewBox="0 0 24 24" stroke="#6B7280" stroke-width="1.8" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                      </svg>
+                    </div>
+                    <span class="text-xs text-slate-500">—</span>
+                  </div>
+
+                  <!-- Email -->
+                  <div class="flex items-center gap-3 px-3 py-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-[#F3EBFF] flex items-center justify-center flex-shrink-0">
+                      <svg fill="none" viewBox="0 0 24 24" stroke="#B683FD" stroke-width="1.8" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/>
+                      </svg>
+                    </div>
+                    <span class="text-xs text-slate-500 truncate">—</span>
+                  </div>
+
+                  <!-- Phone -->
+                  <div class="flex items-center gap-3 px-3 py-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-[#E6EEF8] flex items-center justify-center flex-shrink-0">
+                      <svg fill="none" viewBox="0 0 24 24" stroke="#0452A6" stroke-width="1.8" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"/>
+                      </svg>
+                    </div>
+                    <span class="text-xs text-slate-500">—</span>
+                  </div>
+
+                  <!-- Issue Date -->
+                  <div class="flex items-center gap-3 px-3 py-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-[#E6F9E8] flex items-center justify-center flex-shrink-0">
+                      <svg fill="none" viewBox="0 0 24 24" stroke="#009617" stroke-width="1.8" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+                      </svg>
+                    </div>
+                    <span class="text-xs text-slate-500">Issue Date : N/A</span>
+                  </div>
+
+                  <!-- Return Date -->
+                  <div class="flex items-center gap-3 px-3 py-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-[#FDF3E0] flex items-center justify-center flex-shrink-0">
+                      <svg fill="none" viewBox="0 0 24 24" stroke="#DD9A19" stroke-width="1.8" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+                      </svg>
+                    </div>
+                    <span class="text-xs text-slate-500">Return Date : N/A</span>
+                  </div>
+
+                </div>
+              </div>
+              <!-- /Currently Issued To -->
+
+            </div>
+            <!-- /RIGHT: actions sidebar -->
+
+          </div>
+          <!-- /Detail layout -->
+
+        </ng-container>
+        <!-- /DETAIL VIEW -->
+
+      </div>
+      <!-- /SCROLLABLE BODY -->
+
+      <!-- FOOTER -->
+      <footer class="h-6 bg-[#434B57] flex items-center justify-center flex-shrink-0">
+        <span class="text-[10px] text-white">© Developed by : Software Development Centre, Kristu Jayanti (Deemed to be University), Bangalore</span>
+      </footer>
+
+    </div>
+    <!-- /MAIN CONTENT -->
+
+  </div>
+</div>
