@@ -1,4 +1,4 @@
-/* View Assets Ã¢â‚¬â€œ Tailwind-first, Mac Mini screen (~1280px) */
+/* View Assets – Tailwind-first, responsive desktop */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :host {
@@ -8,12 +8,20 @@
   font-family: 'Inter', sans-serif;
 }
 
-/* Table column grid */
+/* Table column grid – fluid, scales between 1280px and 1920px+ */
 .table-cols {
   display: grid;
-  grid-template-columns: 80px 160px 100px 100px 130px 130px 110px 1fr;
+  grid-template-columns:
+    minmax(72px,  90px)          /* Asset ID   */
+    minmax(120px, 1.8fr)         /* Asset Name */
+    minmax(90px,  1fr)           /* Department */
+    minmax(90px,  1fr)           /* Category   */
+    minmax(110px, 1.3fr)         /* Status     */
+    minmax(110px, 1.3fr)         /* Assigned To*/
+    minmax(100px, 1.1fr)         /* Purch Date */
+    minmax(90px,  1fr);          /* Condition  */
   align-items: center;
-  gap: 0 8px;
+  gap: 0 clamp(4px, 0.5vw, 10px);
 }
 
 /* Status badge colours (used via ngClass) */

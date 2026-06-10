@@ -9,7 +9,7 @@
     <main class="main-content px-2 " [style.background-color]="!showDefaultContent ? 'white' : '#F4F7FE'">
       <!-- <main class="main-content px-2 " [style.background-color]="!showDefaultContent ? 'white' : '#F4F7FE'" [style.padding-bottom]="!showDefaultContent ? '160px' : '0px'"> -->
 
-      <div *ngIf="showDefaultContent" class="p-6 max-w-7xl mx-auto w-full" style="margin-bottom: 80px;">
+      <div *ngIf="showDefaultContent" class="p-6 w-full" style="margin-bottom: 80px; max-width: min(100%, 1600px);">
         <!-- Modules Grid -->
         <div>
           <h2 class="text-2xl font-bold text-gray-800 mb-6">Registered Modules</h2>
@@ -36,7 +36,7 @@
             </div>
           </div>
 
-          <div *ngIf="modulesList.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div *ngIf="modulesList.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <div *ngFor="let mod of modulesList"
               class="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-md border border-gray-100 hover:border-blue-500/30 transition-all duration-300 flex flex-col justify-between cursor-pointer"
               [routerLink]="'/kjusys/' + mod.firstSubPath">
