@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { Breadcrumb } from '@libs/shared-ui';
 
 interface IssueOption {
   value: string;
@@ -18,6 +19,10 @@ interface ModuleTab {
   styleUrls: ['./return-asset.component.css']
 })
 export class ReturnAssetComponent {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home', callback: () => this.router.navigate(['/kjusys/asset-management/asset-dashboard']) },
+    { label: 'Return Asset' },
+  ];
   public issueDropdownOpen = false;
   public selectedIssueId = '';
   public issueIdOptions: IssueOption[] = [

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TabsModule } from '@libs/tabs';
 import { DropdownLibModule } from '@libs/dropdown-lib';
+import { BreadcrumbsTitleComponent } from '@libs/shared-ui';
 
 import { IssueLogModuleRoutingModule } from './issue-log-routing.module';
 import { IssueLogComponent } from './issue-log.component';
@@ -17,6 +18,7 @@ import { IssueLogComponent } from './issue-log.component';
     FormsModule,
     TabsModule,
     DropdownLibModule,
+    BreadcrumbsTitleComponent,
     IssueLogModuleRoutingModule
   ]
 })

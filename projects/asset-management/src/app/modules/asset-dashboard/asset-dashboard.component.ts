@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, HostListener, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
+import { Breadcrumb } from '@libs/shared-ui';
 
 interface AssetDepartment {
   id: string;
@@ -78,6 +79,10 @@ const DEFAULT_ICON = {
   styleUrls: ['./asset-dashboard.component.scss']
 })
 export class AssetDashboardComponent implements OnInit, OnDestroy {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home' },
+    { label: 'Dashboard' },
+  ];
 
   departments: AssetDepartment[] = [];
   issueHistory: IssueRecord[] = [];

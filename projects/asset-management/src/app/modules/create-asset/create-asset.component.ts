@@ -1,6 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
+import { Breadcrumb } from '@libs/shared-ui';
 
 @Component({
   selector: 'app-create-asset',
@@ -8,6 +9,10 @@ import { AssetService } from '../../services/asset.service';
   styleUrls: ['./create-asset.component.css'],
 })
 export class CreateAssetComponent implements OnInit {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home', callback: () => this.router.navigate(['/kjusys/asset-management/asset-dashboard']) },
+    { label: 'Create Asset' },
+  ];
 
   // Left column fields
   company         = '';

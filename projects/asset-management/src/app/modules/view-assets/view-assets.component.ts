@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
+import { Breadcrumb } from '@libs/shared-ui';
 
 export interface Asset {
   _id?: string;
@@ -39,6 +40,10 @@ export interface FilterOption {
   styleUrls: ['./view-assets.component.scss'],
 })
 export class ViewAssetsComponent implements OnInit, OnDestroy {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home', callback: () => this.router.navigate(['/kjusys/asset-management/asset-dashboard']) },
+    { label: 'View Assets' },
+  ];
   view: 'list' | 'detail' = 'list';
   selectedAsset: Asset | null = null;
   detailTab: 'info'|'licenses'|'components'|'assets'|'history'|'maintenances'|'files' = 'info';
@@ -61,7 +66,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   currentPage = 1;
   totalPages = 1;
   totalRecords = 0;
-  pageSize = 8;
+  pageSize = 10;
 
   get pageNumbers(): number[] {
     const pages: number[] = [];

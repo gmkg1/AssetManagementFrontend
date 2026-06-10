@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BreadcrumbsTitleComponent } from '@libs/shared-ui';
+import { TableModule } from '@libs/table';
 import { TabsModule } from '@libs/tabs';
 import { DropdownLibModule } from '@libs/dropdown-lib';
 
@@ -19,7 +20,8 @@ import { ViewAssetsComponent } from './view-assets.component';
     TabsModule,
     DropdownLibModule,
     ViewAssetsModuleRoutingModule,
-    BreadcrumbsTitleComponent
+    BreadcrumbsTitleComponent,
+    TableModule
   ]
 })
 export class ViewAssetsModule { }

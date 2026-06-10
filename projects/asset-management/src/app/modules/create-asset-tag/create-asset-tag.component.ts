@@ -1,6 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
+import { Breadcrumb } from '@libs/shared-ui';
 
 @Component({
   selector: 'app-create-asset-tag',
@@ -8,6 +9,10 @@ import { AssetService } from '../../services/asset.service';
   styleUrls: ['./create-asset-tag.component.css'],
 })
 export class CreateAssetTagComponent implements OnInit {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home', callback: () => this.router.navigate(['/kjusys/asset-management/asset-dashboard']) },
+    { label: 'Create Asset Tag' },
+  ];
 
   // Form fields
   category      = '';
@@ -18,16 +23,23 @@ export class CreateAssetTagComponent implements OnInit {
   assetImageFile: File | null = null;
   assetImagePreview: string | null = null;
 
-  // Dropdown options
+  // Dropdown options — shaped for lib-dropdown-lib (idField='id', textField='title')
   categories      : any[] = [];
-  displayIds      = ['MSE', 'KBD', 'MON', 'LPT', 'PRN', 'SCN', 'PRJ'];
-  classifications = ['Returnable', 'Non-Returnable', 'Consumable'];
+  displayIds      = [
+    { id: 'MSE', title: 'MSE' }, { id: 'KBD', title: 'KBD' }, { id: 'MON', title: 'MON' },
+    { id: 'LPT', title: 'LPT' }, { id: 'PRN', title: 'PRN' }, { id: 'SCN', title: 'SCN' },
+    { id: 'PRJ', title: 'PRJ' }
+  ];
+  classifications = [
+    { id: 'Returnable', title: 'Returnable' },
+    { id: 'Non-Returnable', title: 'Non-Returnable' },
+    { id: 'Consumable', title: 'Consumable' }
+  ];
 
-  // Dropdown open states
-  catOpen    = false;
-  typeOpen   = false;
-  dispOpen   = false;
-  classOpen  = false;
+  // Selected items arrays for lib-dropdown-lib
+  selectedCategory      : any[] = [];
+  selectedDisplayId     : any[] = [];
+  selectedClassification: any[] = [];
 
   // UI state
   showSuccess  = false;
@@ -41,49 +53,31 @@ export class CreateAssetTagComponent implements OnInit {
     this.assetService.getCategories().subscribe({
       next: (res: any) => {
         const rows = res?.responseData?.data?.assets ?? [];
-        this.categories = rows.map((r: any) => ({ id: r.categoryId, name: r.categoryName }));
+        // Shape for lib-dropdown-lib: {id, title}
+        this.categories = rows.map((r: any) => ({ id: r.categoryId, title: r.categoryName }));
       }
     });
   }
 
   @HostListener('document:click')
-  onDocumentClick(): void {
-    this.catOpen   = false;
-    this.typeOpen  = false;
-    this.dispOpen  = false;
-    this.classOpen = false;
+  onDocumentClick(): void {}
+
+  closeAllDropdowns(): void {}
+  toggleDropdown(name: string, event: Event): void {}
+
+  // lib-dropdown-lib selection handlers
+  onCategoryChange(selected: any[]): void {
+    this.category     = selected[0]?.id   ?? '';
+    this.categoryName = selected[0]?.title ?? '';
+  }
+  onDisplayIdChange(selected: any[]): void {
+    this.displayId = selected[0]?.id ?? '';
+  }
+  onClassificationChange(selected: any[]): void {
+    this.classification = selected[0]?.id ?? '';
   }
 
-  closeAllDropdowns(): void {
-    this.catOpen   = false;
-    this.typeOpen  = false;
-    this.dispOpen  = false;
-    this.classOpen = false;
-  }
-
-  toggleDropdown(name: 'cat' | 'type' | 'disp' | 'class', event: Event): void {
-    event.stopPropagation();
-    const wasOpen = name === 'cat'   ? this.catOpen
-                  : name === 'type'  ? this.typeOpen
-                  : name === 'disp'  ? this.dispOpen
-                  : this.classOpen;
-    this.closeAllDropdowns();
-    if (name === 'cat')   this.catOpen   = !wasOpen;
-    if (name === 'type')  this.typeOpen  = !wasOpen;
-    if (name === 'disp')  this.dispOpen  = !wasOpen;
-    if (name === 'class') this.classOpen = !wasOpen;
-  }
-
-  selectOption(field: 'category' | 'assetTagName' | 'displayId' | 'classification', value: any, event: Event): void {
-    event.stopPropagation();
-    if (field === 'category') {
-      this.category = value.id;
-      this.categoryName = value.name;
-    } else {
-      (this as any)[field] = value;
-    }
-    this.closeAllDropdowns();
-  }
+  selectOption(field: string, value: any, event: Event): void {}
 
   // Image upload
   onFileSelected(event: Event): void {
@@ -168,14 +162,17 @@ export class CreateAssetTagComponent implements OnInit {
   }
 
   createAnother(): void {
-    this.showSuccess       = false;
-    this.category          = '';
-    this.categoryName      = '';
-    this.assetTagName      = '';
-    this.displayId         = '';
-    this.classification    = '';
-    this.assetImageFile    = null;
-    this.assetImagePreview = null;
-    this.errorMessage      = '';
+    this.showSuccess          = false;
+    this.category             = '';
+    this.categoryName         = '';
+    this.assetTagName         = '';
+    this.displayId            = '';
+    this.classification       = '';
+    this.selectedCategory     = [];
+    this.selectedDisplayId    = [];
+    this.selectedClassification = [];
+    this.assetImageFile       = null;
+    this.assetImagePreview    = null;
+    this.errorMessage         = '';
   }
 }
