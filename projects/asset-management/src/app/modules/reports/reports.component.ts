@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
 
@@ -16,7 +16,7 @@ export interface ReportAsset {
   checked: boolean;
 }
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 8;
 
 @Component({
   selector: 'app-reports',
@@ -69,7 +69,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
   get deptUnderService(): number { return this.assets.reduce((s, a) => s + a.underService, 0); }
   get deptDamaged(): number { return this.assets.reduce((s, a) => s + a.damaged, 0); }
 
-  constructor(private router: Router, private assetService: AssetService) {}
+  constructor(private router: Router, private assetService: AssetService , private cdr : ChangeDetectorRef) {}
 
   ngOnInit(): void { this.loadAllReportData(); }
   ngOnDestroy(): void {}
@@ -109,7 +109,9 @@ export class ReportsComponent implements OnInit, OnDestroy {
             }
           });
         });
+        
       },
+      
       error: (err: any) => {
         console.error('Failed to load asset status summary:', err);
         this.apiError = 'Could not load report data from the server.';
@@ -143,6 +145,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this.departments = [this.allTab, ...new Set([...this.allCategories, ...fromData])];
     if (!this.departments.includes(this.activeDept)) this.activeDept = this.allTab;
     this.isLoading = false;
+    this.cdr.detectChanges()
   }
 
   @HostListener('document:click')
@@ -209,9 +212,9 @@ export class ReportsComponent implements OnInit, OnDestroy {
     return map[type] ?? '';
   }
 
-  goToDashboard(): void { this.router.navigate(['/']); }
-  goToViewAssets(): void { this.router.navigate(['/assets/view']); }
-  goToIssueAsset(): void { this.router.navigate(['/assets/issue']); }
-  goToIssueLog(): void { this.router.navigate(['/assets/issue-log']); }
-  goToReturnLog(): void { this.router.navigate(['/assets/return-log']); }
+  goToDashboard(): void { this.router.navigate(['/kjusys/asset-management/asset-dashboard']); }
+  goToViewAssets(): void { this.router.navigate(['/kjusys/asset-management/view-assets']); }
+  goToIssueAsset(): void { this.router.navigate(['/kjusys/asset-management/issue-asset']); }
+  goToIssueLog(): void { this.router.navigate(['/kjusys/asset-management/issue-log']); }
+  goToReturnLog(): void { this.router.navigate(['/kjusys/asset-management/return-log']); }
 }

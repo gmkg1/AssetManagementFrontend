@@ -13,8 +13,8 @@ export const environment = {
         'asset-management': 'http://localhost:4205',
     },
     publicPath: 'http://localhost:4200/',
-    baseUrl: 'https://terminals-ross-recommendations-moved.trycloudflare.com',
+    baseUrl: 'https://spoke-michael-recognized-prefix.trycloudflare.com/api/',
     project: 'shell',
     baseRoute: 'kjusys',
     local: true,
-  };
+};

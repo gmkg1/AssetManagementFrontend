@@ -1,23 +1,24 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AssetService } from '../../services/asset.service';
 
 @Component({
   selector: 'app-create-asset',
   templateUrl: './create-asset.component.html',
   styleUrls: ['./create-asset.component.css'],
 })
-export class CreateAssetComponent {
+export class CreateAssetComponent implements OnInit {
 
-  // â”€â”€ Left column fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Left column fields
   company         = '';
   assetTag        = '';
   serial          = '';
   model           = '';
   status          = '';
-  category        = 'Consumables';
+  category        = '';
   defaultLocation = '';
 
-  // â”€â”€ Right column fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Right column fields
   assetName    = '';
   orderNumber  = '';
   warranty     = '';
@@ -27,16 +28,20 @@ export class CreateAssetComponent {
   purchaseCost = '';
   isReturnable = true;
 
-  // â”€â”€ Dropdown options â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Dropdown options
   companies  = ['Kristu Jayanti University', 'KJC Trust'];
-  models     = ['MacBook Pro 13"', 'Dell Latitude 14', 'HP EliteBook', 'Lenovo ThinkPad'];
-  statuses   = ['Available', 'Deployed', 'Under Maintenance', 'Retired'];
-  categories = ['Consumables', 'I.T', 'Electricals', 'Sound', 'Stationery', 'Housekeeping', 'Furniture'];
-  locations  = ['SDC Lab', 'Admin Block', 'Library', 'Sports Block', 'PFA Wing'];
+  models     : any[] = [];
+  statuses   : any[] = [];
+  categories : any[] = [];
+  locations  : any[] = [];
   suppliers  = ['Dell India', 'Apple Reseller', 'HP India', 'Lenovo Store'];
 
-  // â”€â”€ UI state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Searchable dropdown properties
+  assetTagSearch    = '';
+  showTagDropdown   = false;
+  filteredModels    : any[] = [];
 
+  // UI state
   showSuccess      = false;
   isLoading        = false;
   errorMessage     = '';
@@ -45,8 +50,62 @@ export class CreateAssetComponent {
   assetImagePreview: string | null = null;
   billFile         : File | null = null;
 
-  constructor(private router: Router) {}
-  // â”€â”€ Bill upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  constructor(private router: Router, private assetService: AssetService) {}
+
+  ngOnInit(): void {
+    this.loadDropdowns();
+  }
+
+  loadDropdowns(): void {
+    this.assetService.getCategories().subscribe({
+      next: (res: any) => {
+        const rows = res?.responseData?.data?.assets ?? [];
+        this.categories = rows.map((r: any) => ({ id: r.categoryId, name: r.categoryName }));
+      }
+    });
+
+    this.assetService.getLocations().subscribe({
+      next: (res: any) => {
+        const rows = res?.responseData?.data?.locations ?? [];
+        this.locations = rows.map((r: any) => ({ id: r.locationId, name: r.locationName }));
+      }
+    });
+
+    this.assetService.getStatuses().subscribe({
+      next: (res: any) => {
+        const rows = res?.responseData?.data?.statuses ?? [];
+        this.statuses = rows.map((r: any) => ({ id: r.statusId, name: r.statusName }));
+      }
+    });
+
+    this.assetService.getAssetTags().subscribe({
+      next: (res: any) => {
+        const tags = res?.responseData?.data?.assetTags ?? [];
+        this.models = tags.map((t: any) => ({ id: t.id, name: t.assetTagName }));
+        this.filteredModels = this.models;
+      }
+    });
+  }
+
+  // Search filter for dropdown
+  filterAssetTags(): void {
+    this.showTagDropdown = true;
+    const search = this.assetTagSearch.toLowerCase();
+    this.filteredModels = this.models.filter(m => m.name.toLowerCase().includes(search));
+  }
+
+  selectAssetTag(t: any): void {
+    this.model = t.id;
+    this.assetTagSearch = t.name;
+    this.showTagDropdown = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    this.showTagDropdown = false;
+  }
+
+  // Bill upload
   onBillSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
@@ -54,7 +113,7 @@ export class CreateAssetComponent {
     }
   }
 
-  // â”€â”€ Asset image upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Asset image upload
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) this.loadImageFile(input.files[0]);
@@ -79,65 +138,68 @@ export class CreateAssetComponent {
     this.assetImagePreview = null;
   }
 
-  // â”€â”€ Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  goBack()         : void { this.router.navigate(['/kjusys/view-assets']); }
-  goToDashboard()  : void { this.router.navigate(['/kjusys/asset-dashboard']); }
-  goToIssueAsset() : void { this.router.navigate(['/kjusys/issue-asset']); }
-  goToIssueLog()   : void { this.router.navigate(['/kjusys/issue-log']); }
-  goToReturnLog()  : void { this.router.navigate(['/kjusys/return-log']); }
-  goToReports()    : void { this.router.navigate(['/kjusys/reports']); }
+  // Navigation
+  goBack()         : void { this.router.navigate(['/kjusys/asset-management/view-assets']); }
+  goToDashboard()  : void { this.router.navigate(['/kjusys/asset-management/asset-dashboard']); }
+  goToIssueAsset() : void { this.router.navigate(['/kjusys/asset-management/issue-asset']); }
+  goToIssueLog()   : void { this.router.navigate(['/kjusys/asset-management/issue-log']); }
+  goToReturnLog()  : void { this.router.navigate(['/kjusys/asset-management/return-log']); }
+  goToReports()    : void { this.router.navigate(['/kjusys/asset-management/reports']); }
+  goToCreateTag()  : void { this.router.navigate(['/kjusys/asset-management/create-asset-tag']); }
 
-  // â”€â”€ Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Submit
   onSubmit(): void {
     this.errorMessage = '';
 
-    if (!this.assetTag.trim()) {
-      this.errorMessage = 'Asset Tag is required.';
+    if (!this.model) {
+      this.errorMessage = 'Model (Asset Tag) is required.';
       return;
     }
     if (!this.status) {
       this.errorMessage = 'Status is required.';
       return;
     }
+    if (!this.assetName.trim()) {
+      this.errorMessage = 'Asset Name is required.';
+      return;
+    }
 
     this.isLoading = true;
 
     const payload = {
-      company:         this.company,
-      assetTag:        this.assetTag,
-      serial:          this.serial,
-      model:           this.model,
-      status:          this.status,
-      category:        this.category,
-      defaultLocation: this.defaultLocation,
-      assetName:       this.assetName,
-      orderNumber:     this.orderNumber,
-      warranty:        this.warranty,
-      purchaseDate:    this.purchaseDate,
-      eolDate:         this.eolDate,
-      supplier:        this.supplier,
-      purchaseCost:    this.purchaseCost,
+      assetName:       this.assetName.trim(),
+      assetTagId:      this.model,
+      statusId:        this.status,
+      defaultLocation: this.defaultLocation || null,
+      serial:          this.serial.trim(),
+      purchaseCost:    this.purchaseCost.trim(),
+      purchaseDate:    this.purchaseDate.trim(),
       isReturnable:    this.isReturnable,
     };
 
     console.log('Create Asset payload:', payload);
 
-    // TODO: replace with real API call via AssetService
-    setTimeout(() => {
-      this.isLoading   = false;
-      this.showSuccess = true;
-    }, 600);
+    this.assetService.createAsset(payload).subscribe({
+      next: (res: any) => {
+        this.isLoading   = false;
+        this.showSuccess = true;
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        this.errorMessage = err?.error?.responseData?.errors?.[0] || err?.error?.error || 'Failed to create asset.';
+      }
+    });
   }
 
-  // â”€â”€ Reset form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   createAnother(): void {
     this.showSuccess      = false;
     this.company          = '';
     this.assetTag         = '';
+    this.assetTagSearch   = '';
     this.serial           = '';
     this.model            = '';
     this.status           = '';
-    this.category         = 'Consumables';
+    this.category         = '';
     this.defaultLocation  = '';
     this.assetName        = '';
     this.orderNumber      = '';

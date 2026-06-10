@@ -1,11 +1,11 @@
-<div class="flex flex-col h-screen w-screen overflow-hidden bg-[#F0F2F5] font-inter text-xs">
+<div class="flex flex-col min-h-screen w-full bg-[#F0F2F5] font-inter text-xs">
 
   <!-- BELOW HEADER: sidebar + content -->
-  <div class="flex flex-1 overflow-hidden">
+  <div class="flex flex-1">
 
   <!-- MAIN -->
-  <div class="flex flex-col flex-1 overflow-hidden">
-    <div class="flex-1 overflow-y-auto p-4">
+  <div class="flex flex-col flex-1">
+    <div class="flex-1 p-4">
 
       <!-- Page header -->
       <div class="mb-4">
@@ -18,7 +18,7 @@
       </div>
 
       <!-- Form card -->
-      <div class="bg-white rounded-xl shadow-sm p-5">
+      <div class="bg-white rounded-xl shadow-sm p-5 mb-[100px]">
         <h1 class="text-sm font-semibold text-slate-800 mb-0.5">Issue Asset</h1>
         <p class="text-[10px] text-slate-400 mb-5">Asset Tag – {{ assetTag }}</p>
 
@@ -128,7 +128,7 @@
       </div>
 
       <!-- Issue Log Table -->
-      <div class="bg-white rounded-xl shadow-sm overflow-hidden mt-4">
+      <div class="bg-white rounded-xl shadow-sm overflow-hidden mt-4 mb-[100px]">
 
         <!-- Header -->
           <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">

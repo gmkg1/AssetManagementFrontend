@@ -1,8 +1,9 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
 
 export interface Asset {
+  _id?: string;
   id: string;
   name: string;
   department: string;
@@ -60,7 +61,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   currentPage = 1;
   totalPages = 1;
   totalRecords = 0;
-  pageSize = 10;
+  pageSize = 8;
 
   get pageNumbers(): number[] {
     const pages: number[] = [];
@@ -97,7 +98,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   assetsDropdownOpen = false;
   sidebarOpen = false;
 
-  constructor(private router: Router, private route: ActivatedRoute, private assetService: AssetService) {}
+  constructor(private router: Router, private route: ActivatedRoute, private assetService: AssetService , private cdr : ChangeDetectorRef ) {}
 
   ngOnInit(): void {
     this.loadFilterOptions();
@@ -112,10 +113,12 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   }
 
   private loadFilterOptions(): void {
+    
     this.assetService.getCategories().subscribe({
       next: (response: any) => {
         const rows = response?.responseData?.data?.assets ?? [];
         this.categories = rows.map((r: any) => ({ id: r.categoryId, name: r.categoryName }));
+        
       }
     });
     this.assetService.getLocations().subscribe({
@@ -133,6 +136,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   }
 
   private loadAssets(): void {
+    
     this.isLoading = true;
     this.apiError = null;
     this.loadStatusCounts();
@@ -154,6 +158,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
         this.currentPage = data.currentPage ?? this.currentPage;
         this.assets = raw.map((item, i) => this.mapToAsset(item, i));
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error('Failed to load assets:', err);
@@ -187,6 +192,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   }
 
   private loadStatusCounts(): void {
+    
     this.assetService.getStatusSummary().subscribe({
       next: (response: any) => {
         const rows: any[] = response?.responseData?.data?.assets ?? [];
@@ -201,6 +207,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
         this.availableCount = readyToDeploy;
         this.deployedCount = deployed;
         this.maintenanceCount = maintenance;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -211,6 +218,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
 
   private mapToAsset(item: any, index: number): Asset {
     return {
+      _id: item._id,
       id: item.assetSerialNumber ?? `AST-${String(index + 1).padStart(3, '0')}`,
       name: item.assetName ?? '—',
       department: item.location ?? '—',
@@ -237,13 +245,18 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
 
   openDetail(asset: Asset): void { this.selectedAsset = asset; this.detailTab = 'info'; this.view = 'detail'; }
   backToList(): void { this.view = 'list'; this.selectedAsset = null; }
-  goToDashboard(): void { this.router.navigate(['/']); }
-  goToIssueAsset(): void { this.router.navigate(['/assets/issue']); }
-  goToIssueLog(): void { this.router.navigate(['/assets/issue-log']); }
-  goToReturnLog(): void { this.router.navigate(['/assets/return-log']); }
-  goToReports(): void { this.router.navigate(['/assets/reports']); }
+  goToDashboard(): void { this.router.navigate(['/kjusys/asset-management/asset-dashboard']); }
+  goToIssueAsset(): void { this.router.navigate(['/kjusys/asset-management/issue-asset']); }
+  goToIssueLog(): void { this.router.navigate(['/kjusys/asset-management/issue-log']); }
+  goToReturnLog(): void { this.router.navigate(['/kjusys/asset-management/return-log']); }
+  goToReports(): void { this.router.navigate(['/kjusys/asset-management/reports']); }
   issueAsset(asset: Asset): void {
-    this.router.navigate(['/assets/issue'], { queryParams: { assetId: asset.id, assetName: asset.name, assetTag: asset.assetTag, assetModel: asset.model, assetCategory: asset.category } });
+    this.router.navigate(['/kjusys/asset-management/issue-asset'], { queryParams: { assetId: asset.id, assetName: asset.name, assetTag: asset.assetTag, assetModel: asset.model, assetCategory: asset.category } });
+  }
+
+  editAsset(asset: Asset): void {
+    const id = asset._id || asset.id;
+    this.router.navigate(['/kjusys/asset-management/edit-asset', id]);
   }
 
   getStatusClass(status: string): string {

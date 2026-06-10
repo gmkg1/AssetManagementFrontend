@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
 
@@ -34,7 +34,7 @@ export class ReturnLogComponent implements OnInit, OnDestroy {
   currentPage = 1;
   totalPagesVal = 1;
   totalRecords = 0;
-  pageSize = 10;
+  pageSize = 8;
   allRecords: ReturnRecord[] = [];
 
   formAssetName = '';
@@ -56,7 +56,7 @@ export class ReturnLogComponent implements OnInit, OnDestroy {
     return pages;
   }
 
-  constructor(private router: Router, private assetService: AssetService) {}
+  constructor(private router: Router, private assetService: AssetService , private cdr : ChangeDetectorRef) {}
 
   ngOnInit(): void { this.loadReturnLogs(); }
   ngOnDestroy(): void {}
@@ -94,6 +94,7 @@ export class ReturnLogComponent implements OnInit, OnDestroy {
           department: item.classification ?? 'Other',
         }));
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error('Failed to load return logs:', err);
@@ -126,11 +127,11 @@ export class ReturnLogComponent implements OnInit, OnDestroy {
   nextPage(): void { if (this.currentPage < this.totalPagesVal) { this.currentPage++; this.loadReturnLogs(); } }
   goToPage(p: number): void { if (p !== this.currentPage) { this.currentPage = p; this.loadReturnLogs(); } }
 
-  goToDashboard(): void { this.router.navigate(['/']); }
-  goToViewAssets(): void { this.router.navigate(['/assets/view']); }
-  goToIssueAsset(): void { this.router.navigate(['/assets/issue']); }
-  goToIssueLog(): void { this.router.navigate(['/assets/issue-log']); }
-  goToReports(): void { this.router.navigate(['/assets/reports']); }
+  goToDashboard(): void { this.router.navigate(['/kjusys/asset-management/asset-dashboard']); }
+  goToViewAssets(): void { this.router.navigate(['/kjusys/asset-management/view-assets']); }
+  goToIssueAsset(): void { this.router.navigate(['/kjusys/asset-management/issue-asset']); }
+  goToIssueLog(): void { this.router.navigate(['/kjusys/asset-management/issue-log']); }
+  goToReports(): void { this.router.navigate(['/kjusys/asset-management/reports']); }
 
   exportCSV(): void {
     const headers = ['Name', 'Classification', 'Total', 'Return Type', 'Return To', 'Return Date'];
