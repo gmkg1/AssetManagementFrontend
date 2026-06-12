@@ -2,13 +2,7 @@ import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnIn
 import { ActivatedRoute, Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
 
-export interface IssueRecord {
-  assetName: string;
-  assetCategory: string;
-  issueDate: string;
-  receiverName: string;
-  receiverType: string;
-}
+
 
 type OptionItem = { _id: string; label: string };
 
@@ -60,33 +54,7 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
     { _id: 'user-7', label: 'Riya Thomas' },
   ];
 
-  issueLog: IssueRecord[] = [];
-  isLoadingLog = true;
-  logError: string | null = null;
-  searchQuery = '';
-  currentPage = 1;
-  totalPages = 1;
-  totalRecords = 0;
 
-  get filteredLog(): IssueRecord[] {
-    if (!this.searchQuery.trim()) return this.issueLog;
-    const q = this.searchQuery.toLowerCase();
-    return this.issueLog.filter(r =>
-      r.assetName.toLowerCase().includes(q) ||
-      r.assetCategory.toLowerCase().includes(q) ||
-      r.receiverName.toLowerCase().includes(q) ||
-      r.receiverType.toLowerCase().includes(q)
-    );
-  }
-
-  get pageNumbers(): number[] {
-    const pages: number[] = [];
-    for (let i = 1; i <= this.totalPages; i++) {
-      if (i === 1 || i === this.totalPages || Math.abs(i - this.currentPage) <= 1) pages.push(i);
-      else if (pages[pages.length - 1] !== -1) pages.push(-1);
-    }
-    return pages;
-  }
 
   get filteredReceiverOptions(): OptionItem[] {
     const q = this.receiverSearch.trim().toLowerCase();
@@ -116,7 +84,6 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
 
     this.issueDate = new Date().toISOString().slice(0, 10);
     this.loadIssueOptions();
-    this.loadIssueLog();
   }
 
   ngOnDestroy(): void {}
@@ -148,53 +115,7 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
     });
   }
 
-  private loadIssueLog(): void {
-    this.isLoadingLog = true;
-    this.logError = null;
 
-    this.assetService.getIssuedAssets({ page: this.currentPage, pageSize: 3 }).subscribe({
-      next: (response: any) => {
-        const data = response?.responseData?.data ?? {};
-        const raw: any[] = data.assets ?? [];
-
-        this.totalRecords = data.totalRecords ?? raw.length;
-        this.totalPages = data.totalPages ?? 1;
-        this.currentPage = data.currentPage ?? this.currentPage;
-
-        this.issueLog = raw.map(item => ({
-          assetName: item.assetName ?? '—',
-          assetCategory: item.assetCategory ?? '—',
-          issueDate: item.issueDate
-            ? new Date(item.issueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-            : '—',
-          receiverName: item.receiverName ?? '—',
-          receiverType: item.receiverType ?? '—',
-        }));
-
-        this.isLoadingLog = false;
-        this.cdr.detectChanges();
-      },
-      error: (err: any) => {
-        console.error('Failed to load issue log:', err);
-        this.logError = 'Could not load issue log from server.';
-        this.isLoadingLog = false;
-        
-      },
-    });
-  }
-
-  prevPage(): void { if (this.currentPage > 1) { this.currentPage--; this.loadIssueLog(); } }
-  nextPage(): void { if (this.currentPage < this.totalPages) { this.currentPage++; this.loadIssueLog(); } }
-  goToPage(p: number): void { if (p !== this.currentPage) { this.currentPage = p; this.loadIssueLog(); } }
-
-  getReceiverTypeClass(type: string): string {
-    const map: Record<string, string> = {
-      Location: 'bg-blue-50 text-blue-700',
-      Asset: 'bg-purple-50 text-purple-700',
-      Person: 'bg-green-50 text-green-700',
-    };
-    return map[type] ?? 'bg-slate-50 text-slate-600';
-  }
 
   selectReceiverOption(option: OptionItem): void {
     this.selectedReceiverId = option._id;
@@ -294,7 +215,6 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
       next: () => {
         this.showSuccess = true;
         this.isSubmitting = false;
-        this.loadIssueLog();
       },
       error: (err: any) => {
         console.error('Failed to issue asset:', err);
