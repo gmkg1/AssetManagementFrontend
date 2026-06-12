@@ -39,15 +39,15 @@ module.exports = {
              // Example expose, user can add more modules here
              './Module': './projects/asset-management/src/app/app.module.ts',
           './AssetDashboardModule': './projects/asset-management/src/app/modules/asset-dashboard/asset-dashboard.module.ts',
-          './ViewAssetsModule': './projects/asset-management/src/app/modules/view-assets/view-assets.module.ts',
-          './ReturnLogModule': './projects/asset-management/src/app/modules/return-log/return-log.module.ts',
-          './ReportsModule': './projects/asset-management/src/app/modules/reports/reports.module.ts',
-          './IssueAssetModule': './projects/asset-management/src/app/modules/issue-asset/issue-asset.module.ts',
-          './CreateAssetTagModule': './projects/asset-management/src/app/modules/create-asset-tag/create-asset-tag.module.ts',
-          './CreateAssetModule': './projects/asset-management/src/app/modules/create-asset/create-asset.module.ts',
-          './IssueLogModule': './projects/asset-management/src/app/modules/issue-log/issue-log.module.ts',
-          './ReturnAssetModule': './projects/asset-management/src/app/modules/return-asset/return-asset.module.ts',
-          './EditAssetModule': './projects/asset-management/src/app/modules/edit-asset/edit-asset.module.ts',
+          './ViewAssetsModule': './projects/asset-management/src/app/modules/asset-dashboard/asset-dashboard.module.ts',
+          './ReturnLogModule': './projects/asset-management/src/app/modules/asset-dashboard/asset-dashboard.module.ts',
+          './ReportsModule': './projects/asset-management/src/app/modules/asset-dashboard/asset-dashboard.module.ts',
+          './IssueAssetModule': './projects/asset-management/src/app/modules/asset-dashboard/asset-dashboard.module.ts',
+          './CreateAssetTagModule': './projects/asset-management/src/app/modules/asset-dashboard/asset-dashboard.module.ts',
+          './CreateAssetModule': './projects/asset-management/src/app/modules/asset-dashboard/asset-dashboard.module.ts',
+          './IssueLogModule': './projects/asset-management/src/app/modules/asset-dashboard/asset-dashboard.module.ts',
+          './ReturnAssetModule': './projects/asset-management/src/app/modules/asset-dashboard/asset-dashboard.module.ts',
+          './EditAssetModule': './projects/asset-management/src/app/modules/asset-dashboard/asset-dashboard.module.ts',
 
 
 
