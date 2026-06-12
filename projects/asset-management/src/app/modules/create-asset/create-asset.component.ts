@@ -31,6 +31,7 @@ export class CreateAssetComponent implements OnInit {
   eolDate      = '';
   supplier     = '';
   purchaseCost = '';
+  today = new Date().toISOString().split('T')[0];
   isReturnable = true;
 
   // Dropdown options
@@ -168,6 +169,15 @@ export class CreateAssetComponent implements OnInit {
       this.errorMessage = 'Asset Name is required.';
       return;
     }
+    if (this.purchaseDate && this.purchaseDate > this.today) {
+      this.errorMessage = 'Purchase Date cannot be a future date.';
+      return;
+    }
+    if (this.eolDate && this.purchaseDate && this.eolDate <= this.purchaseDate) {
+      this.errorMessage = 'EOL Date must be after the Purchase Date.';
+      return;
+    }
+
 
     this.isLoading = true;
 
