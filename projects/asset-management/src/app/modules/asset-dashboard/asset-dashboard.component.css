@@ -1,4 +1,4 @@
-/* Asset Dashboard Ã¢â‚¬â€œ Tailwind-first */
+/* Asset Dashboard – Tailwind-first */
 :host {
   display: block;
   width: 100%;
@@ -6,10 +6,10 @@
   font-family: 'Inter', sans-serif;
 }
 
-/* Issue history table columns */
+/* Issue history table columns – fluid */
 .issue-cols {
   display: grid;
-  grid-template-columns: 1fr 80px 90px 70px;
+  grid-template-columns: 38% 20% 25% 17%;
   align-items: center;
-  gap: 0 8px;
+  gap: 0 clamp(4px, 0.5vw, 10px);
 }

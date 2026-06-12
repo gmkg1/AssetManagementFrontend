@@ -1,10 +1,21 @@
 :host { display: block; width: 100%; height: 100%; font-family: 'Inter', sans-serif; }
 
+/* Report table columns – fluid, scales across desktop widths */
 .report-cols {
   display: grid;
-  grid-template-columns: 28px 2fr 90px 60px 70px 70px 70px 70px 60px 40px;
+  grid-template-columns:
+    28px                          /* checkbox   */
+    minmax(140px, 2fr)            /* Name       */
+    minmax(80px, 90px)            /* Type       */
+    minmax(48px, 60px)            /* Total      */
+    minmax(56px, 70px)            /* Ready      */
+    minmax(56px, 70px)            /* Deployed   */
+    minmax(56px, 70px)            /* Dead Stock */
+    minmax(56px, 70px)            /* Service    */
+    minmax(48px, 60px)            /* EOL        */
+    40px;                         /* actions    */
   align-items: center;
-  gap: 0 8px;
+  gap: 0 clamp(4px, 0.5vw, 10px);
 }
 
 .class-asset      { background: #EEF2FF; color: #4338CA; }

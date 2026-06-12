@@ -1,4 +1,4 @@
-// View Assets – Tailwind-first, Mac Mini screen (~1280px)
+// View Assets – Tailwind-first, responsive desktop
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :host {
@@ -8,12 +8,20 @@
   font-family: 'Inter', sans-serif;
 }
 
-// Table column grid
+// Table column grid – fluid, scales across desktop widths
 .table-cols {
   display: grid;
-  grid-template-columns: 80px 160px 100px 100px 130px 130px 110px 1fr;
+  grid-template-columns:
+    minmax(72px,  90px)
+    minmax(120px, 1.8fr)
+    minmax(90px,  1fr)
+    minmax(90px,  1fr)
+    minmax(110px, 1.3fr)
+    minmax(110px, 1.3fr)
+    minmax(100px, 1.1fr)
+    minmax(90px,  1fr);
   align-items: center;
-  gap: 0 8px;
+  gap: 0 clamp(4px, 0.5vw, 10px);
 }
 
 // Status badge colours (used via ngClass)
