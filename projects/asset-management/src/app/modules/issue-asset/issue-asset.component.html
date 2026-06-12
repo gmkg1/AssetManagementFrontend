@@ -147,13 +147,23 @@
 
         <div *ngIf="logError" class="px-4 py-3 text-xs text-red-600 bg-red-50">{{ logError }}</div>
 
-        <div *ngIf="isLoadingLog && !logError" class="flex items-center justify-center py-12 gap-2 text-slate-400">
-          <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-          </svg>
-          <span class="text-xs">Loading...</span>
-        </div>
+        <!-- Skeleton rows while loading -->
+        <ng-container *ngIf="isLoadingLog && !logError">
+          <div class="grid grid-cols-5 px-4 py-2 border-b border-slate-100">
+            <span class="text-[10px] text-slate-400">Asset Name</span>
+            <span class="text-[10px] text-slate-400">Category</span>
+            <span class="text-[10px] text-slate-400">Issued To</span>
+            <span class="text-[10px] text-slate-400">Type</span>
+            <span class="text-[10px] text-slate-400">Issue Date</span>
+          </div>
+          <div *ngFor="let s of [1,2,3,4,5,6]" class="grid grid-cols-5 px-4 py-3 border-b border-slate-50 animate-pulse">
+            <div class="h-3 bg-slate-200 rounded w-3/4"></div>
+            <div class="h-3 bg-slate-200 rounded w-2/3"></div>
+            <div class="h-3 bg-slate-200 rounded w-3/4"></div>
+            <div class="h-3 bg-slate-200 rounded w-1/2"></div>
+            <div class="h-3 bg-slate-200 rounded w-2/3"></div>
+          </div>
+        </ng-container>
 
         <div *ngIf="!isLoadingLog" class="grid grid-cols-5 px-4 py-2 border-b border-slate-100">
           <span class="text-[10px] text-slate-400">Asset Name</span>
