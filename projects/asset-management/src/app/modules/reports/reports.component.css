@@ -6,7 +6,6 @@
   grid-template-columns:
     28px                          /* checkbox   */
     minmax(140px, 2fr)            /* Name       */
-    minmax(80px, 90px)            /* Type       */
     minmax(48px, 60px)            /* Total      */
     minmax(56px, 70px)            /* Ready      */
     minmax(56px, 70px)            /* Deployed   */

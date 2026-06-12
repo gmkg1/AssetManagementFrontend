@@ -211,10 +211,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this.allChecked = false;
   }
 
-  getTypeClass(type: string): string {
-    const map: Record<string, string> = { Asset: 'class-asset', Component: 'class-component', Consumable: 'class-consumable', Accessory: 'class-accessory' };
-    return map[type] ?? '';
-  }
+
 
   goToDashboard(): void { this.router.navigate(['/kjusys/asset-management/asset-dashboard']); }
   goToViewAssets(): void { this.router.navigate(['/kjusys/asset-management/view-assets']); }

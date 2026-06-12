@@ -42,7 +42,6 @@
               <svg *ngIf="allChecked" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="3" class="w-2.5 h-2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
             </div>
             <span class="text-[10px] text-slate-400 font-medium">Name</span>
-            <span class="text-[10px] text-slate-400 font-medium">Type</span>
             <span class="text-[10px] text-slate-400 font-medium">Total</span>
             <span class="text-[10px] text-slate-400 font-medium">Ready</span>
             <span class="text-[10px] text-slate-400 font-medium">Deployed</span>
@@ -57,7 +56,6 @@
             <div *ngFor="let s of [1,2,3,4,5,6,7,8]" class="grid report-cols px-4 py-3 border-b border-slate-50 animate-pulse">
               <div class="w-3.5 h-3.5 bg-slate-200 rounded"></div>
               <div class="h-3 bg-slate-200 rounded w-3/4"></div>
-              <div class="h-5 bg-slate-200 rounded-full w-16"></div>
               <div class="h-3 bg-slate-200 rounded w-1/3"></div>
               <div class="h-3 bg-slate-200 rounded w-1/3"></div>
               <div class="h-3 bg-slate-200 rounded w-1/3"></div>
@@ -85,7 +83,6 @@
                 <span class="text-xs font-medium text-slate-800 truncate">{{ asset.name }}</span>
                 <span class="text-[10px] text-slate-400">{{ asset.id }}</span>
               </div>
-              <span><span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium" [ngClass]="getTypeClass(asset.type)">{{ asset.type }}</span></span>
               <span class="text-xs text-slate-700 font-medium">{{ asset.total }}</span>
               <span class="text-xs text-green-600">{{ asset.readyToDeploy }}</span>
               <span class="text-xs text-blue-600">{{ asset.deployed }}</span>
