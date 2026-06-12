@@ -114,6 +114,16 @@ export class AssetService {
     return this.http.post<any>(`${this.baseUrl}/issue-asset`, payload);
   }
 
+  /** POST /return-asset */
+  returnAsset(payload: {
+    assetId: string;
+    issuetoId: string;
+    returnDate: string;
+    notes?: string;
+  }) {
+    return this.http.post<any>(`${this.baseUrl}/return-asset`, payload);
+  }
+
   /** GET /return-logs?page=X&pageSize=Y */
   getReturnLogs(
     pageOrFilters: number | {

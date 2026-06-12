@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
 
@@ -47,8 +47,9 @@ export class EditAssetComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private assetService: AssetService
-  ) {}
+    private assetService: AssetService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -86,7 +87,7 @@ export class EditAssetComponent implements OnInit {
     this.assetService.getAssetTags().subscribe({
       next: (res: any) => {
         const tags = res?.responseData?.data?.assetTags ?? [];
-        this.models = tags.map((t: any) => ({ id: t.id, name: t.assetTagName }));
+        this.models = tags.map((t: any) => ({ id: t.id, name: t.assetTagName, categoryId: t.categoryId }));
         this.filteredModels = this.models;
         this.syncAssetTagSearch();
       }
@@ -103,6 +104,7 @@ export class EditAssetComponent implements OnInit {
           this.assetName = data.assetName || '';
           this.model = data.assetTagId || '';
           this.assetTag = data.assetTagId || '';
+          this.category = data.categoryId || '';
           this.status = data.statusId || '';
           this.defaultLocation = data.locationId || '';
           this.serial = data.assetSerialNumber || '';
@@ -110,7 +112,7 @@ export class EditAssetComponent implements OnInit {
           this.purchaseCost = data.purchaseCost != null ? data.purchaseCost.toString() : '';
           this.isReturnable = data.isIssuable || false;
           this.syncAssetTagSearch();
-          
+
           if (data.purchaseDate) {
             // Convert to YYYY-MM-DD
             try {
@@ -120,10 +122,12 @@ export class EditAssetComponent implements OnInit {
             }
           }
         }
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         this.isLoading = false;
         this.errorMessage = 'Failed to load asset details.';
+
       }
     });
   }
@@ -143,6 +147,9 @@ export class EditAssetComponent implements OnInit {
   selectAssetTag(t: any): void {
     this.model = t.id;
     this.assetTagSearch = t.name;
+    if (t.categoryId) {
+      this.category = t.categoryId;
+    }
     this.showTagDropdown = false;
   }
 
@@ -151,6 +158,9 @@ export class EditAssetComponent implements OnInit {
       const match = this.models.find(m => m.id === this.model);
       if (match) {
         this.assetTagSearch = match.name;
+        if (match.categoryId) {
+          this.category = match.categoryId;
+        }
       }
     }
   }
@@ -167,7 +177,7 @@ export class EditAssetComponent implements OnInit {
 
   onSubmit(): void {
     this.errorMessage = '';
-    
+
     if (!this.assetName.trim()) {
       this.errorMessage = 'Asset Name is required.';
       return;
@@ -184,15 +194,15 @@ export class EditAssetComponent implements OnInit {
     this.isLoading = true;
 
     const payload = {
-      _id:             this.assetId,
-      assetName:       this.assetName.trim(),
-      assetTagId:      this.model,
-      statusId:        this.status,
+      _id: this.assetId,
+      assetName: this.assetName.trim(),
+      assetTagId: this.model,
+      statusId: this.status,
       defaultLocation: this.defaultLocation || null,
-      serial:          this.serial.trim(),
-      purchaseCost:    this.purchaseCost.trim(),
-      purchaseDate:    this.purchaseDate.trim(),
-      isReturnable:    this.isReturnable
+      serial: this.serial.trim(),
+      purchaseCost: this.purchaseCost.trim(),
+      purchaseDate: this.purchaseDate.trim(),
+      isReturnable: this.isReturnable
     };
 
     this.assetService.updateAsset(payload).subscribe({

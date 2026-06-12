@@ -85,9 +85,12 @@
             <button class="flex items-center gap-1.5 h-7 px-3 rounded-lg border border-slate-200 text-[10px] font-medium text-slate-600 hover:border-slate-400 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
               [disabled]="currentPage === 1" (click)="prevPage()">Previous</button>
             <div class="flex items-center gap-1">
-              <button *ngFor="let p of pageNumbers" class="w-7 h-7 rounded-lg text-[10px] font-medium transition-colors"
-                [class.bg-slate-100]="p === currentPage" [class.text-slate-800]="p === currentPage"
-                [class.text-slate-400]="p !== currentPage" (click)="goToPage(p)">{{ p }}</button>
+              <ng-container *ngFor="let p of pageNumbers">
+                <button *ngIf="p !== '...'" class="w-7 h-7 rounded-lg text-[10px] font-medium transition-colors"
+                  [class.bg-slate-100]="p === currentPage" [class.text-slate-800]="p === currentPage"
+                  [class.text-slate-400]="p !== currentPage" (click)="goToPage(p)">{{ p }}</button>
+                <span *ngIf="p === '...'" class="w-7 h-7 flex items-center justify-center text-[10px] font-medium text-slate-400">...</span>
+              </ng-container>
             </div>
             <button class="flex items-center gap-1.5 h-7 px-3 rounded-lg border border-slate-200 text-[10px] font-medium text-slate-600 hover:border-slate-400 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
               [disabled]="currentPage === totalPages" (click)="nextPage()">Next</button>
