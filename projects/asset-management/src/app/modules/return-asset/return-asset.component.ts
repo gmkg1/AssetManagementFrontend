@@ -1,11 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Breadcrumb } from '@libs/shared-ui';
-
-interface IssueOption {
-  value: string;
-  label: string;
-}
+import { AssetService } from '../../services/asset.service';
 
 interface ModuleTab {
   id: string;
@@ -18,24 +13,14 @@ interface ModuleTab {
   templateUrl: './return-asset.component.html',
   styleUrls: ['./return-asset.component.css']
 })
-export class ReturnAssetComponent {
-  breadcrumbs: Breadcrumb[] = [
-    { label: 'Home', callback: () => this.router.navigate(['/kjusys/asset-management/asset-dashboard']) },
-    { label: 'Return Asset' },
-  ];
+export class ReturnAssetComponent implements OnInit {
   public issueDropdownOpen = false;
   public selectedIssueId = '';
-  public issueIdOptions: IssueOption[] = [
-    { value: 'ISS-001', label: 'ISS-001 — MacBook Pro' },
-    { value: 'ISS-002', label: 'ISS-002 — HP Printer' },
-    { value: 'ISS-003', label: 'ISS-003 — BenQ Projector' }
-  ];
+  public selectedIssue: any = null;
+  public activeIssues: any[] = [];
 
-  public assetName = '';
-  public returnType = '';
-  public expectedReturnDate = '';
   public returnDate = '';
-  public notes = '';
+  public isSubmitting = false;
 
   public activeModuleTabId = 'return-asset';
   public moduleTabs: ModuleTab[] = [
@@ -48,7 +33,30 @@ export class ReturnAssetComponent {
     { id: 'reports', label: 'Reports', subtitle: 'Asset analytics' }
   ];
 
-  constructor(public router: Router) {}
+  constructor(public router: Router, private assetService: AssetService) {}
+
+  ngOnInit(): void {
+    // Set default return date to today's date in YYYY-MM-DD format
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    this.returnDate = `${yyyy}-${mm}-${dd}`;
+
+    this.loadActiveIssues();
+  }
+
+  loadActiveIssues(): void {
+    this.assetService.getIssuedAssets({ page: 1, pageSize: 100 }).subscribe({
+      next: (response: any) => {
+        const data = response?.responseData?.data ?? {};
+        this.activeIssues = data.assets ?? [];
+      },
+      error: (err: any) => {
+        console.error('Failed to load active issues:', err);
+      }
+    });
+  }
 
   toggleIssueDropdown(): void {
     this.issueDropdownOpen = !this.issueDropdownOpen;
@@ -61,15 +69,18 @@ export class ReturnAssetComponent {
   goToReturnLog(): void { this.router.navigate(['/kjusys/asset-management/return-log']); }
   goToReports(): void { this.router.navigate(['/kjusys/asset-management/reports']); }
 
-  onIssueSelect(option: IssueOption): void {
-    this.selectedIssueId = option.value;
-    this.assetName = option.label.split('—')[1]?.trim() ?? '';
+  onIssueSelect(issue: any): void {
+    this.selectedIssue = issue;
+    this.selectedIssueId = issue._id;
     this.issueDropdownOpen = false;
   }
 
   getSelectedLabel(): string {
-    const selected = this.issueIdOptions.find(opt => opt.value === this.selectedIssueId);
-    return selected?.label ?? 'Issue Tag';
+    if (!this.selectedIssue) {
+      return 'Select Issued Asset';
+    }
+    const shortId = this.selectedIssue._id ? this.selectedIssue._id.substring(this.selectedIssue._id.length - 6).toUpperCase() : 'ISS';
+    return `${shortId} — ${this.selectedIssue.assetName || 'Unknown Asset'} (${this.selectedIssue.receiverName || 'Unknown'})`;
   }
 
   onCancel(): void {
@@ -77,13 +88,33 @@ export class ReturnAssetComponent {
   }
 
   onReturnAsset(): void {
-    // This is a placeholder implementation. Replace with real return logic later.
-    if (!this.selectedIssueId) {
-      alert('Please select an issue ID before returning the asset.');
+    if (!this.selectedIssue) {
+      alert('Please select an issued asset before processing return.');
+      return;
+    }
+    if (!this.returnDate) {
+      alert('Please select a return date.');
       return;
     }
 
-    this.router.navigate(['/kjusys/asset-management/return-log']);
+    this.isSubmitting = true;
+    const payload = {
+      assetId: this.selectedIssue.assetId,
+      issuetoId: this.selectedIssue._id,
+      returnDate: this.returnDate
+    };
+
+    this.assetService.returnAsset(payload).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.router.navigate(['/kjusys/asset-management/return-log']);
+      },
+      error: (err: any) => {
+        this.isSubmitting = false;
+        console.error('Error returning asset:', err);
+        alert(err?.error?.error ?? 'Failed to return asset. Please try again.');
+      }
+    });
   }
 
   onModuleTabChange(tabId: string): void {

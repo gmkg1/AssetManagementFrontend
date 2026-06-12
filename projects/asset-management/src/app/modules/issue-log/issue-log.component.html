@@ -4,18 +4,18 @@
       <lib-breadcrumbs-title [breadcrumbs]="breadcrumbs" title="Issue Log"></lib-breadcrumbs-title>
       <div class="flex-1 p-4">
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div class="grid gap-3 px-4 py-3 border-b border-slate-100 md:grid-cols-2 xl:grid-cols-5">
-            <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs" type="text" placeholder="Asset name" [(ngModel)]="assetNameQuery" (ngModelChange)="onFilterChange()" />
-            <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs" type="text" placeholder="Category" [(ngModel)]="categoryQuery" (ngModelChange)="onFilterChange()" />
-            <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs" type="text" placeholder="Issued to" [(ngModel)]="issuedToQuery" (ngModelChange)="onFilterChange()" />
-            <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs" [(ngModel)]="selectedType" (change)="onFilterChange()">
+          <div class="flex flex-wrap gap-2 px-4 py-3 border-b border-slate-100">
+            <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[140px] flex-1" type="text" placeholder="Asset name" [(ngModel)]="assetNameQuery" (ngModelChange)="onFilterChange()" />
+            <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[120px] flex-1" type="text" placeholder="Category" [(ngModel)]="categoryQuery" (ngModelChange)="onFilterChange()" />
+            <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[120px] flex-1" type="text" placeholder="Issued to" [(ngModel)]="issuedToQuery" (ngModelChange)="onFilterChange()" />
+            <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[120px] flex-1" [(ngModel)]="selectedType" (change)="onFilterChange()">
               <option value="">All types</option>
               <option value="Location">Location</option>
               <option value="Asset">Asset</option>
               <option value="Person">Person</option>
             </select>
-            <div class="flex items-center gap-2">
-              <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs" type="date" [(ngModel)]="issueDate" (change)="onFilterChange()" />
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[130px]" type="date" [(ngModel)]="issueDate" (change)="onFilterChange()" />
               <button type="button" class="h-8 px-3 rounded-lg border border-slate-200 bg-white text-xs text-slate-600" (click)="clearFilters()">Clear</button>
             </div>
           </div>
@@ -26,11 +26,24 @@
             </div>
           </div>
           <div *ngIf="apiError" class="px-4 py-3 text-xs text-red-600 bg-red-50">{{ apiError }}</div>
-          <div *ngIf="isLoading && !apiError" class="flex items-center justify-center py-16 gap-2 text-slate-400">
-            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
-            <span class="text-xs">Loading issue log...</span>
-          </div>
-          <div *ngIf="!isLoading" class="grid grid-cols-5 px-4 py-2 border-b border-slate-100 bg-slate-50">
+          <!-- Skeleton rows while loading -->
+          <ng-container *ngIf="isLoading && !apiError">
+            <div class="grid grid-cols-5 px-4 py-2 border-b border-slate-100 bg-slate-50">
+              <span class="text-[10px] font-medium text-slate-500">Asset Name</span>
+              <span class="text-[10px] font-medium text-slate-500">Category</span>
+              <span class="text-[10px] font-medium text-slate-500">Issued To</span>
+              <span class="text-[10px] font-medium text-slate-500">Type</span>
+              <span class="text-[10px] font-medium text-slate-500">Issue Date</span>
+            </div>
+            <div *ngFor="let s of [1,2,3,4,5,6,7,8]" class="grid grid-cols-5 px-4 py-3 border-b border-slate-50 animate-pulse">
+              <div class="h-3 bg-slate-200 rounded w-3/4"></div>
+              <div class="h-3 bg-slate-200 rounded w-2/3"></div>
+              <div class="h-3 bg-slate-200 rounded w-3/4"></div>
+              <div class="h-3 bg-slate-200 rounded w-1/2"></div>
+              <div class="h-3 bg-slate-200 rounded w-2/3"></div>
+            </div>
+          </ng-container>
+          <div *ngIf="!isLoading && !apiError" class="grid grid-cols-5 px-4 py-2 border-b border-slate-100 bg-slate-50">
             <span class="text-[10px] font-medium text-slate-500">Asset Name</span>
             <span class="text-[10px] font-medium text-slate-500">Category</span>
             <span class="text-[10px] font-medium text-slate-500">Issued To</span>

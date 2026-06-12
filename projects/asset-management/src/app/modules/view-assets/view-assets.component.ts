@@ -10,6 +10,10 @@ export interface Asset {
   department: string;
   category: string;
   status: string;
+  statusId?: string;
+  locationId?: string;
+  assetTagId?: string;
+  isReturnable?: boolean;
   assignedTo: string;
   purchaseDate: string;
   condition: string;
@@ -81,11 +85,11 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     { key: 'info', label: 'Info', icon: 'M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z' },
     { key: 'licenses', label: 'Licenses', icon: 'M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z' },
     { key: 'components', label: 'Components', icon: 'M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z' },
-    { key: 'assets', label: 'Assets', icon: 'M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z' },
+    { key: 'files', label: 'File', icon: 'M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z' },
     { key: 'history', label: 'History', icon: 'M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z' },
-    { key: 'maintenances', label: 'Maintenances', icon: 'M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l5.653-4.655m5.8-5.8 1.875-1.875a1.875 1.875 0 0 1 2.652 2.652l-1.875 1.875m-5.8 5.8-.8.8' },
-    { key: 'files', label: 'Files', icon: 'M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3' },
   ];
+
+  showStatusDropdown = false;
 
   actions = [
     { label: 'Edit Asset', color: '#E53935', icon: 'M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125' },
@@ -246,9 +250,80 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('document:click')
-  onDocumentClick(): void { this.sidebarOpen = false; }
+  onDocumentClick(): void {
+    this.sidebarOpen = false;
+    this.showStatusDropdown = false;
+  }
 
-  openDetail(asset: Asset): void { this.selectedAsset = asset; this.detailTab = 'info'; this.view = 'detail'; }
+  openDetail(asset: Asset): void {
+    this.selectedAsset = asset;
+    this.detailTab = 'components'; // Default tab components as shown in Figma
+    this.view = 'detail';
+
+    if (asset._id) {
+      this.assetService.getAssetDetails(asset._id).subscribe({
+        next: (res: any) => {
+          const data = res?.responseData?.data;
+          if (data && this.selectedAsset && this.selectedAsset._id === asset._id) {
+            let normalizedPurchaseDate = '';
+            if (data.purchaseDate) {
+              try {
+                normalizedPurchaseDate = new Date(data.purchaseDate).toISOString().substring(0, 10);
+              } catch (e) {
+                normalizedPurchaseDate = '';
+              }
+            }
+            this.selectedAsset = {
+              ...this.selectedAsset,
+              statusId: data.statusId,
+              locationId: data.locationId,
+              assetTagId: data.assetTagId,
+              serial: data.assetSerialNumber || this.selectedAsset.serial,
+              purchaseCost: data.purchaseCost != null ? data.purchaseCost.toString() : this.selectedAsset.purchaseCost,
+              purchaseDate: normalizedPurchaseDate || this.selectedAsset.purchaseDate,
+              isReturnable: data.isIssuable || false
+            };
+          }
+        }
+      });
+    }
+  }
+
+  selectStatus(status: { id: string, name: string }, event: Event): void {
+    event.stopPropagation();
+    this.showStatusDropdown = false;
+    if (!this.selectedAsset || !this.selectedAsset._id) return;
+
+    this.isLoading = true;
+    const rawCost = (this.selectedAsset.purchaseCost || '').replace('Rs. ', '').replace(/,/g, '');
+    const payload = {
+      _id:             this.selectedAsset._id,
+      assetName:       this.selectedAsset.name,
+      assetTagId:      this.selectedAsset.assetTagId || '',
+      statusId:        status.id,
+      defaultLocation: this.selectedAsset.locationId || null,
+      serial:          this.selectedAsset.serial || '',
+      purchaseCost:    rawCost,
+      purchaseDate:    this.selectedAsset.purchaseDate || '',
+      isReturnable:    this.selectedAsset.isReturnable ?? false
+    };
+
+    this.assetService.updateAsset(payload).subscribe({
+      next: (res: any) => {
+        if (this.selectedAsset) {
+          this.selectedAsset.status = status.name;
+          this.selectedAsset.statusId = status.id;
+        }
+        this.isLoading = false;
+        this.loadAssets();
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        console.error('Failed to update status:', err);
+      }
+    });
+  }
+
   backToList(): void { this.view = 'list'; this.selectedAsset = null; }
   goToDashboard(): void { this.router.navigate(['/kjusys/asset-management/asset-dashboard']); }
   goToIssueAsset(): void { this.router.navigate(['/kjusys/asset-management/issue-asset']); }

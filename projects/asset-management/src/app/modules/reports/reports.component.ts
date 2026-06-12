@@ -58,13 +58,17 @@ export class ReportsComponent implements OnInit, OnDestroy {
   }
 
   get totalPages(): number { return Math.max(1, Math.ceil(this.assets.length / PAGE_SIZE)); }
-  get pageNumbers(): number[] {
-    const pages: number[] = [];
-    for (let i = 1; i <= this.totalPages; i++) {
-      if (i === 1 || i === this.totalPages || Math.abs(i - this.currentPage) <= 1) pages.push(i);
-      else if (pages[pages.length - 1] !== -1) pages.push(-1);
+  get pageNumbers(): (number | '...')[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    
+    if (total <= 5) {
+      return Array.from({ length: total }, (_, i) => i + 1);
     }
-    return pages;
+    
+    if (current <= 2) return [1, 2, 3, '...', total];
+    if (current >= total - 1) return [1, '...', total - 2, total - 1, total];
+    return [1, '...', current, '...', total];
   }
   get selectedCount(): number { return this.pagedAssets.filter(a => a.checked).length; }
 
@@ -186,7 +190,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this.pagedAssets.forEach(a => a.checked = this.allChecked);
   }
 
-  goToPage(p: number): void { if (p !== this.currentPage) this.currentPage = p; }
+  goToPage(p: number | '...'): void { if (p !== '...' && p !== this.currentPage) this.currentPage = p; }
   prevPage(): void { if (this.currentPage > 1) this.currentPage--; }
   nextPage(): void { if (this.currentPage < this.totalPages) this.currentPage++; }
 

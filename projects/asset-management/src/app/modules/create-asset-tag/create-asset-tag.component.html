@@ -1,11 +1,21 @@
-<div class="flex flex-col min-h-full bg-[#F5F5F5]" style="font-family: 'DM Sans', 'Inter', sans-serif;">
-  <lib-breadcrumbs-title [breadcrumbs]="breadcrumbs" title="Create New Asset Tag"></lib-breadcrumbs-title>
-  <div class="p-5">
+<div class="flex flex-col min-h-full bg-[#F0F2F5] font-inter text-xs">
+  <div class="p-4">
+        <h1 class="text-sm font-semibold text-slate-800 mb-4">Asset Management</h1>
 
-    <!-- Form card -->
-    <div class="bg-white p-6 w-full rounded-lg border border-[#F0F2F5]" style="box-shadow: 0px 3.96px 0px rgba(0,0,0,0.02);">
+        <!-- Form card -->
+        <div class="bg-white rounded-xl shadow-sm p-5 mb-[100px]" >
 
-      <div class="flex flex-col gap-5">
+          <!-- Card header -->
+          <div class="flex items-center gap-2 mb-0.5">
+            <div class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+              <svg fill="none" viewBox="0 0 24 24" stroke="#2B7FFF" stroke-width="1.8" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-sm font-semibold text-slate-800 leading-none mb-0.5">Create New Asset Tag</h2>
+            </div>
+          </div>
 
         <!-- Category -->
         <div class="flex flex-col gap-1">
@@ -160,7 +170,6 @@
   <!-- Alert container for lib-alert toasts -->
   <lib-alert-container></lib-alert-container>
 
-  <footer class="h-6 bg-[#434B57] flex items-center justify-center flex-shrink-0">
-    <span class="text-[10px] text-white">© Developed by : Software Development Centre, Kristu Jayanti (Deemed to be University), Bangalore</span>
-  </footer>
-</div>
+      <footer class="h-6 bg-[#434B57] flex items-center justify-center flex-shrink-0">
+        <span class="text-[10px] text-white">Â© Developed by : Software Development Centre, Kristu Jayanti (Deemed to be University), Bangalore</span>
+      </footer>

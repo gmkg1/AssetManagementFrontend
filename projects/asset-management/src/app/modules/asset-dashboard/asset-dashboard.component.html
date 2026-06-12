@@ -21,12 +21,12 @@
         <h2 class="text-xs font-medium text-slate-600 mb-3">Asset Categories</h2>
 
         <!-- Loading skeleton -->
-        <div *ngIf="isLoading" class="grid grid-cols-6 gap-3 mb-4">
+        <div *ngIf="isLoading" class="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-4">
           <div *ngFor="let i of [1,2,3,4,5,6]" class="bg-white rounded-xl p-3 shadow-sm animate-pulse h-20"></div>
         </div>
 
         <!-- Department cards -->
-        <div *ngIf="!isLoading" class="grid grid-cols-6 gap-3 mb-4">
+        <div *ngIf="!isLoading" class="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-4">
           <div *ngFor="let dept of departments"
             class="bg-white rounded-xl p-3 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-150"
             (click)="navigateToDeptAssets(dept.id)">
@@ -46,7 +46,7 @@
         </div>
 
         <!-- Bottom row -->
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-3">
 
           <!-- Issue History -->
           <div class="bg-white rounded-xl shadow-sm overflow-hidden">
