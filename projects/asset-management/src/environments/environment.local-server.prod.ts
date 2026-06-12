@@ -13,8 +13,8 @@ export const environment = {
         'asset-management': 'http://localhost:4205',
     },
     publicPath: 'http://localhost:4200/',
-    baseUrl: 'https://spoke-michael-recognized-prefix.trycloudflare.com/api/',
+    baseUrl: 'https://portfolio-mae-governing-maximum.trycloudflare.com/api/',
     project: 'shell',
     baseRoute: 'kjusys',
     local: true,
-};
+  };
