@@ -58,27 +58,26 @@
           <div class="flex flex-wrap gap-2 px-4 py-3 border-b border-slate-100">
             <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 h-8 min-w-[160px] flex-1">
               <svg fill="none" viewBox="0 0 24 24" stroke="#AEAEAE" stroke-width="2" class="w-3.5 h-3.5 flex-shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
-              <input class="flex-1 bg-transparent text-xs text-slate-700 outline-none border-0 placeholder:text-slate-400" type="text" placeholder="Search asset name..." [(ngModel)]="searchQuery" (ngModelChange)="onFilterChange()"/>
+              <input class="flex-1 bg-transparent text-xs text-slate-700 outline-none border-0 placeholder:text-slate-400" type="text" placeholder="Search asset name..." [(ngModel)]="searchQuery"/>
             </div>
             <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 h-8 min-w-[160px] flex-1">
-              <input class="flex-1 bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-400" type="text" placeholder="Search asset tag..." [ngModel]="assetTagQuery" (ngModelChange)="onAssetTagInput($event)"/>
+              <input class="flex-1 bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-400" type="text" placeholder="Search asset tag..." [(ngModel)]="assetTagQuery"/>
             </div>
-            <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[140px] flex-1" [(ngModel)]="selectedCategoryId" (change)="onFilterChange()">
+            <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[140px] flex-1" [(ngModel)]="selectedCategoryId">
               <option value="">All categories</option>
               <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
             </select>
-            <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[140px] flex-1" [(ngModel)]="selectedLocationId" (change)="onFilterChange()">
+            <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[140px] flex-1" [(ngModel)]="selectedLocationId">
               <option value="">All departments</option>
               <option *ngFor="let l of locations" [value]="l.id">{{ l.name }}</option>
             </select>
-            <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[130px] flex-1" [(ngModel)]="selectedStatusId" (change)="onFilterChange()">
+            <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[130px] flex-1" [(ngModel)]="selectedStatusId">
               <option value="">All statuses</option>
               <option *ngFor="let s of statuses" [value]="s.id">{{ s.name }}</option>
             </select>
-            <div class="flex items-center gap-2 flex-shrink-0">
-              <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[130px]" type="date" [(ngModel)]="purchaseDate" (change)="onFilterChange()"/>
-              <button type="button" class="h-8 px-3 rounded-lg border border-slate-200 bg-white text-xs text-slate-600 hover:bg-slate-50 transition-colors" (click)="clearFilters()">Clear</button>
-            </div>
+            <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs w-[130px] flex-shrink-0" type="date" [(ngModel)]="purchaseDate"/>
+            <button type="button" class="h-8 px-4 rounded-lg bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 transition-colors flex-shrink-0" (click)="onSearch()">Search</button>
+            <button type="button" class="h-8 px-3 rounded-lg border border-slate-200 bg-white text-xs text-slate-600 hover:bg-slate-50 transition-colors flex-shrink-0" (click)="clearFilters()">Clear</button>
             <span class="text-[10px] text-slate-400 self-center ml-auto">{{ totalRecords }} result{{ totalRecords !== 1 ? 's' : '' }}</span>
           </div>
 

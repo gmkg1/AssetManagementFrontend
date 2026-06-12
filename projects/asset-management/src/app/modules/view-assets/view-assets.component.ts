@@ -65,7 +65,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   purchaseDate = '';
   searchQuery = '';
   assetTagQuery = '';
-  private assetTagTimer: ReturnType<typeof setTimeout> | null = null;
+  // search is triggered manually via onSearch()
 
   currentPage = 1;
   totalPages = 1;
@@ -117,9 +117,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
-    if (this.assetTagTimer) clearTimeout(this.assetTagTimer);
-  }
+  ngOnDestroy(): void {}
 
   private loadFilterOptions(): void {
     
@@ -177,10 +175,16 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     });
   }
 
+  onSearch(): void {
+    this.currentPage = 1;
+    this.loadAssets();
+  }
+
   onFilterChange(): void {
     this.currentPage = 1;
     this.loadAssets();
   }
+
 
   clearFilters(): void {
     this.selectedCategoryId = '';
@@ -191,13 +195,6 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     this.assetTagQuery = '';
     this.currentPage = 1;
     this.loadAssets();
-  }
-
-  onAssetTagInput(value: string): void {
-    this.assetTagQuery = value;
-    if (this.assetTagTimer) clearTimeout(this.assetTagTimer);
-    if (!value || value.trim().length < 3) return;
-    this.assetTagTimer = setTimeout(() => this.onFilterChange(), 350);
   }
 
   private loadStatusCounts(): void {
