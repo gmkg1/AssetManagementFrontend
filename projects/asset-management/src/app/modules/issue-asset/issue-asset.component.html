@@ -84,8 +84,9 @@
             <div class="grid grid-cols-2 gap-3">
               <div class="flex flex-col gap-1">
                 <label class="text-[10px] text-slate-500 font-medium">Expected Return Date</label>
-                <input type="date" [(ngModel)]="expectedReturn"
+              <input type="date" [(ngModel)]="expectedReturn" [min]="issueDate"
                   class="h-8 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors"/>
+
               </div>
               <div class="flex flex-col gap-1">
                 <label class="text-[10px] text-slate-500 font-medium">Expected Return Time</label>

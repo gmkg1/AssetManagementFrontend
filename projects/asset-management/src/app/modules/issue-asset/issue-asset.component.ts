@@ -276,10 +276,15 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
     this.submitted = true;
     this.submitError = null;
 
-    if (!this.assetId || !this.selectedReceiverId || !this.issueDate) {
+        if (!this.assetId || !this.selectedReceiverId || !this.issueDate) {
       this.submitError = 'Asset, receiver, and issue date are required.';
       return;
     }
+    if (this.expectedReturn && this.expectedReturn <= this.issueDate) {
+      this.submitError = 'Expected Return Date must be after the Issue Date.';
+      return;
+    }
+
 
     const payload: {
       assetId: string;
