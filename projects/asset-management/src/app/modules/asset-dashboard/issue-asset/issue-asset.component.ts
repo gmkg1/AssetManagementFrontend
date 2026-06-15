@@ -338,6 +338,11 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.expectedReturn && this.expectedReturn < this.issueDate) {
+      this.submitError = 'Expected return date cannot be before the issue date.';
+      return;
+    }
+
     const payload: {
       assetId: string;
       issueDate: string;
