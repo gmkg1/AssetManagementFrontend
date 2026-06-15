@@ -15,7 +15,7 @@
             (focus)="assetDropdownOpen = true"
             (input)="onAssetSearchInput(assetSearch)"
             placeholder="Search asset name"
-            class="flex-1 bg-transparent text-xs text-slate-800 outline-none placeholder:text-slate-400"/>
+            class="flex-1 bg-transparent text-xs text-slate-800 border-0 outline-none ring-0 focus:outline-none focus:ring-0 focus:border-0 placeholder:text-slate-400"/>
         </div>
         <div *ngIf="assetDropdownOpen" class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 overflow-hidden max-h-56 overflow-y-auto">
           <div *ngIf="assetOptionsLoading" class="px-3 py-2 text-xs text-slate-400">Loading options...</div>
@@ -48,7 +48,7 @@
             (focus)="receiverDropdownOpen = true"
             (input)="receiverDropdownOpen = true"
             [placeholder]="'Search ' + issueTo.toLowerCase()"
-            class="flex-1 bg-transparent text-xs text-slate-800 outline-none placeholder:text-slate-400"/>
+            class="flex-1 bg-transparent text-xs text-slate-800 border-0 outline-none ring-0 focus:outline-none focus:ring-0 focus:border-0 placeholder:text-slate-400"/>
         </div>
         <div *ngIf="receiverDropdownOpen" class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 overflow-hidden max-h-56 overflow-y-auto">
           <div *ngIf="receiverOptionsLoading" class="px-3 py-2 text-xs text-slate-400">Loading options...</div>
@@ -121,7 +121,7 @@
       <svg fill="none" viewBox="0 0 24 24" stroke="#AEAEAE" stroke-width="2" class="w-3.5 h-3.5 flex-shrink-0">
         <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
       </svg>
-      <input class="flex-1 bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-400"
+      <input class="flex-1 bg-transparent text-xs text-slate-700 border-0 outline-none ring-0 focus:outline-none focus:ring-0 focus:border-0 placeholder:text-slate-400"
         type="text" placeholder="Search log..." [(ngModel)]="searchQuery" (click)="$event.stopPropagation()"/>
     </div>
   </div>
