@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
+import { Breadcrumb } from '@libs/shared-ui';
 
 @Component({
   selector: 'app-edit-asset',
@@ -8,6 +9,10 @@ import { AssetService } from '../../services/asset.service';
   styleUrls: ['./edit-asset.component.css']
 })
 export class EditAssetComponent implements OnInit {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home', callback: () => this.router.navigate(['/kjusys/asset-management/asset-dashboard']) },
+    { label: 'Edit Asset' },
+  ];
   assetId = '';      // Database _id
   serialNumber = ''; // Serial label
   company = '';

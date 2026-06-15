@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
+import { Breadcrumb } from '@libs/shared-ui';
 
 
 
@@ -14,6 +15,10 @@ const PAGE_SIZE = 8;
   styleUrls: ['./issue-asset.component.scss'],
 })
 export class IssueAssetComponent implements OnInit, OnDestroy {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home', callback: () => this.router.navigate(['/kjusys/asset-management/asset-dashboard']) },
+    { label: 'Issue Asset' },
+  ];
   assetId = '';
   assetName = '';
   assetTag = '';
@@ -25,6 +30,11 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
   assetsList: any[] = [];
 
   issueTo = 'User';
+  issueToTabs = [
+    { id: 'User', label: 'User' },
+    { id: 'Asset', label: 'Asset' },
+    { id: 'Location', label: 'Location' },
+  ];
   receiverSearch = '';
   selectedReceiverId = '';
   selectedReceiverLabel = '';
@@ -106,10 +116,30 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
               }))
               .filter((item: OptionItem) => item._id && item.label)
           : [];
-        this.receiverOptionsLoading = false;
       },
       error: (err) => {
         console.error('Failed to load locations for dropdown:', err);
+      },
+    });
+
+    this.assetService.getAssets({ page: 1, pageSize: 200 }).subscribe({
+      next: (response: any) => {
+        const raw: any[] =
+          response?.responseData?.data?.assets ??
+          response?.responseData?.assets ??
+          [];
+        this.assets = Array.isArray(raw)
+          ? raw
+              .map((item: any) => ({
+                _id: item._id ?? '',
+                label: `${item.assetName} (${item.assetTagName || 'No Tag'})`,
+              }))
+              .filter((item: OptionItem) => item._id && item.label)
+          : [];
+        this.receiverOptionsLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load assets for dropdown:', err);
         this.receiverOptionsLoading = false;
       },
     });
@@ -150,30 +180,52 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
       return;
     }
     this.assetOptionsLoading = true;
-    this.assetService.searchAssets(query).subscribe({
+    this.assetService.getUnissuedAssetNames(query).subscribe({
       next: (response: any) => {
-        const raw = response?.responseData?.data?.assets ?? response?.responseData?.assets ?? [];
-        this.assetsList = raw.map((item: any) => ({
-          _id: item._id,
-          label: `${item.assetName} (${item.assetTagName || 'No Tag'})`,
-          assetName: item.assetName,
-          assetTag: item.assetTagName || 'No Tag'
-        }));
+        const data = response?.responseData?.data || response?.responseData || {};
+        const raw = data.assetNames || [];
+        this.assetsList = raw;
         this.assetOptionsLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
-        console.error('Failed to search assets:', err);
+        console.error('Failed to search unissued assets:', err);
         this.assetOptionsLoading = false;
       }
     });
   }
 
-  selectAssetOption(option: any): void {
-    this.assetId = option._id;
-    this.assetName = option.assetName;
-    this.assetTag = option.assetTag;
-    this.assetSearch = option.assetName;
+  selectAssetOption(name: string): void {
+    this.assetSearch = name;
     this.assetDropdownOpen = false;
+    this.assetOptionsLoading = true;
+    this.assetService.getAssets({ assetName: name, pageSize: 50 }).subscribe({
+      next: (response: any) => {
+        const raw = response?.responseData?.data?.assets ?? response?.responseData?.assets ?? [];
+        // Find the first Ready to Deploy asset
+        const available = raw.find((item: any) => item.status === 'Ready to Deploy');
+        if (available) {
+          this.assetId = available._id;
+          this.assetName = available.assetName;
+          this.assetTag = available.assetTagName || 'No Tag';
+          this.assetModel = available.assetTagName || 'No Tag';
+          this.assetCategory = available.category || 'No Category';
+        } else if (raw.length > 0) {
+          const first = raw[0];
+          this.assetId = first._id;
+          this.assetName = first.assetName;
+          this.assetTag = first.assetTagName || 'No Tag';
+          this.assetModel = first.assetTagName || 'No Tag';
+          this.assetCategory = first.category || 'No Category';
+        }
+        this.assetOptionsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Failed to load asset details:', err);
+        this.assetOptionsLoading = false;
+      }
+    });
   }
 
   goBack(): void { this.router.navigate(['/kjusys/asset-management/view-assets']); }
@@ -187,10 +239,15 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
     this.submitted = true;
     this.submitError = null;
 
-    if (!this.assetId || !this.selectedReceiverId || !this.issueDate) {
+        if (!this.assetId || !this.selectedReceiverId || !this.issueDate) {
       this.submitError = 'Asset, receiver, and issue date are required.';
       return;
     }
+    if (this.expectedReturn && this.expectedReturn <= this.issueDate) {
+      this.submitError = 'Expected Return Date must be after the Issue Date.';
+      return;
+    }
+
 
     const payload: {
       assetId: string;

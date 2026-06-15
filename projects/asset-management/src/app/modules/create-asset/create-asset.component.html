@@ -308,23 +308,23 @@
               <input #fileInput type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)" />
             </div>
 
-            <!-- Preview -->
-            <div *ngIf="assetImagePreview" class="relative overflow-hidden flex items-center justify-center"
-              style="height: 120px; border: 1px solid #DFE2E6; border-radius: 6px; background: #FAFAFA;">
-              <img [src]="assetImagePreview" alt="Asset preview" class="max-h-full max-w-full object-contain p-2" />
-              <button
-                class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white border border-slate-200 shadow flex items-center justify-center hover:text-red-500 hover:border-red-300 transition-colors"
-                style="color: #8993A4;" (click)="removeImage($event)" title="Remove image">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="w-3 h-3">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <div
-                class="absolute bottom-2 left-2 right-2 flex items-center gap-1.5 bg-white/80 backdrop-blur-sm rounded px-2 py-1 border border-slate-100">
-                <span class="truncate text-[10px] text-slate-500">{{ assetImageFile?.name }}</span>
+                <!-- Preview -->
+                <div *ngIf="assetImagePreview"
+                  class="relative overflow-hidden flex items-center justify-center"
+                  style="height: 120px; border: 1px solid #DFE2E6; border-radius: 6px; background: #FAFAFA;">
+                  <img [src]="assetImagePreview" alt="Asset preview" class="max-h-full max-w-full object-contain p-2" />
+                  <button
+                    class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white border border-slate-200 shadow flex items-center justify-center hover:text-red-500 hover:border-red-300 transition-colors"
+                    style="color: #8993A4;" (click)="removeImage($event)" title="Remove image">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="w-3 h-3">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                  <div class="absolute bottom-2 left-2 right-2 flex items-center gap-1.5 bg-white/80 backdrop-blur-sm rounded px-2 py-1 border border-slate-100">
+                    <span class="truncate text-[10px] text-slate-500">{{ assetImageFile?.name }}</span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
         </div>
         <!-- END RIGHT COLUMN -->
@@ -332,61 +332,53 @@
       </div>
       <!-- END TWO-COLUMN -->
 
-      <!-- Error -->
-      <div *ngIf="errorMessage"
-        class="mt-4 px-4 py-2.5 rounded-lg bg-red-50 border border-red-200 text-xs text-red-600 flex items-center gap-2">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-4 h-4 flex-shrink-0">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-        </svg>
-        {{ errorMessage }}
-      </div>
+          <!-- Error -->
+          <div *ngIf="errorMessage" class="mt-4 px-4 py-2.5 rounded-lg bg-red-50 border border-red-200 text-xs text-red-600 flex items-center gap-2">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-4 h-4 flex-shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
+            </svg>
+            {{ errorMessage }}
+          </div>
 
-      <!-- Actions -->
-      <div class="flex justify-end gap-3 mt-5 pt-1 border-t border-slate-100">
-        <button
-          class="h-8 px-5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:border-slate-400 hover:text-slate-800 transition-all duration-150 active:scale-95"
-          [disabled]="isLoading" (click)="goBack()">Cancel</button>
-        <button
-          class="h-8 px-5 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all duration-150 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
-          [disabled]="isLoading" (click)="onSubmit()">
-          <svg *ngIf="isLoading" class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-          </svg>
-          {{ isLoading ? 'Creating...' : 'Save Asset' }}
-        </button>
-      </div>
+          <!-- Actions -->
+          <div class="flex justify-end gap-3 mt-5 pt-1 border-t border-slate-100">
+            <button class="h-8 px-5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:border-slate-400 hover:text-slate-800 transition-all duration-150 active:scale-95"
+              [disabled]="isLoading" (click)="goBack()">Cancel</button>
+            <button class="h-8 px-5 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all duration-150 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+              [disabled]="isLoading" (click)="onSubmit()">
+              <svg *ngIf="isLoading" class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+              </svg>
+              {{ isLoading ? 'Creating...' : 'Save Asset' }}
+            </button>
+          </div>
 
     </div>
     <!-- END FORM CARD -->
 
   </div>
 
-  <!-- SUCCESS OVERLAY -->
-  <div *ngIf="showSuccess" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 w-80 flex flex-col items-center text-center">
-      <div class="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center mb-4 shadow-lg shadow-green-200">
-        <svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.5" class="w-7 h-7">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-        </svg>
+      <!-- SUCCESS OVERLAY -->
+      <div *ngIf="showSuccess" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-80 flex flex-col items-center text-center">
+          <div class="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center mb-4 shadow-lg shadow-green-200">
+            <svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.5" class="w-7 h-7">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+            </svg>
+          </div>
+          <h2 class="text-sm font-bold text-slate-800 mb-1">Asset Created</h2>
+          <p class="text-[10px] text-slate-500 mb-5"><strong class="text-slate-700">{{ assetName || assetTag }}</strong> has been added to the system.</p>
+          <div class="flex gap-2 w-full">
+            <button class="flex-1 h-8 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:border-slate-400 transition-all active:scale-95" (click)="createAnother()">Create Another</button>
+            <button class="flex-1 h-8 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all active:scale-95" (click)="goBack()">Back to Assets</button>
+          </div>
+        </div>
       </div>
-      <h2 class="text-sm font-bold text-slate-800 mb-1">Asset Created</h2>
-      <p class="text-[10px] text-slate-500 mb-5"><strong class="text-slate-700">{{ assetName || assetTag }}</strong> has
-        been added to the system.</p>
-      <div class="flex gap-2 w-full">
-        <button
-          class="flex-1 h-8 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:border-slate-400 transition-all active:scale-95"
-          (click)="createAnother()">Create Another</button>
-        <button
-          class="flex-1 h-8 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all active:scale-95"
-          (click)="goBack()">Back to Assets</button>
-      </div>
-    </div>
-  </div>
 
-  <footer class="h-6 bg-[#434B57] flex items-center justify-center flex-shrink-0">
-    <span class="text-[10px] text-white">Â© Developed by : Software Development Centre, Kristu Jayanti (Deemed to be
-      University), Bangalore</span>
-  </footer>
+      <footer class="h-6 bg-[#434B57] flex items-center justify-center flex-shrink-0">
+        <span class="text-[10px] text-white">Â© Developed by : Software Development Centre, Kristu Jayanti (Deemed to be University), Bangalore</span>
+      </footer>
 </div>
+
+<lib-alert-container></lib-alert-container>

@@ -1,7 +1,9 @@
 <div class="flex flex-col min-h-screen w-full bg-[#F0F2F5] font-inter text-xs">
   <div class="flex flex-1">
     <div class="flex flex-col flex-1">
+      <lib-breadcrumbs-title [breadcrumbs]="breadcrumbs" title="Issue Log"></lib-breadcrumbs-title>
       <div class="flex-1 p-4">
+<<<<<<< HEAD
         <div class="mb-4">
         </div>
 
@@ -17,6 +19,8 @@
           <h1 class="text-sm font-semibold text-slate-800 mb-3">Issue Log</h1>
         </div>
 
+=======
+>>>>>>> origin/finalmerge
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
           <div class="flex flex-wrap gap-2 px-4 py-3 border-b border-slate-100">
             <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[140px] flex-1"
@@ -33,10 +37,15 @@
               <option value="Person">Person</option>
             </select>
             <div class="flex items-center gap-2 flex-shrink-0">
+<<<<<<< HEAD
               <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[130px]" type="date"
                 [(ngModel)]="issueDate" (change)="onFilterChange()" />
               <button type="button" class="h-8 px-3 rounded-lg border border-slate-200 bg-white text-xs text-slate-600"
                 (click)="clearFilters()">Clear</button>
+=======
+              <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[130px]" type="date" [(ngModel)]="issueDate" (change)="onFilterChange()" />
+              <button type="button" class="h-8 px-3 rounded-lg border border-slate-200 bg-white text-xs text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition-all duration-150 active:scale-95" (click)="clearFilters()">Clear</button>
+>>>>>>> origin/finalmerge
             </div>
           </div>
           <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">

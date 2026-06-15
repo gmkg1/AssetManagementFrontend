@@ -13,7 +13,11 @@ export const environment = {
         'asset-management': 'http://localhost:4205',
     },
     publicPath: 'http://localhost:4200/',
+<<<<<<< HEAD
     baseUrl: 'https://excellence-foot-journalist-manually.trycloudflare.com/api/',
+=======
+    baseUrl: 'https://highway-over-concluded-period.trycloudflare.com/api/',
+>>>>>>> origin/finalmerge
     project: 'shell',
     baseRoute: 'kjusys',
     local: true,

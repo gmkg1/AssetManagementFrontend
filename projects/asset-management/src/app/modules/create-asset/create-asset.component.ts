@@ -1,6 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
+import { Breadcrumb } from '@libs/shared-ui';
 
 @Component({
   selector: 'app-create-asset',
@@ -8,6 +9,10 @@ import { AssetService } from '../../services/asset.service';
   styleUrls: ['./create-asset.component.css'],
 })
 export class CreateAssetComponent implements OnInit {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home', callback: () => this.router.navigate(['/kjusys/asset-management/asset-dashboard']) },
+    { label: 'Create Asset' },
+  ];
 
   // Left column fields
   company         = '';
@@ -26,6 +31,7 @@ export class CreateAssetComponent implements OnInit {
   eolDate      = '';
   supplier     = '';
   purchaseCost = '';
+  today = new Date().toISOString().split('T')[0];
   isReturnable = true;
 
   // Dropdown options
@@ -163,6 +169,12 @@ export class CreateAssetComponent implements OnInit {
       this.errorMessage = 'Asset Name is required.';
       return;
     }
+    
+    if (this.eolDate && this.purchaseDate && this.eolDate <= this.purchaseDate) {
+      this.errorMessage = 'EOL Date must be after the Purchase Date.';
+      return;
+    }
+
 
     this.isLoading = true;
 

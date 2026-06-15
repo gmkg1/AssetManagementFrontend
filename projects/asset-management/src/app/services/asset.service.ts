@@ -18,7 +18,6 @@ export class AssetService {
     return this.http.get<any>(`${this.baseUrl}/status`);
   }
 
-  /** GET /assets?page=X&size=Y */
   getAssets(filters: {
     page?: number;
     pageSize?: number;
@@ -29,6 +28,8 @@ export class AssetService {
     statusId?: string;
     purchaseDateFrom?: string;
     purchaseDateTo?: string;
+    sortBy?: string;
+    sortOrder?: string;
   } = {}) {
     let params = new HttpParams()
       .set('page', (filters.page ?? 1).toString())
@@ -40,6 +41,10 @@ export class AssetService {
     if (filters.statusId) params = params.set('statusId', filters.statusId);
     if (filters.purchaseDateFrom) params = params.set('purchaseDateFrom', filters.purchaseDateFrom);
     if (filters.purchaseDateTo) params = params.set('purchaseDateTo', filters.purchaseDateTo);
+    if (filters.sortBy) params = params.set('sortBy', filters.sortBy);
+    if (filters.sortOrder) params = params.set('sortOrder', filters.sortOrder);
+    // Also try adding 'sort' commonly used by some backends
+    params = params.set('sort', '-createdAt,-_id');
     return this.http.get<any>(`${this.baseUrl}/assets`, { params });
   }
 
@@ -156,7 +161,10 @@ export class AssetService {
 
   /** GET /asset-status-summary?page=X&size=Y */
   getAssetStatusSummary(page: number = 1, size: number = 10) {
-    const params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('pageSize', size.toString());
     return this.http.get<any>(`${this.baseUrl}/asset-status-summary`, { params });
   }
 
@@ -179,5 +187,21 @@ export class AssetService {
 
   updateAsset(payload: any) {
     return this.http.put<any>(`${this.baseUrl}/edit-asset`, payload);
+  }
+
+  getLicensesAndWarranty(assetId: string) {
+    return this.http.get<any>(`${this.baseUrl}/get-licenses/${assetId}`);
+  }
+
+  getAssetComponents(assetId: string) {
+    return this.http.get<any>(`${this.baseUrl}/get-asset-components/${assetId}`);
+  }
+
+  getUnissuedAssetNames(query?: string) {
+    let params = new HttpParams();
+    if (query) {
+      params = params.set('q', query);
+    }
+    return this.http.get<any>(`${this.baseUrl}/unissued-asset-names`, { params });
   }
 }

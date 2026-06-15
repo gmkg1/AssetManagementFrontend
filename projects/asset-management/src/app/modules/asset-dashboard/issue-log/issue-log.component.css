@@ -1,0 +1,42 @@
+:host { display: block; width: 100%; height: 100%; font-family: 'Inter', sans-serif; }
+
+/* Generic table: name | classification | total | issueType | issuedTo | issuedDate */
+.generic-cols {
+  display: grid;
+  grid-template-columns:
+    minmax(130px, 2fr)
+    minmax(80px,  1fr)
+    minmax(48px,  60px)
+    minmax(100px, 1.5fr)
+    minmax(100px, 1.5fr)
+    minmax(80px,  1fr);
+  align-items: center;
+  gap: 0 clamp(4px, 0.5vw, 10px);
+}
+
+/* Electrical table: name | issuedTo | dept | dateIssued | dueDate | status | condition | actions */
+.elec-cols {
+  display: grid;
+  grid-template-columns:
+    minmax(130px, 2fr)
+    minmax(110px, 1.4fr)
+    minmax(90px,  1.2fr)
+    minmax(80px,  1fr)
+    minmax(80px,  1fr)
+    minmax(80px,  90px)
+    minmax(60px,  70px)
+    50px;
+  align-items: center;
+  gap: 0 clamp(4px, 0.5vw, 10px);
+}
+
+/* Classification badges */
+.class-asset      { background: #EEF2FF; color: #4338CA; }
+.class-component  { background: #F0FDF4; color: #15803D; }
+.class-consumable { background: #FFF7ED; color: #C2410C; }
+.class-accessory  { background: #FDF4FF; color: #9333EA; }
+
+/* Status badges */
+.status-active   { background: #DCFCE7; color: #15803D; }
+.status-overdue  { background: #FEF2F2; color: #DC2626; }
+.status-returned { background: #F1F5F9; color: #475569; }

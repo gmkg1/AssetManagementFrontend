@@ -1,5 +1,4 @@
 <div class="flex flex-col min-h-screen w-full bg-[#F0F2F5] font-inter text-xs">
-
   <!-- BELOW HEADER: sidebar + content -->
   <div class="flex flex-1">
 
@@ -15,116 +14,30 @@
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-2.5 h-2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
             </svg>
-            <span class="text-blue-600 font-medium">Asset Management</span>
+            <span class="text-blue-600 font-medium cursor-pointer" (click)="onTabSelect('dashboard')">Asset
+              Management</span>
           </div>
           <h1 class="text-sm font-semibold text-slate-800 mb-3">Asset Management</h1>
+
+          <lib-tabs [tabs]="visibleTabs" [activeTabId]="activeTabId" [autoWidth]="true"
+            (tabChange)="onTabSelect($event)">
+          </lib-tabs>
         </div>
 
-        <!-- API Error Banner -->
-        <div *ngIf="apiError"
-          class="mb-3 px-4 py-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-600 flex items-center gap-2">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-4 h-4 flex-shrink-0">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-          </svg>
-          {{ apiError }} — Check that the backend is running on <strong>localhost:8080</strong>.
+        <!-- Tab content container -->
+        <div class="mt-4">
+          <app-asset-dashboard-dashboard *ngIf="activeTabId === 'dashboard'"></app-asset-dashboard-dashboard>
+          <app-view-assets *ngIf="activeTabId === 'view-assets'"></app-view-assets>
+          <app-create-asset *ngIf="activeTabId === 'create-asset'"></app-create-asset>
+          <app-edit-asset *ngIf="activeTabId === 'edit-asset'"></app-edit-asset>
+          <app-issue-asset *ngIf="activeTabId === 'issue-asset'"></app-issue-asset>
+          <app-return-asset *ngIf="activeTabId === 'return-asset'"></app-return-asset>
+          <app-issue-log *ngIf="activeTabId === 'issue-log'"></app-issue-log>
+          <app-return-log *ngIf="activeTabId === 'return-log'"></app-return-log>
+          <app-create-asset-tag *ngIf="activeTabId === 'create-asset-tag'"></app-create-asset-tag>
+          <app-reports *ngIf="activeTabId === 'reports'"></app-reports>
         </div>
 
-        <h2 class="text-xs font-medium text-slate-600 mb-3">Asset Categories</h2>
-
-        <!-- Loading skeleton -->
-        <div *ngIf="isLoading" class="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-4">
-          <div *ngFor="let i of [1,2,3,4,5,6]" class="bg-white rounded-xl p-3 shadow-sm animate-pulse h-20"></div>
-        </div>
-
-        <!-- Department cards -->
-        <div *ngIf="!isLoading" class="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-4">
-          <div *ngFor="let dept of departments"
-            class="bg-white rounded-xl p-3 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-150"
-            (click)="navigateToDeptAssets(dept.id)">
-            <p class="text-xs font-bold text-[#242731] mb-3">{{ dept.name }}</p>
-            <p class="text-lg font-semibold text-[#242731]">{{ dept.count }}</p>
-            <div class="flex items-center justify-between mt-1">
-              <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded" [style.background]="dept.iconBgHex"
-                [style.color]="dept.iconStroke">{{ dept.unit }}</span>
-              <div class="w-7 h-7 rounded-full flex items-center justify-center" [style.background]="dept.iconBgHex">
-                <svg fill="none" viewBox="0 0 24 24" [attr.stroke]="dept.iconStroke" stroke-width="2"
-                  class="w-3.5 h-3.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="dept.iconPath" />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Bottom row -->
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-3">
-
-          <!-- Issue History -->
-          <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-            <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-              <span class="text-xs font-medium text-slate-700">Issue History</span>
-              <button
-                class="text-[10px] px-3 py-1 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 active:scale-95 transition-all duration-150"
-                (click)="viewMoreIssues()">
-                View More
-              </button>
-            </div>
-            <div class="grid issue-cols px-4 py-2 border-b border-slate-100">
-              <span class="text-[10px] text-slate-400">Receiver Name</span>
-              <span class="text-[10px] text-slate-400">Department</span>
-              <span class="text-[10px] text-slate-400">Issue Date</span>
-              <span class="text-[10px] text-slate-400 text-right">Asset Dept.</span>
-            </div>
-            <div *ngFor="let row of issueHistory; let i = index"
-              class="grid issue-cols px-4 py-2.5 border-b border-slate-50 last:border-0"
-              [class.bg-slate-50]="i % 2 !== 0">
-              <span class="text-xs text-slate-700">{{ row.receiverName }}</span>
-              <span class="text-xs text-slate-400">{{ row.department }}</span>
-              <span class="text-xs text-slate-400">{{ row.issueDate }}</span>
-              <span class="text-xs text-slate-600 text-right">{{ row.assetDept }}</span>
-            </div>
-          </div>
-
-          <!-- Assets by Status -->
-          <div class="bg-white rounded-xl shadow-sm p-4">
-            <p class="text-xs font-medium text-slate-700 mb-4">Assets by Status Type</p>
-            <div class="flex items-center gap-6">
-              <!-- Donut -->
-              <div class="relative flex-shrink-0">
-                <svg viewBox="0 0 120 120" class="w-28 h-28 -rotate-90">
-                  <!-- background = majority colour -->
-                  <circle cx="60" cy="60" r="46" fill="none" stroke="#F2F8FC" stroke-width="20" />
-                  <!-- small segment = ready to deploy -->
-                  <circle cx="60" cy="60" r="46" fill="none" stroke="#57A8DF" stroke-width="20"
-                    [attr.stroke-dasharray]="readyDashSmall + ' ' + circumferenceSmall" stroke-dashoffset="0" />
-                </svg>
-                <div class="absolute inset-0 flex flex-col items-center justify-center">
-                  <span class="text-[9px] text-slate-500 leading-tight">Total</span>
-                  <span class="text-xs font-bold text-slate-800">{{ totalAssets | number }}</span>
-                </div>
-              </div>
-              <div class="flex flex-col gap-3">
-                <div>
-                  <div class="flex items-center gap-1.5 mb-0.5">
-                    <span class="w-4 h-1.5 rounded-full inline-block" style="background:#57A8DF"></span>
-                    <span class="text-[10px] text-slate-400">Ready to Deploy</span>
-                  </div>
-                  <span class="text-xs font-semibold text-slate-700">{{ readyToDeploy | number }} assets</span>
-                </div>
-                <div>
-                  <div class="flex items-center gap-1.5 mb-0.5">
-                    <span class="w-4 h-1.5 rounded-full inline-block"
-                      style="background:#F2F8FC; border:1px solid #D0E8F5"></span>
-                    <span class="text-[10px] text-slate-400">Deployed</span>
-                  </div>
-                  <span class="text-xs font-semibold text-slate-700">{{ deployed | number }} assets</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
       </div>
       <!-- /BODY -->
 
@@ -135,5 +48,7 @@
       </footer>
 
     </div>
-    <!-- /BELOW HEADER -->
+    <!-- /MAIN CONTENT -->
   </div>
+  <!-- /BELOW HEADER -->
+</div>

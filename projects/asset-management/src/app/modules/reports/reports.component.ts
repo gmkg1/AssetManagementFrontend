@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
+import { Breadcrumb } from '@libs/shared-ui';
 
 export interface ReportAsset {
   id: string;
@@ -24,6 +25,11 @@ const PAGE_SIZE = 8;
   styleUrls: ['./reports.component.scss']
 })
 export class ReportsComponent implements OnInit, OnDestroy {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home', callback: () => this.goToDashboard() },
+    { label: 'Reports' },
+  ];
+
   readonly allTab = 'All';
   readonly allCategories = ['IT', 'Electrical', 'Sound', 'Stationery', 'Housekeeping', 'Furniture'];
 
@@ -47,19 +53,21 @@ export class ReportsComponent implements OnInit, OnDestroy {
   }
 
   get pagedAssets(): ReportAsset[] {
-    const start = (this.currentPage - 1) * PAGE_SIZE;
-    return this.assets.slice(start, start + PAGE_SIZE);
+    return this.assets;
   }
 
-  get totalPages(): number { return Math.max(1, Math.ceil(this.assets.length / PAGE_SIZE)); }
+  serverTotalPages = 1;
+  serverTotalRecords = 0;
+  get totalPages(): number { return this.serverTotalPages; }
+  get totalRecords(): number { return this.serverTotalRecords; }
   get pageNumbers(): (number | '...')[] {
     const total = this.totalPages;
     const current = this.currentPage;
-    
+
     if (total <= 5) {
       return Array.from({ length: total }, (_, i) => i + 1);
     }
-    
+
     if (current <= 2) return [1, 2, 3, '...', total];
     if (current >= total - 1) return [1, '...', total - 2, total - 1, total];
     return [1, '...', current, '...', total];
@@ -73,49 +81,26 @@ export class ReportsComponent implements OnInit, OnDestroy {
   get deptUnderService(): number { return this.assets.reduce((s, a) => s + a.underService, 0); }
   get deptDamaged(): number { return this.assets.reduce((s, a) => s + a.damaged, 0); }
 
-  constructor(private router: Router, private assetService: AssetService , private cdr : ChangeDetectorRef) {}
+  constructor(private router: Router, private assetService: AssetService, private cdr: ChangeDetectorRef) { }
 
-  ngOnInit(): void { this.loadAllReportData(); }
-  ngOnDestroy(): void {}
+  ngOnInit(): void { this.loadReportData(1); }
+  ngOnDestroy(): void { }
 
-  private loadAllReportData(): void {
+  private loadReportData(page: number): void {
     this.isLoading = true;
     this.apiError = null;
+    this.allChecked = false;
     this.allAssets = {};
 
-    this.assetService.getAssetStatusSummary(1, PAGE_SIZE).subscribe({
+    this.assetService.getAssetStatusSummary(page, PAGE_SIZE).subscribe({
       next: (response: any) => {
         const data = response?.responseData?.data ?? {};
-        const firstBatch = data.assets ?? [];
-        const totalPages = data.totalPages ?? 1;
-        this.mergeIntoAllAssets(firstBatch);
-
-        if (totalPages <= 1) {
-          this.finaliseData();
-          return;
-        }
-
-        const remaining = Array.from({ length: totalPages - 1 }, (_, i) =>
-          this.assetService.getAssetStatusSummary(i + 2, PAGE_SIZE)
-        );
-
-        let completed = 0;
-        remaining.forEach(obs => {
-          obs.subscribe({
-            next: (r: any) => {
-              this.mergeIntoAllAssets(r?.responseData?.data?.assets ?? []);
-              completed++;
-              if (completed === remaining.length) this.finaliseData();
-            },
-            error: () => {
-              completed++;
-              if (completed === remaining.length) this.finaliseData();
-            }
-          });
-        });
-        
+        const assets = data.assets ?? [];
+        this.serverTotalPages = data.totalPages ?? 1;
+        this.serverTotalRecords = data.totalRecords ?? assets.length;
+        this.mergeIntoAllAssets(assets);
+        this.finaliseData();
       },
-      
       error: (err: any) => {
         console.error('Failed to load asset status summary:', err);
         this.apiError = 'Could not load report data from the server.';
@@ -160,6 +145,7 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this.currentPage = 1;
     this.allChecked = false;
     this.searchQuery = '';
+    this.loadReportData(1);
   }
 
   exportCSV(): void {
@@ -184,9 +170,24 @@ export class ReportsComponent implements OnInit, OnDestroy {
     this.pagedAssets.forEach(a => a.checked = this.allChecked);
   }
 
-  goToPage(p: number | '...'): void { if (p !== '...' && p !== this.currentPage) this.currentPage = p; }
-  prevPage(): void { if (this.currentPage > 1) this.currentPage--; }
-  nextPage(): void { if (this.currentPage < this.totalPages) this.currentPage++; }
+  goToPage(p: number | '...'): void {
+    if (p !== '...' && p !== this.currentPage) {
+      this.currentPage = p;
+      this.loadReportData(p);
+    }
+  }
+  prevPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadReportData(this.currentPage);
+    }
+  }
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadReportData(this.currentPage);
+    }
+  }
 
   bulkExport(): void {
     const rows = this.pagedAssets.filter(a => a.checked);

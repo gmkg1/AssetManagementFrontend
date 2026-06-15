@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
+import { Breadcrumb } from '@libs/shared-ui';
 
 export interface ReturnRecord {
   assetName: string;
@@ -19,6 +20,11 @@ export interface ReturnRecord {
   styleUrls: ['./return-log.component.scss'],
 })
 export class ReturnLogComponent implements OnInit, OnDestroy {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home', callback: () => this.goToDashboard() },
+    { label: 'Return Log' },
+  ];
+
   sidebarOpen = false;
   isLoading = true;
   apiError: string | null = null;
@@ -34,7 +40,7 @@ export class ReturnLogComponent implements OnInit, OnDestroy {
   currentPage = 1;
   totalPagesVal = 1;
   totalRecords = 0;
-  pageSize = 8;
+  pageSize = 10;
   allRecords: ReturnRecord[] = [];
 
   formAssetName = '';
