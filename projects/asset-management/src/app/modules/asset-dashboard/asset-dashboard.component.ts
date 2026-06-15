@@ -163,6 +163,7 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
             : '—',
           assetDept: item.assetCategory ?? '—'
         }));
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Failed to load issued assets:', err);
