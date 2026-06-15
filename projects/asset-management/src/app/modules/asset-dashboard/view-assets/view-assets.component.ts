@@ -126,7 +126,9 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.assetTagTimer) clearTimeout(this.assetTagTimer);
+    if (this.assetTagTimer) {
+      clearTimeout(this.assetTagTimer);
+    }
   }
 
   private loadFilterOptions(): void {
@@ -182,7 +184,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     });
   }
 
-  onFilterChange(): void {
+  onSearch(): void {
     this.currentPage = 1;
     this.loadAssets();
   }
@@ -200,9 +202,6 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
 
   onAssetTagInput(value: string): void {
     this.assetTagQuery = value;
-    if (this.assetTagTimer) clearTimeout(this.assetTagTimer);
-    if (!value || value.trim().length < 3) return;
-    this.assetTagTimer = setTimeout(() => this.onFilterChange(), 350);
   }
 
   private loadStatusCounts(): void {
