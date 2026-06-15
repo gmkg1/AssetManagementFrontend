@@ -68,7 +68,7 @@
     <div class="flex flex-col gap-1">
       <label class="text-[10px] text-slate-500 font-medium">Return Date</label>
       <div class="relative max-w-xs">
-        <input type="date" [(ngModel)]="returnDate"
+        <input type="date" [(ngModel)]="returnDate" [min]="getIssueDateMin()"
           class="w-full h-9 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 focus:bg-white bg-slate-50 transition-all"/>
       </div>
     </div>

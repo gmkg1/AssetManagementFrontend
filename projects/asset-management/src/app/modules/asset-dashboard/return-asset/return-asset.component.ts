@@ -80,6 +80,26 @@ export class ReturnAssetComponent implements OnInit {
     return `${shortId} — ${this.selectedIssue.assetName || 'Unknown Asset'} (${this.selectedIssue.receiverName || 'Unknown'})`;
   }
 
+  getIssueDateMin(): string {
+    if (!this.selectedIssue || !this.selectedIssue.issueDate) {
+      return '';
+    }
+    const dStr = this.selectedIssue.issueDate;
+    if (typeof dStr === 'string' && dStr.match(/^\d{4}-\d{2}-\d{2}/)) {
+      return dStr.substring(0, 10);
+    }
+    try {
+      const d = new Date(dStr);
+      if (isNaN(d.getTime())) return '';
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    } catch (e) {
+      return '';
+    }
+  }
+
   onCancel(): void {
     this.navigate('return-log', '/kjusys/asset-management/return-log');
   }
@@ -91,6 +111,12 @@ export class ReturnAssetComponent implements OnInit {
     }
     if (!this.returnDate) {
       alert('Please select a return date.');
+      return;
+    }
+
+    const minDate = this.getIssueDateMin();
+    if (minDate && this.returnDate < minDate) {
+      alert(`Return date cannot be before the issue date (${minDate}).`);
       return;
     }
 

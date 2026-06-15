@@ -194,6 +194,12 @@ export class CreateAssetComponent implements OnInit {
     }
   }
 
+  blockNonNumbers(event: KeyboardEvent): void {
+    if (['.', ',', 'e', 'E', '-', '+'].includes(event.key)) {
+      event.preventDefault();
+    }
+  }
+
   // Submit
   onSubmit(): void {
     this.errorMessage = '';
