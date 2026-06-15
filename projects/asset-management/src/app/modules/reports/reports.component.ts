@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
+import { Breadcrumb } from '@libs/shared-ui';
 
 export interface ReportAsset {
   id: string;
@@ -24,6 +25,11 @@ const PAGE_SIZE = 8;
   styleUrls: ['./reports.component.scss']
 })
 export class ReportsComponent implements OnInit, OnDestroy {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home', callback: () => this.goToDashboard() },
+    { label: 'Reports' },
+  ];
+
   readonly allTab = 'All';
   readonly allCategories = ['IT', 'Electrical', 'Sound', 'Stationery', 'Housekeeping', 'Furniture'];
 

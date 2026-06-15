@@ -5,17 +5,8 @@
 
   <!-- MAIN -->
   <div class="flex flex-col flex-1">
+    <lib-breadcrumbs-title [breadcrumbs]="breadcrumbs" title="Issue Asset"></lib-breadcrumbs-title>
     <div class="flex-1 p-4">
-
-      <!-- Page header -->
-      <div class="mb-4">
-        <div class="flex items-center gap-1.5 text-[10px] text-slate-400 mb-1">
-          <span>Apps</span>
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-2.5 h-2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
-          <span class="text-blue-600 font-medium">Asset Management</span>
-        </div>
-        <h1 class="text-sm font-semibold text-slate-800 mb-3">Asset Management</h1>
-      </div>
 
       <!-- Form card -->
       <div class="bg-white rounded-xl shadow-sm p-5 mb-6">
@@ -51,13 +42,11 @@
             <!-- Issue To -->
             <div class="flex flex-col gap-1">
               <label class="text-[10px] text-slate-500 font-medium">Issue To</label>
-              <div class="flex gap-2">
-                <button *ngFor="let opt of ['User','Asset','Location']"
-                  class="flex items-center gap-1.5 px-3 h-8 rounded-lg border text-xs font-medium transition-all duration-150"
-                  [class.bg-slate-800]="issueTo === opt" [class.border-slate-800]="issueTo === opt" [class.text-white]="issueTo === opt"
-                  [class.border-slate-200]="issueTo !== opt" [class.text-slate-600]="issueTo !== opt" [class.hover:border-slate-400]="issueTo !== opt"
-                  (click)="onIssueToChange(opt)">{{ opt }}</button>
-              </div>
+              <lib-pill-tabs
+                [tabs]="issueToTabs"
+                [activeTabId]="issueTo"
+                (tabChange)="onIssueToChange($event)">
+              </lib-pill-tabs>
             </div>
             <!-- Receiver -->
             <div class="flex flex-col gap-1 relative">
@@ -95,8 +84,9 @@
             <div class="grid grid-cols-2 gap-3">
               <div class="flex flex-col gap-1">
                 <label class="text-[10px] text-slate-500 font-medium">Expected Return Date</label>
-                <input type="date" [(ngModel)]="expectedReturn"
+              <input type="date" [(ngModel)]="expectedReturn" [min]="issueDate"
                   class="h-8 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors"/>
+
               </div>
               <div class="flex flex-col gap-1">
                 <label class="text-[10px] text-slate-500 font-medium">Expected Return Time</label>
@@ -140,7 +130,7 @@
               <svg fill="none" viewBox="0 0 24 24" stroke="#AEAEAE" stroke-width="2" class="w-3.5 h-3.5 flex-shrink-0">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
               </svg>
-              <input class="flex-1 bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-400"
+              <input class="flex-1 bg-transparent text-xs text-slate-700 outline-none border-0 placeholder:text-slate-400"
                 type="text" placeholder="Search log..." [(ngModel)]="searchQuery" (click)="$event.stopPropagation()"/>
             </div>
           </div>
@@ -236,5 +226,7 @@
     </footer>
   </div>
   <!-- /BELOW HEADER -->
-</div>
-</div>
+
+  <!-- Alert toasts -->
+  <lib-alert-container></lib-alert-container>
+</div></div>

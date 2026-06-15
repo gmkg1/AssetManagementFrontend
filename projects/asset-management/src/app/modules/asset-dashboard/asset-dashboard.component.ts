@@ -29,7 +29,7 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private dashboardTabsService: DashboardTabsService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.syncTabFromUrl();

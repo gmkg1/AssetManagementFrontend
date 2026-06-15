@@ -1,1 +1,11 @@
-<router-outlet></router-outlet>
+<lib-menu-header-lib [leftMenuObject]="leftMenuObject" [currentUser]="currentUser"></lib-menu-header-lib>
+
+<div class="asset-layout">
+  <aside class="asset-sidebar">
+    <lib-left-menu-lib [leftMenuObject]="leftMenuObject"></lib-left-menu-lib>
+  </aside>
+
+  <main class="asset-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

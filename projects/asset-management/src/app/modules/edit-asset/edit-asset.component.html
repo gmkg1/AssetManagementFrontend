@@ -5,6 +5,7 @@
 
     <!-- MAIN -->
     <div class="flex flex-col flex-1">
+      <lib-breadcrumbs-title [breadcrumbs]="breadcrumbs" title="Edit Asset"></lib-breadcrumbs-title>
       <div class="flex-1 p-4">
         <h1 class="text-sm font-semibold text-slate-800 mb-4">Asset Management</h1>
 
@@ -321,7 +322,7 @@
           <div class="flex justify-end gap-3 mt-5 pt-1 border-t border-slate-100">
             <button class="h-8 px-5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:border-slate-400 hover:text-slate-800 transition-all duration-150 active:scale-95"
               [disabled]="isLoading" (click)="goBack()">Cancel</button>
-            <button class="h-8 px-5 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all duration-150 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+            <button class="h-8 px-5 rounded-lg bg-[#155DFC] text-white text-xs font-semibold hover:bg-[#1147c8] transition-all duration-150 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
               [disabled]="isLoading" (click)="onSubmit()">
               <svg *ngIf="isLoading" class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -349,9 +350,9 @@
             <strong class="text-slate-700">{{ assetName || assetTag }}</strong> has been updated successfully.
           </p>
           <div class="flex gap-2 w-full">
-            <button class="flex-1 h-8 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:border-slate-400 transition-all active:scale-95"
+            <button class="flex-1 h-8 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition-all active:scale-95"
               (click)="showSuccess = false">Continue Editing</button>
-            <button class="flex-1 h-8 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all active:scale-95"
+            <button class="flex-1 h-8 rounded-lg bg-[#155DFC] text-white text-xs font-semibold hover:bg-[#1147c8] transition-all active:scale-95"
               (click)="goBack()">Back to Assets</button>
           </div>
         </div>

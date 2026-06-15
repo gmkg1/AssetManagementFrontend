@@ -17,4 +17,4 @@ export const environment = {
     project: 'shell',
     baseRoute: 'kjusys',
     local: true,
-};
+  };

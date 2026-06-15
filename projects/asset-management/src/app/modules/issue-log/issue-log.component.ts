@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
+import { Breadcrumb } from '@libs/shared-ui';
 
 export interface IssueRecord {
   assetName: string;
@@ -16,6 +17,11 @@ export interface IssueRecord {
   styleUrls: ['./issue-log.component.scss'],
 })
 export class IssueLogComponent implements OnInit, OnDestroy {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home', callback: () => this.goToDashboard() },
+    { label: 'Issue Log' },
+  ];
+
   issueLog: IssueRecord[] = [];
   isLoading = true;
   apiError: string | null = null;

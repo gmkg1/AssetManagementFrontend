@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
+import { Breadcrumb } from '@libs/shared-ui';
 
 export interface IssueRecord {
   assetName: string;
@@ -20,6 +21,10 @@ const PAGE_SIZE = 8;
   styleUrls: ['./issue-asset.component.scss'],
 })
 export class IssueAssetComponent implements OnInit, OnDestroy {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home', callback: () => this.router.navigate(['/kjusys/asset-management/asset-dashboard']) },
+    { label: 'Issue Asset' },
+  ];
   assetId = '';
   assetName = '';
   assetTag = '';
@@ -31,6 +36,11 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
   assetsList: any[] = [];
 
   issueTo = 'User';
+  issueToTabs = [
+    { id: 'User', label: 'User' },
+    { id: 'Asset', label: 'Asset' },
+    { id: 'Location', label: 'Location' },
+  ];
   receiverSearch = '';
   selectedReceiverId = '';
   selectedReceiverLabel = '';
@@ -286,10 +296,15 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
     this.submitted = true;
     this.submitError = null;
 
-    if (!this.assetId || !this.selectedReceiverId || !this.issueDate) {
+        if (!this.assetId || !this.selectedReceiverId || !this.issueDate) {
       this.submitError = 'Asset, receiver, and issue date are required.';
       return;
     }
+    if (this.expectedReturn && this.expectedReturn <= this.issueDate) {
+      this.submitError = 'Expected Return Date must be after the Issue Date.';
+      return;
+    }
+
 
     const payload: {
       assetId: string;

@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AssetService } from '../../services/asset.service';
+import { Breadcrumb } from '@libs/shared-ui';
 
 export interface Asset {
   _id?: string;
@@ -43,6 +44,10 @@ export interface FilterOption {
   styleUrls: ['./view-assets.component.scss'],
 })
 export class ViewAssetsComponent implements OnInit, OnDestroy {
+  breadcrumbs: Breadcrumb[] = [
+    { label: 'Home', callback: () => this.router.navigate(['/kjusys/asset-management/asset-dashboard']) },
+    { label: 'View Assets' },
+  ];
   view: 'list' | 'detail' = 'list';
   selectedAsset: Asset | null = null;
   detailTab: 'info'|'licenses'|'components'|'assets'|'history'|'maintenances'|'files' = 'info';
@@ -60,12 +65,12 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   purchaseDate = '';
   searchQuery = '';
   assetTagQuery = '';
-  private assetTagTimer: ReturnType<typeof setTimeout> | null = null;
+  // search is triggered manually via onSearch()
 
   currentPage = 1;
   totalPages = 1;
   totalRecords = 0;
-  pageSize = 8;
+  pageSize = 10;
 
   get pageNumbers(): number[] {
     const pages: number[] = [];
@@ -112,9 +117,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
-    if (this.assetTagTimer) clearTimeout(this.assetTagTimer);
-  }
+  ngOnDestroy(): void {}
 
   private loadFilterOptions(): void {
     
@@ -172,10 +175,16 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     });
   }
 
+  onSearch(): void {
+    this.currentPage = 1;
+    this.loadAssets();
+  }
+
   onFilterChange(): void {
     this.currentPage = 1;
     this.loadAssets();
   }
+
 
   clearFilters(): void {
     this.selectedCategoryId = '';
@@ -186,13 +195,6 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     this.assetTagQuery = '';
     this.currentPage = 1;
     this.loadAssets();
-  }
-
-  onAssetTagInput(value: string): void {
-    this.assetTagQuery = value;
-    if (this.assetTagTimer) clearTimeout(this.assetTagTimer);
-    if (!value || value.trim().length < 3) return;
-    this.assetTagTimer = setTimeout(() => this.onFilterChange(), 350);
   }
 
   private loadStatusCounts(): void {
