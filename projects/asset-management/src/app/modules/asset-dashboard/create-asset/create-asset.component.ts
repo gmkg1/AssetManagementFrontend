@@ -46,9 +46,6 @@ export class CreateAssetComponent implements OnInit {
   showSuccess = false;
   isLoading = false;
   errorMessage = '';
-  isDragOver = false;
-  assetImageFile: File | null = null;
-  assetImagePreview: string | null = null;
   billFile: File | null = null;
 
   constructor(
@@ -118,30 +115,6 @@ export class CreateAssetComponent implements OnInit {
     }
   }
 
-  // Asset image upload
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) this.loadImageFile(input.files[0]);
-  }
-  onDragOver(event: DragEvent): void { event.preventDefault(); this.isDragOver = true; }
-  onDragLeave(event: DragEvent): void { event.preventDefault(); this.isDragOver = false; }
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    this.isDragOver = false;
-    const file = event.dataTransfer?.files[0];
-    if (file && file.type.startsWith('image/')) this.loadImageFile(file);
-  }
-  private loadImageFile(file: File): void {
-    this.assetImageFile = file;
-    const reader = new FileReader();
-    reader.onload = (e) => { this.assetImagePreview = e.target?.result as string; };
-    reader.readAsDataURL(file);
-  }
-  removeImage(event: Event): void {
-    event.stopPropagation();
-    this.assetImageFile = null;
-    this.assetImagePreview = null;
-  }
 
   // Navigation
   goBack(): void {
@@ -217,6 +190,11 @@ export class CreateAssetComponent implements OnInit {
       return;
     }
 
+    if (this.eolDate && this.purchaseDate && this.eolDate < this.purchaseDate) {
+      this.errorMessage = 'EOL Date cannot be before Purchase Date.';
+      return;
+    }
+
     this.isLoading = true;
 
     const payload = {
@@ -262,8 +240,6 @@ export class CreateAssetComponent implements OnInit {
     this.supplier = '';
     this.purchaseCost = '';
     this.isReturnable = true;
-    this.assetImageFile = null;
-    this.assetImagePreview = null;
     this.billFile = null;
     this.errorMessage = '';
   }
