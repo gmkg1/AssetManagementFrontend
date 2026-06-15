@@ -165,6 +165,8 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
       locationId: this.selectedLocationId || undefined,
       statusId: this.selectedStatusId || undefined,
       purchaseDateFrom: this.purchaseDate || undefined,
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
     }).subscribe({
       next: (response: any) => {
         const data = response?.responseData?.data ?? {};
