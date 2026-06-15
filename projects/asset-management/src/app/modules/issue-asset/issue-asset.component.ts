@@ -149,10 +149,30 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
               }))
               .filter((item: OptionItem) => item._id && item.label)
           : [];
-        this.receiverOptionsLoading = false;
       },
       error: (err) => {
         console.error('Failed to load locations for dropdown:', err);
+      },
+    });
+
+    this.assetService.getAssets({ page: 1, pageSize: 200 }).subscribe({
+      next: (response: any) => {
+        const raw: any[] =
+          response?.responseData?.data?.assets ??
+          response?.responseData?.assets ??
+          [];
+        this.assets = Array.isArray(raw)
+          ? raw
+              .map((item: any) => ({
+                _id: item._id ?? '',
+                label: `${item.assetName} (${item.assetTagName || 'No Tag'})`,
+              }))
+              .filter((item: OptionItem) => item._id && item.label)
+          : [];
+        this.receiverOptionsLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load assets for dropdown:', err);
         this.receiverOptionsLoading = false;
       },
     });

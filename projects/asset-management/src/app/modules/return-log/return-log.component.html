@@ -75,11 +75,11 @@
           </ng-container>
 
           <div class="flex items-center justify-between px-4 py-2.5 border-t border-slate-100">
-            <button class="h-7 px-3 rounded-lg border border-slate-200 text-[10px] text-slate-600" [disabled]="currentPage === 1" (click)="prevPage()">Previous</button>
+            <button class="h-7 px-3 rounded-lg border border-slate-200 text-[10px] text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="currentPage === 1" (click)="prevPage()">Previous</button>
             <div class="flex items-center gap-1">
               <button *ngFor="let p of visiblePages" class="w-7 h-7 rounded-lg text-[10px]" [class.bg-slate-100]="p === currentPage" [disabled]="p === -1" (click)="p !== -1 && goToPage(p)">{{ p === -1 ? '...' : p }}</button>
             </div>
-            <button class="h-7 px-3 rounded-lg border border-slate-200 text-[10px] text-slate-600" [disabled]="currentPage === totalPages" (click)="nextPage()">Next</button>
+            <button class="h-7 px-3 rounded-lg border border-slate-200 text-[10px] text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="currentPage === totalPages" (click)="nextPage()">Next</button>
           </div>
         </div>
       </div>

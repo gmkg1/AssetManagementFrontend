@@ -156,7 +156,10 @@ export class AssetService {
 
   /** GET /asset-status-summary?page=X&size=Y */
   getAssetStatusSummary(page: number = 1, size: number = 10) {
-    const params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('pageSize', size.toString());
     return this.http.get<any>(`${this.baseUrl}/asset-status-summary`, { params });
   }
 

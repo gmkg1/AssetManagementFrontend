@@ -21,7 +21,7 @@ The workspace is split into three main areas under the `projects/` directory:
 AssetManagementFrontend/
 ├── angular.json                     # Workspace configuration (projects, architect targets)
 ├── package.json                     # Monorepo dependencies and build/serve scripts
-├── backend_context.md               # Backend schema and API documentation
+├── backendContext.md                # Backend schema and API documentation
 ├── frontend_context.md              # [This File] Frontend explanation for backend devs
 ├── projects/
 │   ├── shell/                       # Host Shell Application (Runs on port 4200)

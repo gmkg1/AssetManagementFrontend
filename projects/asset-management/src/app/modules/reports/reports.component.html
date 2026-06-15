@@ -29,8 +29,8 @@
 
           <div *ngIf="selectedCount > 0" class="flex items-center gap-3 px-4 py-2 bg-blue-50 border-b border-blue-100">
             <span class="text-[10px] font-medium text-blue-700">{{ selectedCount }} selected</span>
-            <button class="flex items-center gap-1 h-6 px-2.5 rounded-lg bg-blue-600 text-white text-[10px] font-medium hover:bg-blue-700 transition-colors active:scale-95" (click)="bulkExport()">Export Selected</button>
-            <button class="flex items-center gap-1 h-6 px-2.5 rounded-lg border border-red-200 text-red-600 text-[10px] font-medium hover:bg-red-50 transition-colors active:scale-95" (click)="bulkDelete()">Delete</button>
+            <button class="flex items-center gap-1 h-8 px-2.5 rounded-lg bg-blue-600 text-white text-[10px] font-medium hover:bg-blue-700 transition-colors active:scale-95" (click)="bulkExport()">Export Selected</button>
+            <button class="flex items-center gap-1 h-8 px-2.5 rounded-lg border border-red-200 text-red-600 text-[10px] font-medium hover:bg-red-50 transition-colors active:scale-95" (click)="bulkDelete()">Delete</button>
             <button class="text-[10px] text-slate-500 hover:text-slate-700 transition-colors ml-1" (click)="clearSelection()">Clear</button>
           </div>
 
@@ -97,19 +97,25 @@
           </ng-container>
           </ng-container>
 
-          <div class="flex items-center justify-between px-4 py-2.5 border-t border-slate-100">
-            <button class="flex items-center gap-1.5 h-7 px-3 rounded-lg border border-slate-200 text-[10px] font-medium text-slate-600 hover:border-slate-400 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-              [disabled]="currentPage === 1" (click)="prevPage()">Previous</button>
+          <div *ngIf="totalPages > 1" class="flex items-center justify-between px-4 py-2.5 border-t border-slate-100">
+            <span class="text-[10px] text-slate-400">Page {{ currentPage }} of {{ totalPages }} &nbsp;·&nbsp; {{ totalRecords }} total</span>
             <div class="flex items-center gap-1">
+              <button class="flex items-center gap-1.5 h-7 px-3 rounded-lg border border-slate-200 text-[10px] font-medium text-slate-600 hover:border-slate-400 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                [disabled]="currentPage === 1" (click)="prevPage()">Previous</button>
               <ng-container *ngFor="let p of pageNumbers">
-                <button *ngIf="p !== '...'" class="w-7 h-7 rounded-lg text-[10px] font-medium transition-colors"
-                  [class.bg-slate-100]="p === currentPage" [class.text-slate-800]="p === currentPage"
-                  [class.text-slate-400]="p !== currentPage" (click)="goToPage(p)">{{ p }}</button>
+                <button *ngIf="p !== '...'" class="w-7 h-7 rounded-lg text-[10px] font-medium border transition-colors"
+                  [class.bg-blue-600]="p === currentPage"
+                  [class.text-white]="p === currentPage"
+                  [class.border-blue-600]="p === currentPage"
+                  [class.border-slate-200]="p !== currentPage"
+                  [class.text-slate-600]="p !== currentPage"
+                  [class.hover:bg-slate-50]="p !== currentPage"
+                  (click)="goToPage(p)">{{ p }}</button>
                 <span *ngIf="p === '...'" class="w-7 h-7 flex items-center justify-center text-[10px] font-medium text-slate-400">...</span>
               </ng-container>
+              <button class="flex items-center gap-1.5 h-7 px-3 rounded-lg border border-slate-200 text-[10px] font-medium text-slate-600 hover:border-slate-400 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                [disabled]="currentPage === totalPages" (click)="nextPage()">Next</button>
             </div>
-            <button class="flex items-center gap-1.5 h-7 px-3 rounded-lg border border-slate-200 text-[10px] font-medium text-slate-600 hover:border-slate-400 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-              [disabled]="currentPage === totalPages" (click)="nextPage()">Next</button>
           </div>
         </div>
       </div>
