@@ -29,12 +29,12 @@
               </div>
               <div *ngIf="assetDropdownOpen" class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 overflow-hidden max-h-56 overflow-y-auto">
                 <div *ngIf="assetOptionsLoading" class="px-3 py-2 text-xs text-slate-400">Loading options...</div>
-                <button *ngFor="let item of assetsList"
+                <button *ngFor="let name of assetsList"
                   class="block w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                  [class.bg-blue-50]="assetId === item._id"
-                  [class.text-blue-600]="assetId === item._id"
-                  (click)="selectAssetOption(item); $event.stopPropagation()">
-                  {{ item.label }}
+                  [class.bg-blue-50]="assetSearch === name"
+                  [class.text-blue-600]="assetSearch === name"
+                  (click)="selectAssetOption(name); $event.stopPropagation()">
+                  {{ name }}
                 </button>
                 <div *ngIf="!assetOptionsLoading && assetsList.length === 0" class="px-3 py-2 text-xs text-slate-400">No assets found.</div>
               </div>

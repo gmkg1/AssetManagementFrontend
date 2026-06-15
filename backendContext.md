@@ -1,6 +1,6 @@
 # Asset Management System - Backend Integration & Context Guide
 
-This document provides a comprehensive overview of the backend architecture, MongoDB database collections, and REST API endpoints for the Asset Management system. It reflects the actual implementation in the **Java / Vert.x** codebase and serves as a reference for frontend development.
+This document provides a comprehensive overview of the backend architecture, MongoDB database collections, and REST API endpoints for the Asset Management system. It reflects the current implementation in the **Java / Vert.x** codebase and serves as a reference for frontend development.
 
 ---
 
@@ -10,12 +10,16 @@ This document provides a comprehensive overview of the backend architecture, Mon
 - **Database**: MongoDB
 - **Base Routing Prefix**: `/kjusys-api/asset-management-api`
 - **Default Server Port**: `8080` (Standard local development url: `http://localhost:8080/kjusys-api/asset-management-api`)
+- **Additional Technologies**: 
+  - Redis (for caching/session management)
+  - BodyHandler & CorsHandler (Vert.x web handlers)
+  - MongoDB Java Driver
 
 ---
 
 ## 2. Database Collections Schema
 
-The backend uses the following MongoDB collections to manage assets, category tags, issue assignments, and returns.
+The backend uses the following MongoDB collections to manage assets, category tags, issue assignments, returns, licenses, and warranties.
 
 ### `assets`
 Contains the core records of inventory assets.
@@ -45,6 +49,7 @@ Tracks current and historical asset issue assignments, as well as returned statu
 - `returnStatus`: `Boolean` (set to `true` when the asset is returned)
 - `returnDate`: `Date` (timestamp of when the asset was returned)
 - `notes`: `String` (optional remarks added during return)
+- **Partial Unique Index**: `{assetId: 1}` with `partialFilterExpression: {returnStatus: false}` (ensures only one active issue per asset)
 
 ### `assettags`
 Contains classification/model names for assets.
@@ -68,9 +73,27 @@ Asset states.
 - `_id`: `ObjectId`
 - `statusName`: `String` (e.g., `"Ready to Deploy"`, `"Deployed"`, `"Under Maintenance"`, `"Damaged"`, `"Dead Stock"`)
 
+### `licenses`
+Contains license keys and contracts associated with assets.
+- `_id`: `ObjectId`
+- `assetId`: `ObjectId` (references `assets`)
+- `licenseName`: `String` (e.g., `"Windows 11 Enterprise"`)
+- `licenseKey`: `String`
+- `expiryDate`: `Date`
+
+### `warranty`
+Tracks warranties associated with assets.
+- `_id`: `ObjectId`
+- `assetId`: `ObjectId` (references `assets`)
+- `provider`: `String` (e.g., `"Dell"`, `"Apple"`)
+- `displayId`: `String` (warranty serial/contract ID)
+- `startDate`: `Date`
+- `endDate`: `Date`
+- `ActiveStatus`: `Boolean`
+
 ---
 
-## 3. REST API Endpoints
+## 3. Standard Response Format
 
 All responses from the backend follow a standard envelope pattern:
 ```json
@@ -78,18 +101,22 @@ All responses from the backend follow a standard envelope pattern:
   "responseType": "SUCCESS" | "ERROR",
   "statusCode": 200 | 400 | 500,
   "responseData": {
-    "data": ...
+    "data": ... | "error": ...
   }
 }
 ```
 
-### A. Asset Management
+---
+
+## 4. REST API Endpoints
+
+### A. Asset Management (CRUD & Listings)
 
 #### 1. List Assets
 - **Path**: `GET /kjusys-api/asset-management-api/assets`
 - **Query Parameters**:
   - `page`: `Integer` (default: 1)
-  - `pageSize`: `Integer` (default: 10)
+  - `pageSize`: `Integer` (default: 10, max: 100)
   - `assetName`: `String` (filter)
   - `assetTagName`: `String` (filter)
   - `categoryId`: `String` (filter)
@@ -103,9 +130,9 @@ All responses from the backend follow a standard envelope pattern:
     "responseType": "SUCCESS",
     "statusCode": 200,
     "responseData": {
-      "data": [
+      "assets": [
         {
-          "_id": "6a1035ba99696f0a7c441532",
+          "_id": "ObjectId",
           "assetName": "MacBook Pro",
           "assetSerialNumber": "SN12345678",
           "purchaseCost": 1200,
@@ -113,13 +140,10 @@ All responses from the backend follow a standard envelope pattern:
           "isIssuable": true,
           "quantity": 1,
           "assetTagName": "MacBook Pro 16",
-          "model": "MacBook Pro 16",
           "category": "Laptops",
           "status": "Ready to Deploy",
-          "issuable": true,
           "location": "Staff Room 1",
-          "block": "B002",
-          "issuedTo": "Not Issued"
+          "blockId": "B002"
         }
       ],
       "totalRecords": 1,
@@ -152,65 +176,7 @@ All responses from the backend follow a standard envelope pattern:
   }
   ```
 
-#### 3. Create Asset
-- **Path**: `POST /kjusys-api/asset-management-api/create-asset`
-- **Request Payload**:
-  ```json
-  {
-    "assetName": "MacBook Pro",
-    "assetTagId": "6a1035ba99696f0a7c441532",
-    "statusId": "6a0fe1928c08584d89441544",
-    "defaultLocation": "6a0fe1928c08584d89441544", // Optional
-    "serial": "SN123456789",                      // Optional
-    "purchaseCost": "1200",                       // Optional (String or Integer representation)
-    "purchaseDate": "2026-06-12",                 // Optional (YYYY-MM-DD)
-    "isReturnable": true                          // Optional
-  }
-  ```
-- **Response Shape**:
-  ```json
-  {
-    "responseType": "SUCCESS",
-    "statusCode": 200,
-    "responseData": {
-      "data": {
-        "message": "Asset created successfully",
-        "_id": "6a1035ba99696f0a7c441532"
-      }
-    }
-  }
-  ```
-
-#### 4. Edit Asset
-- **Path**: `PUT /kjusys-api/asset-management-api/edit-asset`
-- **Request Payload**:
-  ```json
-  {
-    "_id": "6a1035ba99696f0a7c441532",             // Required
-    "assetName": "MacBook Pro",                    // Optional
-    "assetTagId": "6a1035ba99696f0a7c441532",      // Optional
-    "statusId": "6a0fe1928c08584d89441544",        // Optional
-    "defaultLocation": "6a0fe1928c08584d89441544", // Optional
-    "serial": "SN123456789",                      // Optional
-    "purchaseCost": "1300",                       // Optional
-    "purchaseDate": "2026-06-12",                 // Optional
-    "isReturnable": true                          // Optional
-  }
-  ```
-- **Response Shape**:
-  ```json
-  {
-    "responseType": "SUCCESS",
-    "statusCode": 200,
-    "responseData": {
-      "data": {
-        "message": "Asset updated successfully"
-      }
-    }
-  }
-  ```
-
-#### 5. Get Asset Details
+#### 3. Get Asset Details
 - **Path**: `GET /kjusys-api/asset-management-api/asset-details`
 - **Query Parameters**:
   - `id`: `String` (Asset document ID)
@@ -220,22 +186,145 @@ All responses from the backend follow a standard envelope pattern:
     "responseType": "SUCCESS",
     "statusCode": 200,
     "responseData": {
-      "data": {
-        "_id": "6a1035ba99696f0a7c441532",
-        "purchaseCost": 1200,
-        "purchaseDate": "2026-05-27T00:00:00Z",
-        "assetSerialNumber": "SN12345678",
-        "isIssuable": true,
-        "assetName": "MacBook Pro",
-        "assetTagId": "6a1035ba99696f0a7c441532",
-        "categoryId": "6a0fe1928c08584d89441544",
-        "quantity": 1,
-        "unitOfMeasureId": "6a1533d11fcf30c131441533",
-        "campusId": "6a101a50df52662f6e441530",
-        "blockId": "B002",
-        "statusId": "6a0fe1928c08584d89441544",
-        "locationId": "6a0fe1928c08584d89441544"
-      }
+      "_id": "ObjectId",
+      "assetName": "MacBook Pro",
+      "assetSerialNumber": "SN12345678",
+      "purchaseCost": 1200,
+      "purchaseDate": "2026-05-27T00:00:00Z",
+      "isIssuable": true,
+      "assetTagId": "ObjectId",
+      "categoryId": "ObjectId",
+      "quantity": 1,
+      "unitOfMeasureId": "ObjectId",
+      "campusId": "ObjectId",
+      "blockId": "B002",
+      "statusId": "ObjectId",
+      "locationId": "ObjectId"
+    }
+  }
+  ```
+
+#### 4. Create Asset
+- **Path**: `POST /kjusys-api/asset-management-api/create-asset`
+- **Request Payload**:
+  ```json
+  {
+    "assetName": "MacBook Pro",
+    "assetTagId": "ObjectId",
+    "statusId": "ObjectId",
+    "defaultLocation": "ObjectId (optional, maps to locationId)",
+    "serial": "String (optional, maps to assetSerialNumber)",
+    "purchaseCost": "String/Int (optional)",
+    "purchaseDate": "String (optional, YYYY-MM-DD)",
+    "isReturnable": "Boolean (optional, default: true, maps to isIssuable)"
+  }
+  ```
+- **Response Shape**:
+  ```json
+  {
+    "responseType": "SUCCESS",
+    "statusCode": 200,
+    "responseData": {
+      "message": "Asset created successfully",
+      "_id": "ObjectId"
+    }
+  }
+  ```
+
+#### 5. Edit Asset
+- **Path**: `PUT /kjusys-api/asset-management-api/edit-asset`
+- **Request Payload**:
+  ```json
+  {
+    "_id": "ObjectId",
+    "assetName": "MacBook Pro",
+    "assetTagId": "ObjectId",
+    "statusId": "ObjectId",
+    "defaultLocation": "ObjectId (optional)",
+    "serial": "String (optional)",
+    "purchaseCost": "String/Int (optional)",
+    "purchaseDate": "String (optional, YYYY-MM-DD)",
+    "isReturnable": "Boolean (optional)"
+  }
+  ```
+- **Response Shape**:
+  ```json
+  {
+    "responseType": "SUCCESS",
+    "statusCode": 200,
+    "responseData": {
+      "message": "Asset updated successfully"
+    }
+  }
+  ```
+
+#### 6. List Unissued Asset Names
+Searches for unique names of assets that do not have any active (unreturned) issues.
+- **Path**: `GET /kjusys-api/asset-management-api/unissued-asset-names`
+- **Query Parameters**:
+  - `q` or `query`: `String` (optional keypress filter to search for asset names case-insensitively)
+- **Response Shape**:
+  ```json
+  {
+    "responseType": "SUCCESS",
+    "statusCode": 200,
+    "responseData": {
+      "assetNames": [
+        "Lenovo ThinkPad",
+        "MacBook Pro"
+      ]
+    }
+  }
+  ```
+
+#### 7. Get Asset Licenses & Warranty
+Retrieves all associated licenses and warranty contracts for a given asset ID.
+- **Path**: `GET /kjusys-api/asset-management-api/get-licenses/:assetId`
+- **Path or Query Parameters**:
+  - `assetId`: `String` (Asset document ID, required in path template or as query parameter)
+- **Response Shape**:
+  ```json
+  {
+    "responseType": "SUCCESS",
+    "statusCode": 200,
+    "responseData": {
+      "licenses": [
+        {
+          "licenseName": "Windows 11 Enterprise",
+          "licenseKey": "XXXX-XXXX-XXXX-XXXX",
+          "expiryDate": "2027-12-31"
+        }
+      ],
+      "warranty": [
+        {
+          "provider": "Dell",
+          "displayId": "WARR-12345",
+          "startDate": "2026-06-15",
+          "endDate": "2029-06-15",
+          "status": "Active"
+        }
+      ]
+    }
+  }
+  ```
+
+#### 8. Get Asset Components
+Retrieves all active sub-components (child assets) assigned/issued to a given parent asset.
+- **Path**: `GET /kjusys-api/asset-management-api/get-asset-components/:assetId`
+- **Path or Query Parameters**:
+  - `assetId`: `String` (Parent asset document ID, required in path template or as query parameter)
+- **Response Shape**:
+  ```json
+  {
+    "responseType": "SUCCESS",
+    "statusCode": 200,
+    "responseData": {
+      "components": [
+        {
+          "assetId": "6a1035ba99696f0a7c441532",
+          "assetName": "MacBook Pro Charger"
+        }
+      ]
     }
   }
   ```
@@ -247,8 +336,8 @@ All responses from the backend follow a standard envelope pattern:
 #### 1. Get Issued Assets List (Active Assignments)
 - **Path**: `GET /kjusys-api/asset-management-api/issued-assets`
 - **Query Parameters**:
-  - `page`: `Integer`
-  - `pageSize`: `Integer`
+  - `page`: `Integer` (default: 1)
+  - `pageSize`: `Integer` (default: 10, max: 100)
   - `assetName`: `String` (filter)
   - `category`: `String` (filter category name)
   - `issuedTo`: `String` (filter receiver name)
@@ -260,26 +349,24 @@ All responses from the backend follow a standard envelope pattern:
     "responseType": "SUCCESS",
     "statusCode": 200,
     "responseData": {
-      "data": {
-        "assets": [
-          {
-            "_id": "6a168f4c083766160e44152f",         // issueId
-            "assetId": "6a1035ba99696f0a7c441532",
-            "assetName": "MacBook Pro",
-            "assetCategory": "Laptops",
-            "issueDate": "2026-05-27T00:00:00Z",
-            "receiverName": "Staff Room 1",
-            "receiverType": "Location",
-            "locationId": "6a0fe1928c08584d89441544",
-            "personId": null,
-            "issuedToAssetId": null
-          }
-        ],
-        "totalRecords": 1,
-        "currentPage": 1,
-        "pageSize": 10,
-        "totalPages": 1
-      }
+      "assets": [
+        {
+          "_id": "ObjectId (issueId)",
+          "assetId": "ObjectId",
+          "assetName": "MacBook Pro",
+          "assetCategory": "Laptops",
+          "issueDate": "2026-05-27T00:00:00Z",
+          "receiverName": "Staff Room 1",
+          "receiverType": "Location",
+          "locationId": "ObjectId",
+          "personId": null,
+          "issuedToAssetId": null
+        }
+      ],
+      "totalRecords": 1,
+      "currentPage": 1,
+      "pageSize": 10,
+      "totalPages": 1
     }
   }
   ```
@@ -289,28 +376,31 @@ All responses from the backend follow a standard envelope pattern:
 - **Request Payload**:
   ```json
   {
-    "assetId": "6a1035ba99696f0a7c441532",
-    "issueDate": "2026-05-27",
-    "locationId": "6a0fe1928c08584d89441544", // null if not Location
-    "personId": null,                         // null if not Person
-    "issuedToAssetId": null                    // null if not Asset
+    "assetId": "ObjectId",
+    "issueDate": "2026-05-27 (optional, defaults to current date)",
+    "locationId": "ObjectId (optional)",
+    "personId": "ObjectId (optional)",
+    "issuedToAssetId": "ObjectId (optional)"
   }
   ```
+- **Validation Rules**:
+  - At least one of `locationId`, `personId`, or `issuedToAssetId` is required
+  - Cannot assign to both a location and an asset simultaneously
+  - Self-assignment (assetId == issuedToAssetId) is not allowed
+  - Only one active issue per asset (enforced by partial unique index)
 - **Response Shape**:
   ```json
   {
     "responseType": "SUCCESS",
     "statusCode": 200,
     "responseData": {
-      "data": {
-        "message": "Asset issued successfully",
-        "issueId": "6a168f4c083766160e44152f",
-        "assetId": "6a1035ba99696f0a7c441532",
-        "issueDate": "2026-05-27T00:00:00Z",
-        "locationId": "6a0fe1928c08584d89441544",
-        "personId": null,
-        "issuedToAssetId": null
-      }
+      "message": "Asset issued successfully",
+      "issueId": "ObjectId",
+      "assetId": "ObjectId",
+      "issueDate": "2026-05-27T00:00:00Z",
+      "locationId": "ObjectId",
+      "personId": null,
+      "issuedToAssetId": null
     }
   }
   ```
@@ -320,10 +410,10 @@ All responses from the backend follow a standard envelope pattern:
 - **Request Payload**:
   ```json
   {
-    "assetId": "6a1035ba99696f0a7c441532",      // Required
-    "issuetoId": "6a168f4c083766160e44152f",    // Required (Original issue record ID)
-    "returnDate": "2026-05-27",                 // Required (YYYY-MM-DD)
-    "notes": "Returned in perfect condition"    // Optional
+    "assetId": "ObjectId",
+    "issuetoId": "ObjectId (Original issue record ID)",
+    "returnDate": "2026-05-27 (optional, defaults to current date)",
+    "notes": "Returned in perfect condition (optional)"
   }
   ```
 - **Response Shape**:
@@ -332,16 +422,14 @@ All responses from the backend follow a standard envelope pattern:
     "responseType": "SUCCESS",
     "statusCode": 200,
     "responseData": {
-      "data": {
-        "message": "Asset returned successfully",
-        "returnId": "6a168f4c083766160e44152f",
-        "assetId": "6a1035ba99696f0a7c441532",
-        "issuetoId": "6a168f4c083766160e44152f",
-        "returnDate": "2026-05-27T00:00:00Z",
-        "locationId": "6a0fe1928c08584d89441544",
-        "personId": null,
-        "issuedToAssetId": null
-      }
+      "message": "Asset returned successfully",
+      "returnId": "ObjectId",
+      "assetId": "ObjectId",
+      "issuetoId": "ObjectId",
+      "returnDate": "2026-05-27T00:00:00Z",
+      "locationId": "ObjectId",
+      "personId": null,
+      "issuedToAssetId": null
     }
   }
   ```
@@ -349,8 +437,8 @@ All responses from the backend follow a standard envelope pattern:
 #### 4. Get Return Logs
 - **Path**: `GET /kjusys-api/asset-management-api/return-logs`
 - **Query Parameters**:
-  - `page`: `Integer`
-  - `pageSize`: `Integer`
+  - `page`: `Integer` (default: 1)
+  - `pageSize`: `Integer` (default: 10)
   - `name`: `String` (Asset name filter)
   - `classification`: `String` (Category filter)
   - `total`: `String` (Quantity filter)
@@ -370,7 +458,8 @@ All responses from the backend follow a standard envelope pattern:
           "total": 1,
           "returnType": "Location",
           "returnTo": "Staff Room 1",
-          "returnDate": "2026-05-27T06:38:33Z"
+          "returnDate": "2026-05-27T06:38:33Z",
+          "notes": "Returned in perfect condition"
         }
       ],
       "totalRecords": 1,
@@ -383,7 +472,93 @@ All responses from the backend follow a standard envelope pattern:
 
 ---
 
-### C. Dropdowns & Metadata
+### C. Dashboard & Analytics
+
+#### 1. Get Category Counts
+- **Path**: `GET /kjusys-api/asset-management-api/categories`
+- **Response Shape**:
+  ```json
+  {
+    "responseType": "SUCCESS",
+    "statusCode": 200,
+    "responseData": {
+      "data": [
+        {
+          "categoryId": "6a0fe1928c08584d8944152d",
+          "categoryName": "Laptops",
+          "assetCount": 15
+        }
+      ]
+    }
+  }
+  ```
+
+#### 2. Get Status Counts
+- **Path**: `GET /kjusys-api/asset-management-api/status`
+- **Response Shape**:
+  ```json
+  {
+    "responseType": "SUCCESS",
+    "statusCode": 200,
+    "responseData": {
+      "data": [
+        {
+          "statusId": "6a0fe1928c08584d89441551",
+          "statusName": "Ready to Deploy",
+          "assetCount": 8
+        }
+      ]
+    }
+  }
+  ```
+
+#### 3. Get Asset Status Summary
+- **Path**: `GET /kjusys-api/asset-management-api/asset-status-summary`
+- **Query Parameters**:
+  - `page`: `Integer` (default: 1)
+  - `pageSize`: `Integer` (default: 10)
+- **Response Shape**:
+  ```json
+  {
+    "responseType": "SUCCESS",
+    "statusCode": 200,
+    "responseData": {
+      "data": [
+        {
+          "assetTagName": "MacBook Pro 16",
+          "category": "Laptops",
+          "totalAssets": 15,
+          "ready": 8,
+          "deployed": 5,
+          "underMaintenance": 2,
+          "damaged": 0,
+          "deadStock": 0
+        }
+      ],
+      "totalRecords": 1,
+      "currentPage": 1,
+      "pageSize": 10,
+      "totalPages": 1
+    }
+  }
+  ```
+
+#### 4. Get Asset Grouping
+- **Path**: `GET /kjusys-api/asset-management-api/grp`
+- **Response Shape**: Returns assets grouped by campus and location structure.
+  ```json
+  {
+    "responseType": "SUCCESS",
+    "statusCode": 200,
+    "responseData": {
+      "data": [ ... ]
+    }
+  }
+  ```
+
+---
+
+### D. Metadata & Lookup Lists (Dropdowns)
 
 #### 1. List Categories
 - **Path**: `GET /kjusys-api/asset-management-api/categories-list`
@@ -458,76 +633,7 @@ All responses from the backend follow a standard envelope pattern:
   }
   ```
 
-#### 5. Get Category Counts (Dashboard)
-- **Path**: `GET /kjusys-api/asset-management-api/categories`
-- **Response Shape**:
-  ```json
-  {
-    "responseType": "SUCCESS",
-    "statusCode": 200,
-    "responseData": {
-      "data": [
-        {
-          "categoryId": "6a0fe1928c08584d8944152d",
-          "categoryName": "Laptops",
-          "assetCount": 15
-        }
-      ]
-    }
-  }
-  ```
-
-#### 6. Get Status Counts (Dashboard Donut Chart)
-- **Path**: `GET /kjusys-api/asset-management-api/status`
-- **Response Shape**:
-  ```json
-  {
-    "responseType": "SUCCESS",
-    "statusCode": 200,
-    "responseData": {
-      "data": [
-        {
-          "statusId": "6a0fe1928c08584d89441551",
-          "statusName": "Ready to Deploy",
-          "assetCount": 8
-        }
-      ]
-    }
-  }
-  ```
-
-#### 7. Get Asset Status Summary (Dashboard Grid)
-- **Path**: `GET /kjusys-api/asset-management-api/asset-status-summary`
-- **Query Parameters**:
-  - `page`: `Integer`
-  - `pageSize`: `Integer`
-- **Response Shape**:
-  ```json
-  {
-    "responseType": "SUCCESS",
-    "statusCode": 200,
-    "responseData": {
-      "data": [
-        {
-          "assetTagName": "MacBook Pro 16",
-          "category": "Laptops",
-          "totalAssets": 15,
-          "ready": 8,
-          "deployed": 5,
-          "deadStock": 0,
-          "underMaintenance": 2,
-          "damaged": 0
-        }
-      ],
-      "totalRecords": 1,
-      "currentPage": 1,
-      "pageSize": 10,
-      "totalPages": 1
-    }
-  }
-  ```
-
-#### 8. Create Asset Tag
+#### 5. Create Asset Tag
 - **Path**: `POST /kjusys-api/asset-management-api/create-asset-tag`
 - **Request Payload**:
   ```json
@@ -549,3 +655,61 @@ All responses from the backend follow a standard envelope pattern:
     }
   }
   ```
+
+---
+
+## 5. Error Handling
+
+All error responses follow the standard format:
+```json
+{
+  "responseType": "ERROR",
+  "statusCode": 400 | 500,
+  "responseData": {
+    "error": "Error message describing the issue"
+  }
+}
+```
+
+### Common HTTP Status Codes
+- `200`: Success
+- `400`: Bad Request (Validation errors)
+- `500`: Internal Server Error
+
+### Common Error Cases
+- Missing required fields in request payload
+- Invalid ObjectId format
+- Resource not found
+- Self-assignment in issue operations
+- Duplicate issue attempts (when asset is already actively issued)
+
+---
+
+## 6. Technology Details
+
+### Vert.x Framework
+- **Router**: Routes HTTP requests to appropriate handlers
+- **BodyHandler**: Parses request bodies (JSON, form data)
+- **CorsHandler**: Enables Cross-Origin Resource Sharing
+- **BlockingHandler**: Executes database operations without blocking event loop
+
+### MongoDB Operations
+- Aggregation pipeline for complex queries (pagination, filtering, grouping)
+- Partial unique indexes for data integrity constraints
+- ObjectId for document identification
+
+### Request/Response Envelope
+- All responses wrapped in `ResponseType` (SUCCESS/ERROR) and `StatusCode`
+- Consistent data structure across all endpoints
+- Logging at INFO and ERROR levels for debugging
+
+---
+
+## 7. Development Notes
+
+- **Pagination**: Default page size is 10, max is 100
+- **Date Format**: `YYYY-MM-DD` for input, ISO 8601 for output
+- **ID Format**: MongoDB ObjectId (24-character hex string)
+- **CORS**: Enabled for all origins with credentials support
+- **Content-Type**: `application/json`
+- **HTTP Methods**: GET (retrieve), POST (create), PUT (update)

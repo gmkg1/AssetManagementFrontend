@@ -253,10 +253,13 @@
               <span class="text-xs font-semibold text-slate-700">License Key</span>
               <span class="text-xs font-semibold text-slate-700">Expiry Date</span>
             </div>
-            <div class="grid grid-cols-3 px-4 py-4 bg-white">
-              <span class="text-xs text-slate-600 pl-1">N/A</span>
-              <span class="text-xs text-slate-600 pl-1">N/A</span>
-              <span class="text-xs text-slate-600 pl-1">N/A</span>
+            <div *ngFor="let lic of assetLicenses" class="grid grid-cols-3 px-4 py-4 bg-white border-b border-slate-100 last:border-0">
+              <span class="text-xs text-slate-600 pl-1">{{ lic.licenseName || '—' }}</span>
+              <span class="text-xs text-slate-600 pl-1 font-mono">{{ lic.licenseKey || '—' }}</span>
+              <span class="text-xs text-slate-600 pl-1">{{ lic.expiryDate ? (lic.expiryDate | date:'dd-MMM-yyyy') : '—' }}</span>
+            </div>
+            <div *ngIf="assetLicenses.length === 0" class="grid grid-cols-3 px-4 py-4 bg-white">
+              <span class="text-xs text-slate-400 pl-1">No licenses found</span>
             </div>
           </div>
         </div>
@@ -272,12 +275,15 @@
               <span class="text-xs font-semibold text-slate-700">Expiry Date</span>
               <span class="text-xs font-semibold text-slate-700">Status</span>
             </div>
-            <div class="grid grid-cols-5 px-4 py-4 bg-white">
-              <span class="text-xs text-slate-600">Logitech</span>
-              <span class="text-xs text-slate-600">WAR-003</span>
-              <span class="text-xs text-slate-600">22-May-2026</span>
-              <span class="text-xs text-slate-600">22-May-2027</span>
-              <span class="text-xs text-slate-600">Active</span>
+            <div *ngFor="let war of assetWarranties" class="grid grid-cols-5 px-4 py-4 bg-white border-b border-slate-100 last:border-0">
+              <span class="text-xs text-slate-600">{{ war.provider || '—' }}</span>
+              <span class="text-xs text-slate-600 font-mono">{{ war.displayId || '—' }}</span>
+              <span class="text-xs text-slate-600">{{ war.startDate ? (war.startDate | date:'dd-MMM-yyyy') : '—' }}</span>
+              <span class="text-xs text-slate-600">{{ war.endDate ? (war.endDate | date:'dd-MMM-yyyy') : '—' }}</span>
+              <span class="text-xs font-semibold" [class.text-green-600]="war.status === 'Active'" [class.text-slate-400]="war.status !== 'Active'">{{ war.status || '—' }}</span>
+            </div>
+            <div *ngIf="assetWarranties.length === 0" class="grid grid-cols-5 px-4 py-4 bg-white">
+              <span class="text-xs text-slate-400">No warranty details found</span>
             </div>
           </div>
         </div>
@@ -301,7 +307,7 @@
           </div>
           <div class="grid grid-cols-2 py-3 px-4">
             <div class="text-slate-600 text-xs">Assigned To Asset</div>
-            <div class="text-slate-800 text-xs">Dell XPS Laptop</div>
+            <div class="text-slate-800 text-xs">—</div>
           </div>
         </div>
 
@@ -309,11 +315,12 @@
         <div>
           <h3 class="text-xs font-bold text-slate-600 mb-3 uppercase tracking-wider">Components</h3>
           <div class="border border-slate-300 rounded bg-white">
-            <div class="py-4 px-4 text-slate-600 text-xs border-b border-slate-100">
-              No additional components found
+            <div *ngFor="let comp of assetComponents" class="py-3 px-4 text-slate-700 text-xs border-b border-slate-100 last:border-0 flex justify-between items-center hover:bg-slate-50 transition-colors">
+              <span class="font-medium text-slate-800">{{ comp.assetName }}</span>
+              <span class="text-[10px] text-slate-400 font-mono">{{ comp.assetId }}</span>
             </div>
-            <div class="py-4 px-4 text-slate-600 text-xs">
-              No assigned asset found
+            <div *ngIf="assetComponents.length === 0" class="py-4 px-4 text-slate-600 text-xs">
+              No additional components found
             </div>
           </div>
         </div>

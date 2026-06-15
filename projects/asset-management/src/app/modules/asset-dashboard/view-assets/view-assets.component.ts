@@ -55,6 +55,10 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   locations: FilterOption[] = [];
   statuses: FilterOption[] = [];
 
+  assetLicenses: any[] = [];
+  assetWarranties: any[] = [];
+  assetComponents: any[] = [];
+
   selectedCategoryId = '';
   selectedLocationId = '';
   selectedStatusId = '';
@@ -263,6 +267,10 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     this.detailTab = 'components';
     this.view = 'detail';
 
+    this.assetLicenses = [];
+    this.assetWarranties = [];
+    this.assetComponents = [];
+
     if (asset._id) {
       this.assetService.getAssetDetails(asset._id).subscribe({
         next: (res: any) => {
@@ -287,6 +295,29 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
               isReturnable: data.isIssuable || false
             };
           }
+        }
+      });
+
+      this.assetService.getLicensesAndWarranty(asset._id).subscribe({
+        next: (res: any) => {
+          const data = res?.responseData?.data || {};
+          this.assetLicenses = data.licenses || [];
+          this.assetWarranties = data.warranty || [];
+          this.cdr.detectChanges();
+        },
+        error: (err: any) => {
+          console.error('Failed to load licenses and warranty:', err);
+        }
+      });
+
+      this.assetService.getAssetComponents(asset._id).subscribe({
+        next: (res: any) => {
+          const data = res?.responseData?.data || {};
+          this.assetComponents = data.components || [];
+          this.cdr.detectChanges();
+        },
+        error: (err: any) => {
+          console.error('Failed to load components:', err);
         }
       });
     }

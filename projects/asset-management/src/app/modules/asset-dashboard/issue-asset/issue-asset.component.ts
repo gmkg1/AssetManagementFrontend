@@ -260,30 +260,52 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
       return;
     }
     this.assetOptionsLoading = true;
-    this.assetService.searchAssets(query).subscribe({
+    this.assetService.getUnissuedAssetNames(query).subscribe({
       next: (response: any) => {
-        const raw = response?.responseData?.data?.assets ?? response?.responseData?.assets ?? [];
-        this.assetsList = raw.map((item: any) => ({
-          _id: item._id,
-          label: `${item.assetName} (${item.assetTagName || 'No Tag'})`,
-          assetName: item.assetName,
-          assetTag: item.assetTagName || 'No Tag'
-        }));
+        const data = response?.responseData?.data || response?.responseData || {};
+        const raw = data.assetNames || [];
+        this.assetsList = raw;
         this.assetOptionsLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
-        console.error('Failed to search assets:', err);
+        console.error('Failed to search unissued assets:', err);
         this.assetOptionsLoading = false;
       }
     });
   }
 
-  selectAssetOption(option: any): void {
-    this.assetId = option._id;
-    this.assetName = option.assetName;
-    this.assetTag = option.assetTag;
-    this.assetSearch = option.assetName;
+  selectAssetOption(name: string): void {
+    this.assetSearch = name;
     this.assetDropdownOpen = false;
+    this.assetOptionsLoading = true;
+    this.assetService.getAssets({ assetName: name, pageSize: 50 }).subscribe({
+      next: (response: any) => {
+        const raw = response?.responseData?.data?.assets ?? response?.responseData?.assets ?? [];
+        // Find the first Ready to Deploy asset
+        const available = raw.find((item: any) => item.status === 'Ready to Deploy');
+        if (available) {
+          this.assetId = available._id;
+          this.assetName = available.assetName;
+          this.assetTag = available.assetTagName || 'No Tag';
+          this.assetModel = available.assetTagName || 'No Tag';
+          this.assetCategory = available.category || 'No Category';
+        } else if (raw.length > 0) {
+          const first = raw[0];
+          this.assetId = first._id;
+          this.assetName = first.assetName;
+          this.assetTag = first.assetTagName || 'No Tag';
+          this.assetModel = first.assetTagName || 'No Tag';
+          this.assetCategory = first.category || 'No Category';
+        }
+        this.assetOptionsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Failed to load asset details:', err);
+        this.assetOptionsLoading = false;
+      }
+    });
   }
 
   goBack(): void {

@@ -183,4 +183,20 @@ export class AssetService {
   updateAsset(payload: any) {
     return this.http.put<any>(`${this.baseUrl}/edit-asset`, payload);
   }
+
+  getLicensesAndWarranty(assetId: string) {
+    return this.http.get<any>(`${this.baseUrl}/get-licenses/${assetId}`);
+  }
+
+  getAssetComponents(assetId: string) {
+    return this.http.get<any>(`${this.baseUrl}/get-asset-components/${assetId}`);
+  }
+
+  getUnissuedAssetNames(query?: string) {
+    let params = new HttpParams();
+    if (query) {
+      params = params.set('q', query);
+    }
+    return this.http.get<any>(`${this.baseUrl}/unissued-asset-names`, { params });
+  }
 }
