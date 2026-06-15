@@ -1,85 +1,77 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
-import { AssetService } from '../../services/asset.service';
-import { Breadcrumb } from '@libs/shared-ui';
 
 @Component({
   selector: 'app-create-asset-tag',
   templateUrl: './create-asset-tag.component.html',
   styleUrls: ['./create-asset-tag.component.css'],
 })
-export class CreateAssetTagComponent implements OnInit {
-  breadcrumbs: Breadcrumb[] = [
-    { label: 'Home', callback: () => this.router.navigate(['/kjusys/asset-management/asset-dashboard']) },
-    { label: 'Create Asset Tag' },
-  ];
+export class CreateAssetTagComponent {
 
-  // Form fields
+  // â”€â”€ Form fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   category      = '';
-  categoryName  = '';
-  assetTagName  = '';
+  assetTypeName = '';
   displayId     = '';
   classification = '';
   assetImageFile: File | null = null;
   assetImagePreview: string | null = null;
 
-  // Dropdown options — shaped for lib-dropdown-lib (idField='id', textField='title')
-  categories      : any[] = [];
-  displayIds      = [
-    { id: 'MSE', title: 'MSE' }, { id: 'KBD', title: 'KBD' }, { id: 'MON', title: 'MON' },
-    { id: 'LPT', title: 'LPT' }, { id: 'PRN', title: 'PRN' }, { id: 'SCN', title: 'SCN' },
-    { id: 'PRJ', title: 'PRJ' }
-  ];
-  classifications = [
-    { id: 'Returnable', title: 'Returnable' },
-    { id: 'Non-Returnable', title: 'Non-Returnable' },
-    { id: 'Consumable', title: 'Consumable' }
-  ];
+  // â”€â”€ Dropdown options â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  categories      = ['IT â€“ Information Technology', 'Electricals', 'Sound', 'Stationery', 'Housekeeping', 'Furniture'];
+  assetTypeNames  = ['Mouse', 'Keyboard', 'Monitor', 'Laptop', 'Printer', 'Scanner', 'Projector'];
+  displayIds      = ['MSE', 'KBD', 'MON', 'LPT', 'PRN', 'SCN', 'PRJ'];
+  classifications = ['Returnable', 'Non-Returnable', 'Consumable'];
 
-  // Selected items arrays for lib-dropdown-lib
-  selectedCategory      : any[] = [];
-  selectedDisplayId     : any[] = [];
-  selectedClassification: any[] = [];
+  // â”€â”€ Dropdown open states â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  catOpen    = false;
+  typeOpen   = false;
+  dispOpen   = false;
+  classOpen  = false;
 
-  // UI state
+  // â”€â”€ UI state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
   showSuccess  = false;
   isLoading    = false;
   errorMessage = '';
   isDragOver   = false;
 
-  constructor(private router: Router, private assetService: AssetService) {}
-
-  ngOnInit(): void {
-    this.assetService.getCategories().subscribe({
-      next: (res: any) => {
-        const rows = res?.responseData?.data?.assets ?? [];
-        // Shape for lib-dropdown-lib: {id, title}
-        this.categories = rows.map((r: any) => ({ id: r.categoryId, title: r.categoryName }));
-      }
-    });
-  }
+  constructor(private router: Router) {}
 
   @HostListener('document:click')
-  onDocumentClick(): void {}
-
-  closeAllDropdowns(): void {}
-  toggleDropdown(name: string, event: Event): void {}
-
-  // lib-dropdown-lib selection handlers
-  onCategoryChange(selected: any[]): void {
-    this.category     = selected[0]?.id   ?? '';
-    this.categoryName = selected[0]?.title ?? '';
-  }
-  onDisplayIdChange(selected: any[]): void {
-    this.displayId = selected[0]?.id ?? '';
-  }
-  onClassificationChange(selected: any[]): void {
-    this.classification = selected[0]?.id ?? '';
+  onDocumentClick(): void {
+    this.catOpen   = false;
+    this.typeOpen  = false;
+    this.dispOpen  = false;
+    this.classOpen = false;
   }
 
-  selectOption(field: string, value: any, event: Event): void {}
+  closeAllDropdowns(): void {
+    this.catOpen   = false;
+    this.typeOpen  = false;
+    this.dispOpen  = false;
+    this.classOpen = false;
+  }
 
-  // Image upload
+  toggleDropdown(name: 'cat' | 'type' | 'disp' | 'class', event: Event): void {
+    event.stopPropagation();
+    const wasOpen = name === 'cat'   ? this.catOpen
+                  : name === 'type'  ? this.typeOpen
+                  : name === 'disp'  ? this.dispOpen
+                  : this.classOpen;
+    this.closeAllDropdowns();
+    if (name === 'cat')   this.catOpen   = !wasOpen;
+    if (name === 'type')  this.typeOpen  = !wasOpen;
+    if (name === 'disp')  this.dispOpen  = !wasOpen;
+    if (name === 'class') this.classOpen = !wasOpen;
+  }
+
+  selectOption(field: 'category' | 'assetTypeName' | 'displayId' | 'classification', value: string, event: Event): void {
+    event.stopPropagation();
+    (this as any)[field] = value;
+    this.closeAllDropdowns();
+  }
+
+  // â”€â”€ Image upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
@@ -121,19 +113,19 @@ export class CreateAssetTagComponent implements OnInit {
     this.assetImagePreview = null;
   }
 
-  // Navigation
-  goBack(): void         { this.router.navigate(['/kjusys/asset-management/create-asset']); }
-  goToDashboard(): void  { this.router.navigate(['/kjusys/asset-management/asset-dashboard']); }
-  goToIssueAsset(): void { this.router.navigate(['/kjusys/asset-management/issue-asset']); }
-  goToIssueLog(): void   { this.router.navigate(['/kjusys/asset-management/issue-log']); }
-  goToReturnLog(): void  { this.router.navigate(['/kjusys/asset-management/return-log']); }
-  goToReports(): void    { this.router.navigate(['/kjusys/asset-management/reports']); }
+  // â”€â”€ Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  goBack(): void         { this.router.navigate(['/kjusys/view-assets']); }
+  goToDashboard(): void  { this.router.navigate(['/kjusys/asset-dashboard']); }
+  goToIssueAsset(): void { this.router.navigate(['/kjusys/issue-asset']); }
+  goToIssueLog(): void   { this.router.navigate(['/kjusys/issue-log']); }
+  goToReturnLog(): void  { this.router.navigate(['/kjusys/return-log']); }
+  goToReports(): void    { this.router.navigate(['/kjusys/reports']); }
 
-  // Submit
+  // â”€â”€ Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   onSubmit(): void {
     this.errorMessage = '';
 
-    if (!this.category || !this.assetTagName || !this.displayId || !this.classification) {
+    if (!this.category || !this.assetTypeName || !this.displayId || !this.classification) {
       this.errorMessage = 'Please fill in all required fields.';
       return;
     }
@@ -142,37 +134,29 @@ export class CreateAssetTagComponent implements OnInit {
 
     const payload = {
       category:       this.category,
-      assetTagName:   this.assetTagName.trim(),
-      displayId:      this.displayId.trim(),
+      assetTypeName:  this.assetTypeName,
+      displayId:      this.displayId,
       classification: this.classification,
+      assetImage:     this.assetImageFile?.name ?? null,
     };
 
     console.log('Create Asset Tag payload:', payload);
 
-    this.assetService.createAssetTag(payload).subscribe({
-      next: (res: any) => {
-        this.isLoading   = false;
-        this.showSuccess = true;
-      },
-      error: (err: any) => {
-        this.isLoading = false;
-        this.errorMessage = err?.error?.responseData?.errors?.[0] || err?.error?.error || 'Failed to create asset tag.';
-      }
-    });
+    // TODO: replace with real API call via AssetService
+    setTimeout(() => {
+      this.isLoading   = false;
+      this.showSuccess = true;
+    }, 600);
   }
 
   createAnother(): void {
-    this.showSuccess          = false;
-    this.category             = '';
-    this.categoryName         = '';
-    this.assetTagName         = '';
-    this.displayId            = '';
-    this.classification       = '';
-    this.selectedCategory     = [];
-    this.selectedDisplayId    = [];
-    this.selectedClassification = [];
-    this.assetImageFile       = null;
-    this.assetImagePreview    = null;
-    this.errorMessage         = '';
+    this.showSuccess       = false;
+    this.category          = '';
+    this.assetTypeName     = '';
+    this.displayId         = '';
+    this.classification    = '';
+    this.assetImageFile    = null;
+    this.assetImagePreview = null;
+    this.errorMessage      = '';
   }
 }
