@@ -202,9 +202,9 @@ export class CreateAssetComponent implements OnInit {
       assetTagId: this.model,
       statusId: this.status,
       defaultLocation: this.defaultLocation || null,
-      serial: this.serial.trim(),
-      purchaseCost: this.purchaseCost.trim(),
-      purchaseDate: this.purchaseDate.trim(),
+      serial: this.serial != null ? this.serial.toString().trim() : '',
+      purchaseCost: this.purchaseCost != null ? this.purchaseCost.toString().trim() : '',
+      purchaseDate: this.purchaseDate ? this.purchaseDate.trim() : '',
       isReturnable: this.isReturnable,
     };
 
