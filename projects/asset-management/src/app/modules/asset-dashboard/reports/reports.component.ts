@@ -44,7 +44,9 @@ export class ReportsComponent implements OnInit, OnDestroy {
       ? Object.values(this.allAssets).flat()
       : (this.allAssets[this.activeDept] ?? []);
     const q = this.searchQuery.toLowerCase().trim();
-    return list.filter(a => !q || a.name.toLowerCase().includes(q));
+    // Only filter when query is empty (show all) or at least 3 chars
+    if (!q || q.length < 3) return list;
+    return list.filter(a => a.name.toLowerCase().includes(q));
   }
 
   get pagedAssets(): ReportAsset[] {
@@ -85,6 +87,11 @@ export class ReportsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void { this.loadReportData(1); }
   ngOnDestroy(): void { }
+
+  onSearchInput(): void {
+    // The getter already gates filtering at 3 chars — just trigger change detection
+    this.cdr.detectChanges();
+  }
 
   private loadReportData(page: number): void {
     this.isLoading = true;

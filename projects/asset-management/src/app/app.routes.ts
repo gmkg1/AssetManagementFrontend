@@ -119,6 +119,16 @@ export const APP_ROUTES: Routes = [
                throw error;
             }),
       },
+      {
+        path: 'edit-warranty-licenses/:id',
+        loadChildren: () =>
+          import('./modules/asset-dashboard/asset-dashboard.module')
+            .then((m) => m.AssetDashboardModule)
+            .catch((error) => {
+               console.error('Error loading AssetDashboardModule', error);
+               throw error;
+            }),
+      },
 
 
 

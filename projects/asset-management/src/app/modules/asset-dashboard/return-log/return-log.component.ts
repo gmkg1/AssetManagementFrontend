@@ -1,5 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, Optional } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { AssetService } from '../../../services/asset.service';
 import { DashboardTabsService } from '../dashboard-tabs.service';
 
@@ -30,6 +32,9 @@ export class ReturnLogComponent implements OnInit, OnDestroy {
   returnTypeQuery = '';
   returnToQuery = '';
   returnDateQuery = '';
+
+  private searchSubject = new Subject<void>();
+  private searchSub!: Subscription;
 
   selectedRecord: ReturnRecord | null = null;
   currentPage = 1;
@@ -64,8 +69,17 @@ export class ReturnLogComponent implements OnInit, OnDestroy {
     @Optional() private dashboardTabsService: DashboardTabsService
   ) { }
 
-  ngOnInit(): void { this.loadReturnLogs(); }
-  ngOnDestroy(): void { }
+  ngOnInit(): void {
+    this.searchSub = this.searchSubject.pipe(debounceTime(300)).subscribe(() => {
+      this.currentPage = 1;
+      this.loadReturnLogs();
+    });
+    this.loadReturnLogs();
+  }
+
+  ngOnDestroy(): void {
+    this.searchSub?.unsubscribe();
+  }
 
   private loadReturnLogs(): void {
     this.isLoading = true;
@@ -113,6 +127,20 @@ export class ReturnLogComponent implements OnInit, OnDestroy {
   onFilterChange(): void {
     this.currentPage = 1;
     this.loadReturnLogs();
+  }
+
+  onSearchInput(field: string): void {
+    const len: Record<string, number> = {
+      nameQuery: this.nameQuery.length,
+      classificationQuery: this.classificationQuery.length,
+      totalQuery: this.totalQuery.length,
+      returnTypeQuery: this.returnTypeQuery.length,
+      returnToQuery: this.returnToQuery.length,
+    };
+    const changed = len[field] ?? 0;
+    if (changed === 3 || changed === 0) {
+      this.searchSubject.next();
+    }
   }
 
   clearFilters(): void {

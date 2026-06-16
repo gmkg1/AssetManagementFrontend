@@ -29,7 +29,7 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
   assets: OptionItem[] = [];
   assetSearch = '';
   assetDropdownOpen = false;
-  assetsList: any[] = [];
+  assetsList: { _id: string; displayLabel: string; assetName: string; assetTagName: string; assetSerialNumber: string; category: string }[] = [];
 
   issueTo = 'User';
   receiverSearch = '';
@@ -255,57 +255,45 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
   onAssetSearchInput(query: string): void {
     this.assetSearch = query;
     this.assetDropdownOpen = true;
-    if (!query.trim()) {
+    if (!query.trim() || query.trim().length < 3) {
       this.assetsList = [];
+      this.assetOptionsLoading = false;
       return;
     }
     this.assetOptionsLoading = true;
-    this.assetService.getUnissuedAssetNames(query).subscribe({
+    this.assetService.getAssets({ assetName: query, pageSize: 50 }).subscribe({
       next: (response: any) => {
-        const data = response?.responseData?.data || response?.responseData || {};
-        const raw = data.assetNames || [];
-        this.assetsList = raw;
+        const raw: any[] = response?.responseData?.data?.assets ?? response?.responseData?.assets ?? [];
+        this.assetsList = raw.map((item: any) => {
+          const serial = item.assetSerialNumber?.trim() ? item.assetSerialNumber : null;
+          return {
+            _id: item._id ?? '',
+            displayLabel: serial ? `${item.assetName} (S/N: ${serial})` : item.assetName,
+            assetName: item.assetName ?? '',
+            assetTagName: item.assetTagName ?? '',
+            assetSerialNumber: item.assetSerialNumber ?? '',
+            category: item.category ?? '',
+          };
+        });
         this.assetOptionsLoading = false;
         this.cdr.detectChanges();
       },
       error: (err: any) => {
-        console.error('Failed to search unissued assets:', err);
+        console.error('Failed to search assets:', err);
         this.assetOptionsLoading = false;
       }
     });
   }
 
-  selectAssetOption(name: string): void {
-    this.assetSearch = name;
+  selectAssetOption(asset: { _id: string; displayLabel: string; assetName: string; assetTagName: string; assetSerialNumber: string; category: string }): void {
+    this.assetSearch = asset.displayLabel;
     this.assetDropdownOpen = false;
-    this.assetOptionsLoading = true;
-    this.assetService.getAssets({ assetName: name, pageSize: 50 }).subscribe({
-      next: (response: any) => {
-        const raw = response?.responseData?.data?.assets ?? response?.responseData?.assets ?? [];
-        // Find the first Ready to Deploy asset
-        const available = raw.find((item: any) => item.status === 'Ready to Deploy');
-        if (available) {
-          this.assetId = available._id;
-          this.assetName = available.assetName;
-          this.assetTag = available.assetTagName || 'No Tag';
-          this.assetModel = available.assetTagName || 'No Tag';
-          this.assetCategory = available.category || 'No Category';
-        } else if (raw.length > 0) {
-          const first = raw[0];
-          this.assetId = first._id;
-          this.assetName = first.assetName;
-          this.assetTag = first.assetTagName || 'No Tag';
-          this.assetModel = first.assetTagName || 'No Tag';
-          this.assetCategory = first.category || 'No Category';
-        }
-        this.assetOptionsLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: (err: any) => {
-        console.error('Failed to load asset details:', err);
-        this.assetOptionsLoading = false;
-      }
-    });
+    this.assetId = asset._id;
+    this.assetName = asset.assetName;
+    this.assetTag = asset.assetTagName || 'No Tag';
+    this.assetModel = asset.assetTagName || 'No Tag';
+    this.assetCategory = asset.category || 'No Category';
+    this.cdr.detectChanges();
   }
 
   goBack(): void {
