@@ -235,6 +235,35 @@ Response inner key: `responseData.data`
 
 ---
 
+#### GET `/asset-history/:assetId`
+Path param: `assetId`
+
+Response inner key: `responseData.data`
+```json
+{
+  "dispatches": [],
+  "issues": [
+    {
+      "issueDate": "2026-05-27T00:00:00Z",
+      "location": "Staff Room 1",
+      "personId": "12345",
+      "issuedToAsset": "N/A"
+    }
+  ],
+  "returns": [
+    {
+      "returnDate": "2026-05-28T00:00:00Z",
+      "location": "Staff Room 1",
+      "personId": "12345",
+      "returnedToAsset": "N/A"
+    }
+  ]
+}
+```
+**Used by**: `ViewAssetsComponent` (on row click, for History tab)
+
+---
+
 #### PUT `/edit-licenses-warranty`
 Payload:
 ```json
