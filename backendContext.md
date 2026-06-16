@@ -120,7 +120,7 @@ Tracks active issues and returns in the same collection.
 ### A. Assets
 
 #### GET `/assets`
-Paginated, filterable asset list.
+Paginated, filterable asset list (sorted by most recently added by default).
 
 Query params: `page`, `pageSize`, `assetName`, `assetTagName`, `categoryId`, `locationId`, `statusId`, `purchaseDateFrom` (YYYY-MM-DD), `purchaseDateTo`, `sort`
 
@@ -312,6 +312,7 @@ Response inner key: `assets[]`
       "_id": "ObjectId (issueId)",
       "assetId": "ObjectId",
       "assetName": "MacBook Pro",
+      "assetSerialNumber": "SN12345678",
       "assetCategory": "IT",
       "issueDate": "2026-05-27T00:00:00Z",
       "receiverName": "Staff Room 1",
