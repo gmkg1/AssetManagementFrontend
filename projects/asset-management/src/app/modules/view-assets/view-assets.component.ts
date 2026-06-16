@@ -1,5 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { AssetService } from '../../services/asset.service';
 import { Breadcrumb } from '@libs/shared-ui';
 
@@ -69,7 +71,9 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   purchaseDate = '';
   searchQuery = '';
   assetTagQuery = '';
-  // search is triggered manually via onSearch()
+
+  private searchSubject = new Subject<void>();
+  private searchSub!: Subscription;
 
   currentPage = 1;
   totalPages = 1;
@@ -114,6 +118,14 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   constructor(private router: Router, private route: ActivatedRoute, private assetService: AssetService , private cdr : ChangeDetectorRef ) {}
 
   ngOnInit(): void {
+    // Debounce search input — fires from the 1st character, 300ms after user stops typing
+    this.searchSub = this.searchSubject.pipe(
+      debounceTime(300)
+    ).subscribe(() => {
+      this.currentPage = 1;
+      this.loadAssets();
+    });
+
     this.loadFilterOptions();
     this.route.queryParams.subscribe((params: Record<string, string>) => {
       if (params['category']) this.selectedCategoryId = params['category'];
@@ -121,7 +133,9 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    this.searchSub?.unsubscribe();
+  }
 
   private loadFilterOptions(): void {
     
@@ -182,6 +196,19 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   onSearch(): void {
     this.currentPage = 1;
     this.loadAssets();
+  }
+
+  onSearchInput(): void {
+    const nameLen = this.searchQuery.length;
+    const tagLen = this.assetTagQuery.length;
+    // Fire only when a field hits exactly 3 chars (the minimum to start filtering),
+    // or when a field is fully cleared back to 0 (to reset the list).
+    // 1–2 chars in either field do nothing.
+    const nameTrigger = nameLen === 3 || (nameLen === 0 && tagLen === 0);
+    const tagTrigger  = tagLen  === 3 || (tagLen  === 0 && nameLen === 0);
+    if (nameTrigger || tagTrigger) {
+      this.searchSubject.next();
+    }
   }
 
   onFilterChange(): void {

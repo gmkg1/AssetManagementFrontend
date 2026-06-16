@@ -1,5 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, Optional } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { AssetService } from '../../../services/asset.service';
 import { DashboardTabsService } from '../dashboard-tabs.service';
 
@@ -28,6 +30,9 @@ export class IssueLogComponent implements OnInit, OnDestroy {
   selectedType = '';
   issueDate = '';
 
+  private searchSubject = new Subject<void>();
+  private searchSub!: Subscription;
+
   currentPage = 1;
   totalPages = 1;
   totalRecords = 0;
@@ -50,10 +55,16 @@ export class IssueLogComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    this.searchSub = this.searchSubject.pipe(debounceTime(300)).subscribe(() => {
+      this.currentPage = 1;
+      this.loadIssueLog();
+    });
     this.loadIssueLog();
   }
 
-  ngOnDestroy(): void { }
+  ngOnDestroy(): void {
+    this.searchSub?.unsubscribe();
+  }
 
   private loadIssueLog(): void {
     this.isLoading = true;
@@ -99,6 +110,19 @@ export class IssueLogComponent implements OnInit, OnDestroy {
   onFilterChange(): void {
     this.currentPage = 1;
     this.loadIssueLog();
+  }
+
+  onSearchInput(field: string): void {
+    const len: Record<string, number> = {
+      assetNameQuery: this.assetNameQuery.length,
+      categoryQuery: this.categoryQuery.length,
+      issuedToQuery: this.issuedToQuery.length,
+    };
+    const changed = len[field] ?? 0;
+    // Trigger only at exactly 3 chars or when cleared to 0
+    if (changed === 3 || changed === 0) {
+      this.searchSubject.next();
+    }
   }
 
   clearFilters(): void {

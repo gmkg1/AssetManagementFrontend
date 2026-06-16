@@ -1,5 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, Optional } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { AssetService } from '../../../services/asset.service';
 import { DashboardTabsService } from '../dashboard-tabs.service';
 
@@ -68,7 +70,9 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   purchaseDate = '';
   searchQuery = '';
   assetTagQuery = '';
-  private assetTagTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private searchSubject = new Subject<void>();
+  private searchSub!: Subscription;
 
   currentPage = 1;
   totalPages = 1;
@@ -118,6 +122,14 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    // Debounced search: fires from 1st char, stops at 3 chars (beyond 3 use Search button)
+    this.searchSub = this.searchSubject.pipe(
+      debounceTime(300)
+    ).subscribe(() => {
+      this.currentPage = 1;
+      this.loadAssets();
+    });
+
     this.loadFilterOptions();
     if (this.dashboardTabsService && this.dashboardTabsService.filterCategoryId) {
       this.selectedCategoryId = this.dashboardTabsService.filterCategoryId;
@@ -132,9 +144,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.assetTagTimer) {
-      clearTimeout(this.assetTagTimer);
-    }
+    this.searchSub?.unsubscribe();
   }
 
   private loadFilterOptions(): void {
@@ -197,6 +207,19 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     this.loadAssets();
   }
 
+  onSearchInput(): void {
+    const nameLen = this.searchQuery.length;
+    const tagLen = this.assetTagQuery.length;
+    // Fire only when a field hits exactly 3 chars (the minimum to start filtering),
+    // or when a field is fully cleared back to 0 (to reset the list).
+    // 1–2 chars in either field do nothing.
+    const nameTrigger = nameLen === 3 || (nameLen === 0 && tagLen === 0);
+    const tagTrigger  = tagLen  === 3 || (tagLen  === 0 && nameLen === 0);
+    if (nameTrigger || tagTrigger) {
+      this.searchSubject.next();
+    }
+  }
+
   clearFilters(): void {
     this.selectedCategoryId = '';
     this.selectedLocationId = '';
@@ -208,9 +231,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     this.loadAssets();
   }
 
-  onAssetTagInput(value: string): void {
-    this.assetTagQuery = value;
-  }
+
 
   private loadStatusCounts(): void {
     this.assetService.getStatusSummary().subscribe({

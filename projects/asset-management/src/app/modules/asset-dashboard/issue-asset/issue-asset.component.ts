@@ -255,8 +255,9 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
   onAssetSearchInput(query: string): void {
     this.assetSearch = query;
     this.assetDropdownOpen = true;
-    if (!query.trim()) {
+    if (!query.trim() || query.trim().length < 3) {
       this.assetsList = [];
+      this.assetOptionsLoading = false;
       return;
     }
     this.assetOptionsLoading = true;
