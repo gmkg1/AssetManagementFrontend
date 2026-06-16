@@ -74,10 +74,8 @@ export class ReturnAssetComponent implements OnInit {
     if (!this.selectedIssue) {
       return 'Select Issued Asset';
     }
-    const shortId = this.selectedIssue._id
-      ? this.selectedIssue._id.substring(this.selectedIssue._id.length - 6).toUpperCase()
-      : 'ISS';
-    return `${shortId} — ${this.selectedIssue.assetName || 'Unknown Asset'} (${this.selectedIssue.receiverName || 'Unknown'})`;
+    const serial = this.selectedIssue.assetSerialNumber || '—';
+    return `${serial} — ${this.selectedIssue.assetName || 'Unknown Asset'} (${this.selectedIssue.receiverName || 'Unknown'})`;
   }
 
   getIssueDateMin(): string {
