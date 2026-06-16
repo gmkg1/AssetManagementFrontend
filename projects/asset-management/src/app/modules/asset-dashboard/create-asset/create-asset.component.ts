@@ -16,13 +16,11 @@ export class CreateAssetComponent implements OnInit {
   serial = '';
   model = '';
   status = '';
-  category = '';
   defaultLocation = '';
 
   // Right column fields
   assetName = '';
   orderNumber = '';
-  warranty = '';
   purchaseDate = '';
   eolDate = '';
   supplier = '';
@@ -33,7 +31,6 @@ export class CreateAssetComponent implements OnInit {
   companies = ['Kristu Jayanti University', 'KJC Trust'];
   models: any[] = [];
   statuses: any[] = [];
-  categories: any[] = [];
   locations: any[] = [];
   suppliers = ['Dell India', 'Apple Reseller', 'HP India', 'Lenovo Store'];
 
@@ -60,21 +57,12 @@ export class CreateAssetComponent implements OnInit {
   }
 
   loadDropdowns(): void {
-    let pending = 4; // number of dropdown calls
+    let pending = 3; // number of dropdown calls
 
     const tryApplyClone = () => {
       pending--;
       if (pending === 0) this.applyCloneDataIfPresent();
     };
-
-    this.assetService.getCategories().subscribe({
-      next: (res: any) => {
-        const rows = res?.responseData?.data?.assets ?? [];
-        this.categories = rows.map((r: any) => ({ id: r.categoryId, name: r.categoryName }));
-        tryApplyClone();
-      },
-      error: () => tryApplyClone()
-    });
 
     this.assetService.getLocations().subscribe({
       next: (res: any) => {
@@ -266,11 +254,9 @@ export class CreateAssetComponent implements OnInit {
     this.serial = '';
     this.model = '';
     this.status = '';
-    this.category = '';
     this.defaultLocation = '';
     this.assetName = '';
     this.orderNumber = '';
-    this.warranty = '';
     this.purchaseDate = '';
     this.eolDate = '';
     this.supplier = '';
