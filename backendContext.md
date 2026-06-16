@@ -215,7 +215,7 @@ Same payload shape as `/create-asset` plus `_id`.
 #### GET `/unissued-asset-names`
 Query params: `q` (optional, case-insensitive asset name filter)
 
-Response: `{ assetNames: ["Lenovo ThinkPad", "MacBook Pro"] }`
+Response: `{ assetNames: [ { "_id": "ObjectId", "assetName": "MacBook Pro", "assetSerialNumber": "SN12345678" } ] }`
 
 **Used by**: Defined in service — not currently called by any component.
 
