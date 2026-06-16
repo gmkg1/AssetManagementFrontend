@@ -1,0 +1,71 @@
+<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+  <div class="flex flex-wrap gap-2 px-4 py-3 border-b border-slate-100">
+    <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[140px] flex-1" type="text" placeholder="Asset name" [(ngModel)]="assetNameQuery" (ngModelChange)="onSearchInput('assetNameQuery')" />
+    <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[120px] flex-1" type="text" placeholder="Category" [(ngModel)]="categoryQuery" (ngModelChange)="onSearchInput('categoryQuery')" />
+    <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[120px] flex-1" type="text" placeholder="Issued to" [(ngModel)]="issuedToQuery" (ngModelChange)="onSearchInput('issuedToQuery')" />
+    <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[120px] flex-1" [(ngModel)]="selectedType" (change)="onFilterChange()">
+      <option value="">All types</option>
+      <option value="Location">Location</option>
+      <option value="Asset">Asset</option>
+      <option value="Person">Person</option>
+    </select>
+    <div class="flex items-center gap-2 flex-shrink-0">
+      <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[130px]" type="date" [(ngModel)]="issueDate" (change)="onFilterChange()" />
+      <button type="button" class="h-8 px-3 rounded-lg border border-slate-200 bg-white text-xs text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition-all duration-150 active:scale-95" (click)="clearFilters()">Clear</button>
+    </div>
+  </div>
+  <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+    <div>
+      <h2 class="text-xs font-semibold text-slate-800">Issue Log</h2>
+      <p class="text-[10px] text-slate-400 mt-0.5">{{ totalRecords }} record{{ totalRecords !== 1 ? 's' : '' }} total</p>
+    </div>
+  </div>
+  <div *ngIf="apiError" class="px-4 py-3 text-xs text-red-600 bg-red-50">{{ apiError }}</div>
+  <!-- Skeleton rows while loading -->
+  <ng-container *ngIf="isLoading && !apiError">
+    <div class="grid grid-cols-5 px-4 py-2 border-b border-slate-100 bg-slate-50">
+      <span class="text-[10px] font-medium text-slate-500">Asset Name</span>
+      <span class="text-[10px] font-medium text-slate-500">Category</span>
+      <span class="text-[10px] font-medium text-slate-500">Issued To</span>
+      <span class="text-[10px] font-medium text-slate-500">Type</span>
+      <span class="text-[10px] font-medium text-slate-500">Issue Date</span>
+    </div>
+    <div *ngFor="let s of [1,2,3,4,5,6,7,8]" class="grid grid-cols-5 px-4 py-3 border-b border-slate-50 animate-pulse">
+      <div class="h-3 bg-slate-200 rounded w-3/4"></div>
+      <div class="h-3 bg-slate-200 rounded w-2/3"></div>
+      <div class="h-3 bg-slate-200 rounded w-3/4"></div>
+      <div class="h-3 bg-slate-200 rounded w-1/2"></div>
+      <div class="h-3 bg-slate-200 rounded w-2/3"></div>
+    </div>
+  </ng-container>
+  <div *ngIf="!isLoading && !apiError" class="grid grid-cols-5 px-4 py-2 border-b border-slate-100 bg-slate-50">
+    <span class="text-[10px] font-medium text-slate-500">Asset Name</span>
+    <span class="text-[10px] font-medium text-slate-500">Category</span>
+    <span class="text-[10px] font-medium text-slate-500">Issued To</span>
+    <span class="text-[10px] font-medium text-slate-500">Type</span>
+    <span class="text-[10px] font-medium text-slate-500">Issue Date</span>
+  </div>
+  <div *ngIf="!isLoading && issueLog.length === 0" class="flex flex-col items-center justify-center py-16 gap-2 text-slate-400">
+    <span class="text-xs">No issued assets found.</span>
+  </div>
+  <ng-container *ngIf="!isLoading">
+    <div *ngFor="let row of issueLog; let i = index" class="grid grid-cols-5 px-4 py-2.5 border-b border-slate-50 last:border-0 hover:bg-blue-50 transition-colors" [class.bg-white]="i % 2 === 0" [class.bg-slate-50]="i % 2 !== 0">
+      <span class="text-xs font-medium text-slate-800 truncate pr-2">{{ row.assetName }}</span>
+      <span class="text-xs text-slate-500">{{ row.assetCategory }}</span>
+      <span class="text-xs text-slate-700 truncate pr-2">{{ row.receiverName }}</span>
+      <span><span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold" [ngClass]="getReceiverTypeClass(row.receiverType)">{{ row.receiverType }}</span></span>
+      <span class="text-xs text-slate-400">{{ row.issueDate }}</span>
+    </div>
+  </ng-container>
+  <div *ngIf="!isLoading && totalPages > 1" class="flex items-center justify-between px-4 py-3 border-t border-slate-100">
+    <span class="text-[10px] text-slate-400">Page {{ currentPage }} of {{ totalPages }} · {{ totalRecords }} total</span>
+    <div class="flex items-center gap-1">
+      <button class="h-7 px-2 rounded-md text-[11px] border border-slate-200 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="currentPage === 1" (click)="prevPage()">‹ Prev</button>
+      <ng-container *ngFor="let p of pageNumbers">
+        <button *ngIf="p !== -1" class="h-7 w-7 rounded-md text-[11px] border" [class.bg-blue-600]="p === currentPage" [class.text-white]="p === currentPage" [class.border-blue-600]="p === currentPage" [class.border-slate-200]="p !== currentPage" [class.text-slate-600]="p !== currentPage" (click)="goToPage(p)">{{ p }}</button>
+        <span *ngIf="p === -1" class="text-slate-400 text-[11px] px-1">…</span>
+      </ng-container>
+      <button class="h-7 px-2 rounded-md text-[11px] border border-slate-200 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="currentPage === totalPages" (click)="nextPage()">Next ›</button>
+    </div>
+  </div>
+</div>

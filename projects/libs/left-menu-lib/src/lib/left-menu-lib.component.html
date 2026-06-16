@@ -29,8 +29,7 @@
             <li *ngFor="let remote of menu.subModule" class="mb-2">
               <a [routerLink]="'/kjusys/' + remote.subPath" [state]="{ back: false }" (click)="menuItemClick(remote, menu); openSidebarMob = false"
                 routerLinkActive="active"
-                class="flex items-center w-full p-2 text-[10px] text-gray-500 rounded-lg hover:text-black transition duration-150 ease-in-out"
-                [title]="toSentenceCase(remote.displayName)">
+                class="flex items-center w-full p-2 text-[10px] text-gray-500 rounded-lg hover:text-black transition duration-150 ease-in-out">
                 {{ toSentenceCase(remote.displayName) }}
               </a>
             </li>
@@ -95,8 +94,7 @@
                   <li *ngFor="let remote of menu.subModule" class="mb-1">
                     <a [routerLink]="'/kjusys/' + remote.subPath" [state]="{ back: false }" (click)="menuItemClick(remote, menu); closeSidebar()"
                       routerLinkActive="active"
-                      class="flex items-center w-full p-2 text-[10px] text-gray-600 rounded-lg hover:text-black hover:font-bold transition-all duration-200 group"
-                      [title]="toSentenceCase(remote.displayName)">
+                      class="flex items-center w-full p-2 text-[10px] text-gray-600 rounded-lg hover:text-black hover:font-bold transition-all duration-200 group">
                       {{ toSentenceCase(remote.displayName) }}
                     </a>
                   </li>

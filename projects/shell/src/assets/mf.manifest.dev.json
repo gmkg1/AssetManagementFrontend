@@ -10,69 +10,6 @@
         "subPath": "asset-management/asset-dashboard",
         "ngModuleName": "AssetDashboardModule",
         "pinned": false
-      },
-      {
-        "exposedModule": "./ViewAssetsModule",
-        "displayName": "View Assets",
-        "subPath": "asset-management/view-assets",
-        "ngModuleName": "ViewAssetsModule",
-        "pinned": false
-      },
-      {
-        "exposedModule": "./ReturnLogModule",
-        "displayName": "Return Log",
-        "subPath": "asset-management/return-log",
-        "ngModuleName": "ReturnLogModule",
-        "pinned": false
-      },
-      {
-        "exposedModule": "./ReportsModule",
-        "displayName": "Reports",
-        "subPath": "asset-management/reports",
-        "ngModuleName": "ReportsModule",
-        "pinned": false
-      },
-      {
-        "exposedModule": "./IssueAssetModule",
-        "displayName": "Issue Asset",
-        "subPath": "asset-management/issue-asset",
-        "ngModuleName": "IssueAssetModule",
-        "pinned": false
-      },
-      {
-        "exposedModule": "./CreateAssetTagModule",
-        "displayName": "Create Asset Tag",
-        "subPath": "asset-management/create-asset-tag",
-        "ngModuleName": "CreateAssetTagModule",
-        "pinned": false
-      },
-      {
-        "exposedModule": "./CreateAssetModule",
-        "displayName": "Create Asset",
-        "subPath": "asset-management/create-asset",
-        "ngModuleName": "CreateAssetModule",
-        "pinned": false
-      },
-      {
-        "exposedModule": "./IssueLogModule",
-        "displayName": "Issue Log",
-        "subPath": "asset-management/issue-log",
-        "ngModuleName": "IssueLogModule",
-        "pinned": false
-      },
-      {
-        "exposedModule": "./ReturnAssetModule",
-        "displayName": "Return Asset",
-        "subPath": "asset-management/return-asset",
-        "ngModuleName": "ReturnAssetModule",
-        "pinned": false
-      },
-      {
-        "exposedModule": "./EditAssetModule",
-        "displayName": "Edit Asset",
-        "subPath": "asset-management/edit-asset",
-        "ngModuleName": "EditAssetModule",
-        "pinned": false
       }
     ]
   }

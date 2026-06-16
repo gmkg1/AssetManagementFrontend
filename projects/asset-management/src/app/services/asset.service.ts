@@ -18,7 +18,6 @@ export class AssetService {
     return this.http.get<any>(`${this.baseUrl}/status`);
   }
 
-  /** GET /assets?page=X&size=Y */
   getAssets(filters: {
     page?: number;
     pageSize?: number;
@@ -29,6 +28,8 @@ export class AssetService {
     statusId?: string;
     purchaseDateFrom?: string;
     purchaseDateTo?: string;
+    sortBy?: string;
+    sortOrder?: string;
   } = {}) {
     let params = new HttpParams()
       .set('page', (filters.page ?? 1).toString())
@@ -40,6 +41,10 @@ export class AssetService {
     if (filters.statusId) params = params.set('statusId', filters.statusId);
     if (filters.purchaseDateFrom) params = params.set('purchaseDateFrom', filters.purchaseDateFrom);
     if (filters.purchaseDateTo) params = params.set('purchaseDateTo', filters.purchaseDateTo);
+    if (filters.sortBy) params = params.set('sortBy', filters.sortBy);
+    if (filters.sortOrder) params = params.set('sortOrder', filters.sortOrder);
+    // Also try adding 'sort' commonly used by some backends
+    params = params.set('sort', '-createdAt,-_id');
     return this.http.get<any>(`${this.baseUrl}/assets`, { params });
   }
 
@@ -51,6 +56,11 @@ export class AssetService {
 
   getCategories() {
     return this.http.get<any>(`${this.baseUrl}/categories`);
+  }
+
+  /** GET /categories-list — flat list of { categoryId, categoryName } for dropdowns/filters */
+  getCategoriesList() {
+    return this.http.get<any>(`${this.baseUrl}/categories-list`);
   }
 
   getLocations() {
@@ -73,6 +83,19 @@ export class AssetService {
       .set('categoryId', categoryId)
       .set('page', page.toString())
       .set('pageSize', pageSize.toString());
+    return this.http.get<any>(`${this.baseUrl}/grp`, { params });
+  }
+
+  /** GET /grp — assets grouped by campus/location, optionally filtered by categoryId */
+  getAssetGrouped(filters: {
+    categoryId?: string;
+    page?: number;
+    pageSize?: number;
+  } = {}) {
+    let params = new HttpParams()
+      .set('page', (filters.page ?? 1).toString())
+      .set('pageSize', (filters.pageSize ?? 10).toString());
+    if (filters.categoryId) params = params.set('categoryId', filters.categoryId);
     return this.http.get<any>(`${this.baseUrl}/grp`, { params });
   }
 
@@ -114,6 +137,16 @@ export class AssetService {
     return this.http.post<any>(`${this.baseUrl}/issue-asset`, payload);
   }
 
+  /** POST /return-asset */
+  returnAsset(payload: {
+    assetId: string;
+    issuetoId: string;
+    returnDate: string;
+    notes?: string;
+  }) {
+    return this.http.post<any>(`${this.baseUrl}/return-asset`, payload);
+  }
+
   /** GET /return-logs?page=X&pageSize=Y */
   getReturnLogs(
     pageOrFilters: number | {
@@ -146,7 +179,10 @@ export class AssetService {
 
   /** GET /asset-status-summary?page=X&size=Y */
   getAssetStatusSummary(page: number = 1, size: number = 10) {
-    const params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('pageSize', size.toString());
     return this.http.get<any>(`${this.baseUrl}/asset-status-summary`, { params });
   }
 
@@ -169,5 +205,36 @@ export class AssetService {
 
   updateAsset(payload: any) {
     return this.http.put<any>(`${this.baseUrl}/edit-asset`, payload);
+  }
+
+  getLicensesAndWarranty(assetId: string) {
+    return this.http.get<any>(`${this.baseUrl}/get-licenses/${assetId}`);
+  }
+
+  getAssetComponents(assetId: string) {
+    return this.http.get<any>(`${this.baseUrl}/get-asset-components/${assetId}`);
+  }
+
+  /** GET /issued-asset-details/:assetId — currently issued details for a specific asset */
+  getIssuedDetailByAssetId(assetId: string) {
+    return this.http.get<any>(`${this.baseUrl}/issued-asset-details/${assetId}`);
+  }
+
+  getUnissuedAssetNames(query?: string) {
+    let params = new HttpParams();
+    if (query) {
+      params = params.set('q', query);
+    }
+    return this.http.get<any>(`${this.baseUrl}/unissued-asset-names`, { params });
+  }
+
+  /** GET /asset-history/:assetId — dispatch, issue and return history for a specific asset */
+  getAssetHistory(assetId: string) {
+    return this.http.get<any>(`${this.baseUrl}/asset-history/${assetId}`);
+  }
+
+  /** PUT /edit-licenses-warranty — update licenses and warranty for an asset */
+  updateLicensesAndWarranty(payload: any) {
+    return this.http.put<any>(`${this.baseUrl}/edit-licenses-warranty`, payload);
   }
 }
