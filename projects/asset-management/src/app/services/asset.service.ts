@@ -58,6 +58,11 @@ export class AssetService {
     return this.http.get<any>(`${this.baseUrl}/categories`);
   }
 
+  /** GET /categories-list — flat list of { categoryId, categoryName } for dropdowns/filters */
+  getCategoriesList() {
+    return this.http.get<any>(`${this.baseUrl}/categories-list`);
+  }
+
   getLocations() {
     return this.http.get<any>(`${this.baseUrl}/locations-list`);
   }
@@ -78,6 +83,19 @@ export class AssetService {
       .set('categoryId', categoryId)
       .set('page', page.toString())
       .set('pageSize', pageSize.toString());
+    return this.http.get<any>(`${this.baseUrl}/grp`, { params });
+  }
+
+  /** GET /grp — assets grouped by campus/location, optionally filtered by categoryId */
+  getAssetGrouped(filters: {
+    categoryId?: string;
+    page?: number;
+    pageSize?: number;
+  } = {}) {
+    let params = new HttpParams()
+      .set('page', (filters.page ?? 1).toString())
+      .set('pageSize', (filters.pageSize ?? 10).toString());
+    if (filters.categoryId) params = params.set('categoryId', filters.categoryId);
     return this.http.get<any>(`${this.baseUrl}/grp`, { params });
   }
 
