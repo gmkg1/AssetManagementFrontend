@@ -502,6 +502,67 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     }
   }
 
+  cloneAsset(asset: Asset): void {
+    if (!asset._id) return;
+
+    this.isLoading = true;
+
+    this.assetService.getAssetDetails(asset._id).subscribe({
+      next: (res: any) => {
+        this.isLoading = false;
+        const data = res?.responseData?.data;
+
+        let normalizedPurchaseDate = '';
+        if (data?.purchaseDate) {
+          try { normalizedPurchaseDate = new Date(data.purchaseDate).toISOString().substring(0, 10); } catch (_) {}
+        }
+
+        const rawSerial: string = data?.assetSerialNumber || asset.serial || '';
+        let newSerial = rawSerial;
+        const match = rawSerial.match(/^(.*?)(\d+)$/);
+        if (match) {
+          const num = parseInt(match[2], 10) + 1;
+          newSerial = match[1] + String(num).padStart(match[2].length, '0');
+        } else if (rawSerial) {
+          newSerial = rawSerial + '-1';
+        }
+
+        const rawCost = (data?.purchaseCost ?? asset.purchaseCost ?? '').toString().replace('Rs. ', '').replace(/,/g, '');
+
+        if (this.dashboardTabsService) {
+          this.dashboardTabsService.cloneAssetData = {
+            assetName: asset.name,
+            assetTagId: data?.assetTagId || '',
+            assetTagName: asset.assetTag || '',
+            statusId: data?.statusId || '',
+            locationId: data?.locationId || '',
+            serial: newSerial,
+            purchaseCost: rawCost,
+            purchaseDate: normalizedPurchaseDate || '',
+            isReturnable: data?.isIssuable ?? false,
+          };
+          this.dashboardTabsService.changeTab('create-asset');
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        console.error('Failed to fetch asset details for cloning:', err);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  handleAction(label: string): void {
+    if (!this.selectedAsset) return;
+    switch (label) {
+      case 'Edit Asset': this.editAsset(this.selectedAsset); break;
+      case 'Issue Asset': this.issueAsset(this.selectedAsset); break;
+      case 'Edit Licenses and Warranty': this.editWarrantyLicenses(this.selectedAsset); break;
+      case 'Clone Asset': this.cloneAsset(this.selectedAsset); break;
+    }
+  }
+
   editWarrantyLicenses(asset: Asset): void {
     const id = asset._id || asset.id;
     if (this.dashboardTabsService) {
