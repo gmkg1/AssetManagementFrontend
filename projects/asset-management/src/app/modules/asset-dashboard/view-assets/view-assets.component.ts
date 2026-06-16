@@ -443,6 +443,16 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     }
   }
 
+  editWarrantyLicenses(asset: Asset): void {
+    const id = asset._id || asset.id;
+    if (this.dashboardTabsService) {
+      this.dashboardTabsService.warrantyLicensesAssetId = id;
+      this.dashboardTabsService.changeTab('edit-warranty-licenses');
+    } else {
+      this.router.navigate(['/kjusys/asset-management/edit-warranty-licenses', id]);
+    }
+  }
+
   getStatusClass(status: string): string {
     const map: Record<string, string> = {
       'Ready to Deploy': 'status-available',
