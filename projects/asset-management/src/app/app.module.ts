@@ -11,9 +11,6 @@ import { EffectsModule } from '@ngrx/effects';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavigationComponent } from './modules/navigation/navigation.component';
-import { SharedAuthModule } from '@libs/shared-auth';
-import { LeftMenuLibModule } from '@libs/left-menu-lib';
-import { MenuHeaderLibModule } from '@libs/menu-header-lib';
 
 @NgModule({
   declarations: [
@@ -37,9 +34,6 @@ import { MenuHeaderLibModule } from '@libs/menu-header-lib';
       }
     ),
     EffectsModule.forRoot([]),
-    SharedAuthModule,
-    LeftMenuLibModule,
-    MenuHeaderLibModule,
     AppRoutingModule,
   ],
   providers: [],

@@ -1,26 +1,5 @@
-.asset-layout {
-  display: flex;
-  min-height: calc(100vh - 64px);
-}
-
-.asset-sidebar {
-  min-width: 72px;
-  max-width: 320px;
-}
-
-.asset-content {
-  flex: 1;
-  background-color: #f4f7fe;
-  min-height: calc(100vh - 64px);
-}
-
-@media (max-width: 768px) {
-  .asset-layout {
-    flex-direction: column;
-  }
-
-  .asset-sidebar {
-    width: 100%;
-    max-width: 100%;
-  }
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
