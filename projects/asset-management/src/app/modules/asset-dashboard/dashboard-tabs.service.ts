@@ -19,6 +19,19 @@ export class DashboardTabsService {
   public issueAssetModel = '';
   public issueAssetCategory = '';
 
+  // For Clone Asset — prefill data passed to create-asset tab
+  public cloneAssetData: {
+    assetName: string;
+    assetTagId: string;
+    assetTagName: string;
+    statusId: string;
+    locationId: string;
+    serial: string;
+    purchaseCost: string;
+    purchaseDate: string;
+    isReturnable: boolean;
+  } | null = null;
+
   constructor() {}
 
   changeTab(tabId: string): void {

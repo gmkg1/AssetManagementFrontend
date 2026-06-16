@@ -47,6 +47,7 @@ export class CreateAssetComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   billFile: File | null = null;
+  isCloneMode = false;
 
   constructor(
     private router: Router,
@@ -59,25 +60,38 @@ export class CreateAssetComponent implements OnInit {
   }
 
   loadDropdowns(): void {
+    let pending = 4; // number of dropdown calls
+
+    const tryApplyClone = () => {
+      pending--;
+      if (pending === 0) this.applyCloneDataIfPresent();
+    };
+
     this.assetService.getCategories().subscribe({
       next: (res: any) => {
         const rows = res?.responseData?.data?.assets ?? [];
         this.categories = rows.map((r: any) => ({ id: r.categoryId, name: r.categoryName }));
-      }
+        tryApplyClone();
+      },
+      error: () => tryApplyClone()
     });
 
     this.assetService.getLocations().subscribe({
       next: (res: any) => {
         const rows = res?.responseData?.data?.locations ?? [];
         this.locations = rows.map((r: any) => ({ id: r.locationId, name: r.locationName }));
-      }
+        tryApplyClone();
+      },
+      error: () => tryApplyClone()
     });
 
     this.assetService.getStatuses().subscribe({
       next: (res: any) => {
         const rows = res?.responseData?.data?.statuses ?? [];
         this.statuses = rows.map((r: any) => ({ id: r.statusId, name: r.statusName }));
-      }
+        tryApplyClone();
+      },
+      error: () => tryApplyClone()
     });
 
     this.assetService.getAssetTags().subscribe({
@@ -85,8 +99,30 @@ export class CreateAssetComponent implements OnInit {
         const tags = res?.responseData?.data?.assetTags ?? [];
         this.models = tags.map((t: any) => ({ id: t.id, name: t.assetTagName }));
         this.filteredModels = this.models;
-      }
+        tryApplyClone();
+      },
+      error: () => tryApplyClone()
     });
+  }
+
+  private applyCloneDataIfPresent(): void {
+    if (!this.dashboardTabsService?.cloneAssetData) return;
+    const d = this.dashboardTabsService.cloneAssetData;
+    this.dashboardTabsService.cloneAssetData = null; // consume it
+
+    this.isCloneMode = true;
+    this.assetName = d.assetName;
+    this.serial = d.serial;
+    this.status = d.statusId;
+    this.defaultLocation = d.locationId;
+    this.purchaseCost = d.purchaseCost;
+    this.purchaseDate = d.purchaseDate;
+    this.isReturnable = d.isReturnable;
+
+    // Set asset tag (model) and its display name in the searchable dropdown
+    this.model = d.assetTagId;
+    const found = this.models.find(m => m.id === d.assetTagId);
+    this.assetTagSearch = found ? found.name : d.assetTagName;
   }
 
   // Search filter for dropdown
