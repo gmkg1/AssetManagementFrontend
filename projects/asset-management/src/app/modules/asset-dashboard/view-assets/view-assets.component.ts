@@ -543,10 +543,12 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
           };
           this.dashboardTabsService.changeTab('create-asset');
         }
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         this.isLoading = false;
         console.error('Failed to fetch asset details for cloning:', err);
+        this.cdr.detectChanges();
       }
     });
   }

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { TabItem } from '@libs/tabs';
@@ -28,12 +28,14 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private dashboardTabsService: DashboardTabsService
+    private dashboardTabsService: DashboardTabsService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.subscription = this.dashboardTabsService.activeTab$.subscribe(tabId => {
       this.activeTabId = tabId;
+      this.cdr.detectChanges();
     });
   }
 

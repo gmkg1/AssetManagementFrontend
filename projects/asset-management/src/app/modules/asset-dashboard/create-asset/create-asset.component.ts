@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, Optional } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, Optional } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../../services/asset.service';
 import { DashboardTabsService } from '../dashboard-tabs.service';
@@ -49,6 +49,7 @@ export class CreateAssetComponent implements OnInit {
   constructor(
     private router: Router,
     private assetService: AssetService,
+    private cdr: ChangeDetectorRef,
     @Optional() private dashboardTabsService: DashboardTabsService
   ) { }
 
@@ -111,6 +112,8 @@ export class CreateAssetComponent implements OnInit {
     this.model = d.assetTagId;
     const found = this.models.find(m => m.id === d.assetTagId);
     this.assetTagSearch = found ? found.name : d.assetTagName;
+
+    this.cdr.detectChanges();
   }
 
   // Search filter for dropdown
