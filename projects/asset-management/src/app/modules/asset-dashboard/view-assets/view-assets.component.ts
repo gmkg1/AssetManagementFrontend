@@ -21,6 +21,7 @@ export interface Asset {
   condition: string;
   assetTag: string;
   serial: string;
+  displayId: string;
   checkoutDate: string;
   model: string;
   modelNo: string;
@@ -308,6 +309,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
       condition: 'Good',
       assetTag: item.assetTagName ?? '—',
       serial: item.assetSerialNumber ?? '—',
+      displayId: item.displayId ?? item.assetSerialNumber ?? '—',
       checkoutDate: '—',
       model: item.assetTagName ?? '—',
       modelNo: '—',
@@ -356,6 +358,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
               locationId: data.locationId,
               assetTagId: data.assetTagId,
               serial: data.assetSerialNumber || this.selectedAsset.serial,
+              displayId: data.displayId || this.selectedAsset.displayId,
               purchaseCost: data.purchaseCost != null ? data.purchaseCost.toString() : this.selectedAsset.purchaseCost,
               purchaseDate: normalizedPurchaseDate || this.selectedAsset.purchaseDate,
               isReturnable: data.isIssuable || false

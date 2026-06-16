@@ -261,25 +261,41 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
       return;
     }
     this.assetOptionsLoading = true;
-    this.assetService.getAssets({ assetName: query, pageSize: 50 }).subscribe({
+    // Use /unissued-asset-names for suggestions — only assets not currently issued
+    this.assetService.getUnissuedAssetNames(query).subscribe({
       next: (response: any) => {
-        const raw: any[] = response?.responseData?.data?.assets ?? response?.responseData?.assets ?? [];
-        this.assetsList = raw.map((item: any) => {
-          const serial = item.assetSerialNumber?.trim() ? item.assetSerialNumber : null;
+        const items: any[] =
+          response?.responseData?.data?.assetNames ??
+          response?.responseData?.assetNames ??
+          [];
+        this.assetsList = items.map((item: any) => {
+          if (typeof item === 'string') {
+            return {
+              _id: '',
+              displayLabel: item,
+              assetName: item,
+              assetTagName: '',
+              assetSerialNumber: '',
+              category: '',
+            };
+          }
+          const name = item?.assetName ?? '';
+          const serial = item?.assetSerialNumber ?? '';
+          const display = serial ? `${name} (${serial})` : name;
           return {
-            _id: item._id ?? '',
-            displayLabel: serial ? `${item.assetName} (S/N: ${serial})` : item.assetName,
-            assetName: item.assetName ?? '',
-            assetTagName: item.assetTagName ?? '',
-            assetSerialNumber: item.assetSerialNumber ?? '',
-            category: item.category ?? '',
+            _id: item?._id ?? '',
+            displayLabel: display,
+            assetName: name,
+            assetTagName: '',
+            assetSerialNumber: serial,
+            category: '',
           };
         });
         this.assetOptionsLoading = false;
         this.cdr.detectChanges();
       },
       error: (err: any) => {
-        console.error('Failed to search assets:', err);
+        console.error('Failed to fetch unissued asset names:', err);
         this.assetOptionsLoading = false;
       }
     });
@@ -288,12 +304,40 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
   selectAssetOption(asset: { _id: string; displayLabel: string; assetName: string; assetTagName: string; assetSerialNumber: string; category: string }): void {
     this.assetSearch = asset.displayLabel;
     this.assetDropdownOpen = false;
-    this.assetId = asset._id;
-    this.assetName = asset.assetName;
-    this.assetTag = asset.assetTagName || 'No Tag';
-    this.assetModel = asset.assetTagName || 'No Tag';
-    this.assetCategory = asset.category || 'No Category';
-    this.cdr.detectChanges();
+    this.assetOptionsLoading = true;
+
+    // Resolve full asset details (_id, tag, category) via /assets-search
+    this.assetService.searchAssets(asset.assetName).subscribe({
+      next: (response: any) => {
+        const results: any[] =
+          response?.responseData?.data?.data ??
+          response?.responseData?.data ??
+          [];
+        const match = results.find((r: any) =>
+          (r.assetSerialNumber ?? '') === asset.assetSerialNumber
+        ) ?? results.find((r: any) =>
+          (r.assetName ?? '').toLowerCase() === asset.assetName.toLowerCase()
+        ) ?? results[0];
+
+        if (match) {
+          this.assetId = match._id ?? '';
+          this.assetName = match.assetName ?? asset.assetName;
+          this.assetTag = match.assetTagName ?? 'No Tag';
+          this.assetModel = match.assetTagName ?? 'No Tag';
+          this.assetCategory = match.category ?? 'No Category';
+        } else {
+          // Fallback: keep the name but no id (submit will fail validation)
+          this.assetId = '';
+          this.assetName = asset.assetName;
+        }
+        this.assetOptionsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Failed to resolve asset details:', err);
+        this.assetOptionsLoading = false;
+      }
+    });
   }
 
   goBack(): void {

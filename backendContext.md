@@ -215,7 +215,7 @@ Same payload shape as `/create-asset` plus `_id`.
 #### GET `/unissued-asset-names`
 Query params: `q` (optional, case-insensitive asset name filter)
 
-Response: `{ assetNames: ["Lenovo ThinkPad", "MacBook Pro"] }`
+Response: `{ assetNames: [ { "_id": "ObjectId", "assetName": "MacBook Pro", "assetSerialNumber": "SN12345678" } ] }`
 
 **Used by**: Defined in service — not currently called by any component.
 
@@ -232,6 +232,35 @@ Response inner key: `responseData.data`
 }
 ```
 **Used by**: `EditWarrantyLicensesComponent` (on init, to pre-fill the form), `ViewAssetsComponent` (on row click, for Licenses tab)
+
+---
+
+#### GET `/asset-history/:assetId`
+Path param: `assetId`
+
+Response inner key: `responseData.data`
+```json
+{
+  "dispatches": [],
+  "issues": [
+    {
+      "issueDate": "2026-05-27T00:00:00Z",
+      "location": "Staff Room 1",
+      "personId": "12345",
+      "issuedToAsset": "N/A"
+    }
+  ],
+  "returns": [
+    {
+      "returnDate": "2026-05-28T00:00:00Z",
+      "location": "Staff Room 1",
+      "personId": "12345",
+      "returnedToAsset": "N/A"
+    }
+  ]
+}
+```
+**Used by**: `ViewAssetsComponent` (on row click, for History tab)
 
 ---
 
