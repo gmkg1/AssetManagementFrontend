@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { AssetService } from '../../../services/asset.service';
 import { DashboardTabsService } from '../dashboard-tabs.service';
 
@@ -31,7 +30,6 @@ export class EditWarrantyLicensesComponent implements OnInit {
   warrantyStatusOptions = ['Active', 'Expired', 'Pending'];
 
   constructor(
-    private router: Router,
     private assetService: AssetService,
     private dashboardTabsService: DashboardTabsService,
     private cdr: ChangeDetectorRef
@@ -85,25 +83,41 @@ export class EditWarrantyLicensesComponent implements OnInit {
 
   onSave(): void {
     this.errorMessage = '';
+
+    const licName = this.licenseName.trim();
+    const licKey = this.licenseKey.trim();
+    const warProvider = this.warrantyName.trim();
+    const warRefId = this.warrantyReferenceId.trim();
+
+    // Validate: at least one of licenseName or provider must be filled
+    if (!licName && !warProvider) {
+      this.errorMessage = 'Please enter at least a License Name or a Warranty Provider before saving.';
+      return;
+    }
+
     this.isSaving = true;
 
-    const payload = {
-      assetId: this.assetId,
-      license: {
-        licenseName: this.licenseName.trim(),
-        licenseKey: this.licenseKey.trim(),
+    const payload: any = { assetId: this.assetId };
+
+    if (licName || licKey || this.licenseExpiry) {
+      payload.license = {
+        licenseName: licName || undefined,
+        licenseKey: licKey || undefined,
         expiryDate: this.licenseExpiry || null
-      },
-      warranty: {
-        provider: this.warrantyName.trim(),
-        displayId: this.warrantyReferenceId.trim(),
+      };
+    }
+
+    if (warProvider || warRefId || this.warrantyStartDate || this.warrantyExpiryDate || this.warrantyStatus) {
+      payload.warranty = {
+        provider: warProvider || undefined,
+        displayId: warRefId || undefined,
         startDate: this.warrantyStartDate || null,
         endDate: this.warrantyExpiryDate || null,
-        status: this.warrantyStatus
-      }
-    };
+        status: this.warrantyStatus || undefined
+      };
+    }
 
-    this.assetService.updateLicensesAndWarranty(payload).subscribe({
+    this.assetService.createLicenses(payload).subscribe({
       next: () => {
         this.isSaving = false;
         this.showSuccess = true;
@@ -115,6 +129,7 @@ export class EditWarrantyLicensesComponent implements OnInit {
       error: (err: any) => {
         this.isSaving = false;
         this.errorMessage =
+          err?.error?.responseData?.data?.error ||
           err?.error?.responseData?.errors?.[0] ||
           err?.error?.error ||
           'Failed to save. Please try again.';

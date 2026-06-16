@@ -233,8 +233,8 @@ export class AssetService {
     return this.http.get<any>(`${this.baseUrl}/asset-history/${assetId}`);
   }
 
-  /** PUT /edit-licenses-warranty — update licenses and warranty for an asset */
-  updateLicensesAndWarranty(payload: any) {
-    return this.http.put<any>(`${this.baseUrl}/edit-licenses-warranty`, payload);
+  /** POST /create-licenses — create licenses and warranty for an asset */
+  createLicenses(payload: any) {
+    return this.http.post<any>(`${this.baseUrl}/create-licenses`, payload);
   }
 }
