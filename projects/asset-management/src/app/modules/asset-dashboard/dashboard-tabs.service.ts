@@ -10,6 +10,7 @@ export class DashboardTabsService {
   public editAssetId = '';
   public warrantyLicensesAssetId = '';
   public filterCategoryId = '';
+  public filterCategoryName = '';
 
   // For Issue Asset tab
   public issueAssetId = '';

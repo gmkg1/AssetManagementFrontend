@@ -112,6 +112,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   maintenanceCount = 0;
   assetsDropdownOpen = false;
   sidebarOpen = false;
+  activeCategoryName = '';
 
   constructor(
     private router: Router,
@@ -133,11 +134,14 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     this.loadFilterOptions();
     if (this.dashboardTabsService && this.dashboardTabsService.filterCategoryId) {
       this.selectedCategoryId = this.dashboardTabsService.filterCategoryId;
+      this.activeCategoryName = this.dashboardTabsService.filterCategoryName ?? '';
       this.dashboardTabsService.filterCategoryId = '';
+      this.dashboardTabsService.filterCategoryName = '';
       this.loadAssets();
     } else {
       this.route.queryParams.subscribe((params: Record<string, string>) => {
         if (params['category']) this.selectedCategoryId = params['category'];
+        if (params['categoryName']) this.activeCategoryName = params['categoryName'];
         this.loadAssets();
       });
     }
@@ -204,6 +208,13 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
 
   onSearch(): void {
     this.currentPage = 1;
+    // If the user manually changed the category dropdown, sync activeCategoryName
+    if (this.selectedCategoryId) {
+      const found = this.categories.find(c => c.id === this.selectedCategoryId);
+      this.activeCategoryName = found?.name ?? '';
+    } else {
+      this.activeCategoryName = '';
+    }
     this.loadAssets();
   }
 
@@ -227,6 +238,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     this.purchaseDate = '';
     this.searchQuery = '';
     this.assetTagQuery = '';
+    this.activeCategoryName = '';
     this.currentPage = 1;
     this.loadAssets();
   }
@@ -234,23 +246,49 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
 
 
   private loadStatusCounts(): void {
-    this.assetService.getStatusSummary().subscribe({
-      next: (response: any) => {
-        const rows: any[] = response?.responseData?.data?.assets ?? [];
-        let total = 0, readyToDeploy = 0, deployed = 0, maintenance = 0;
-        rows.forEach(r => {
-          total += r.assetCount ?? 0;
-          if (r.statusName === 'Ready to Deploy') readyToDeploy = r.assetCount ?? 0;
-          else if (r.statusName === 'Deployed') deployed = r.assetCount ?? 0;
-          else if (r.statusName === 'Under Maintenance') maintenance = r.assetCount ?? 0;
-        });
-        this.totalCount = total;
-        this.availableCount = readyToDeploy;
-        this.deployedCount = deployed;
-        this.maintenanceCount = maintenance;
-        this.cdr.detectChanges();
-      }
-    });
+    if (this.selectedCategoryId) {
+      // Fetch all assets for this category (large page) and derive counts from the result
+      this.assetService.getAssets({
+        page: 1,
+        pageSize: 9999,
+        categoryId: this.selectedCategoryId,
+      }).subscribe({
+        next: (response: any) => {
+          const raw: any[] = response?.responseData?.data?.assets ?? [];
+          let total = 0, readyToDeploy = 0, deployed = 0, maintenance = 0;
+          raw.forEach((r: any) => {
+            total++;
+            const s = r.status ?? '';
+            if (s === 'Ready to Deploy') readyToDeploy++;
+            else if (s === 'Deployed') deployed++;
+            else if (s === 'Under Maintenance') maintenance++;
+          });
+          this.totalCount = total;
+          this.availableCount = readyToDeploy;
+          this.deployedCount = deployed;
+          this.maintenanceCount = maintenance;
+          this.cdr.detectChanges();
+        }
+      });
+    } else {
+      this.assetService.getStatusSummary().subscribe({
+        next: (response: any) => {
+          const rows: any[] = response?.responseData?.data?.assets ?? [];
+          let total = 0, readyToDeploy = 0, deployed = 0, maintenance = 0;
+          rows.forEach(r => {
+            total += r.assetCount ?? 0;
+            if (r.statusName === 'Ready to Deploy') readyToDeploy = r.assetCount ?? 0;
+            else if (r.statusName === 'Deployed') deployed = r.assetCount ?? 0;
+            else if (r.statusName === 'Under Maintenance') maintenance = r.assetCount ?? 0;
+          });
+          this.totalCount = total;
+          this.availableCount = readyToDeploy;
+          this.deployedCount = deployed;
+          this.maintenanceCount = maintenance;
+          this.cdr.detectChanges();
+        }
+      });
+    }
   }
 
   prevPage(): void { if (this.currentPage > 1) { this.currentPage--; this.loadAssets(); } }
