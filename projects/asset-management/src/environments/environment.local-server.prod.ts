@@ -13,7 +13,7 @@ export const environment = {
         'asset-management': 'http://localhost:4205',
     },
     publicPath: 'http://localhost:4200/',
-    baseUrl: 'https://highway-over-concluded-period.trycloudflare.com/api/',
+    baseUrl: 'https://hits-payments-refuse-davis.trycloudflare.com/api/',
     project: 'shell',
     baseRoute: 'kjusys',
     local: true,

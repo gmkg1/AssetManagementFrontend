@@ -197,11 +197,26 @@ export class AssetService {
     return this.http.get<any>(`${this.baseUrl}/get-asset-components/${assetId}`);
   }
 
+  /** GET /issued-asset-details/:assetId — currently issued details for a specific asset */
+  getIssuedDetailByAssetId(assetId: string) {
+    return this.http.get<any>(`${this.baseUrl}/issued-asset-details/${assetId}`);
+  }
+
   getUnissuedAssetNames(query?: string) {
     let params = new HttpParams();
     if (query) {
       params = params.set('q', query);
     }
     return this.http.get<any>(`${this.baseUrl}/unissued-asset-names`, { params });
+  }
+
+  /** GET /asset-history/:assetId — dispatch, issue and return history for a specific asset */
+  getAssetHistory(assetId: string) {
+    return this.http.get<any>(`${this.baseUrl}/asset-history/${assetId}`);
+  }
+
+  /** PUT /edit-licenses-warranty — update licenses and warranty for an asset */
+  updateLicensesAndWarranty(payload: any) {
+    return this.http.put<any>(`${this.baseUrl}/edit-licenses-warranty`, payload);
   }
 }

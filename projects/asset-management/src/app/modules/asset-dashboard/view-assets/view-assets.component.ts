@@ -58,6 +58,9 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   assetLicenses: any[] = [];
   assetWarranties: any[] = [];
   assetComponents: any[] = [];
+  assetDispatches: any[] = [];
+  assetIssues: any[] = [];
+  assetReturns: any[] = [];
 
   selectedCategoryId = '';
   selectedLocationId = '';
@@ -94,9 +97,8 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   actions = [
     { label: 'Edit Asset', color: '#E53935', icon: 'M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125' },
     { label: 'Issue Asset', color: '#43A047', icon: 'M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z' },
-    { label: 'Add Note', color: '#1E88E5', icon: 'M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z' },
+    { label: 'Edit Licenses and Warranty', color: '#1E88E5', icon: 'M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z' },
     { label: 'Clone Asset', color: '#757575', icon: 'M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75' },
-    { label: 'Return and Delete', color: '#FB8C00', icon: 'M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3' },
   ];
 
   assets: Asset[] = [];
@@ -272,6 +274,9 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     this.assetLicenses = [];
     this.assetWarranties = [];
     this.assetComponents = [];
+    this.assetDispatches = [];
+    this.assetIssues = [];
+    this.assetReturns = [];
 
     if (asset._id) {
       this.assetService.getAssetDetails(asset._id).subscribe({
@@ -320,6 +325,19 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
         },
         error: (err: any) => {
           console.error('Failed to load components:', err);
+        }
+      });
+
+      this.assetService.getAssetHistory(asset._id).subscribe({
+        next: (res: any) => {
+          const data = res?.responseData?.data || {};
+          this.assetDispatches = data.dispatches || [];
+          this.assetIssues = data.issues || [];
+          this.assetReturns = data.returns || [];
+          this.cdr.detectChanges();
+        },
+        error: (err: any) => {
+          console.error('Failed to load asset history:', err);
         }
       });
     }

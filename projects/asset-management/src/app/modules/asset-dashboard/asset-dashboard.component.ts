@@ -58,6 +58,16 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
         ];
       }
     }
+    if (this.activeTabId === 'edit-warranty-licenses') {
+      const hasTab = this.tabs.some(t => t.id === 'edit-warranty-licenses');
+      if (!hasTab) {
+        return [
+          ...this.tabs.slice(0, 2),
+          { id: 'edit-warranty-licenses', label: 'Edit Warranty/Licenses' },
+          ...this.tabs.slice(2)
+        ];
+      }
+    }
     return this.tabs;
   }
 
@@ -79,6 +89,12 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
         this.dashboardTabsService.editAssetId = match[1];
       }
       this.dashboardTabsService.changeTab('edit-asset');
+    } else if (url.includes('edit-warranty-licenses')) {
+      const match = url.match(/edit-warranty-licenses\/([^/?#]+)/);
+      if (match && match[1]) {
+        this.dashboardTabsService.warrantyLicensesAssetId = match[1];
+      }
+      this.dashboardTabsService.changeTab('edit-warranty-licenses');
     } else if (url.includes('issue-asset')) {
       this.dashboardTabsService.changeTab('issue-asset');
     } else if (url.includes('return-asset')) {
@@ -100,6 +116,7 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
       'view-assets': 'view-assets',
       'create-asset': 'create-asset',
       'edit-asset': 'edit-asset',
+      'edit-warranty-licenses': 'edit-warranty-licenses',
       'issue-asset': 'issue-asset',
       'return-asset': 'return-asset',
       'issue-log': 'issue-log',
@@ -114,6 +131,9 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
         let finalPath = `/kjusys/asset-management/${path}`;
         if (tabId === 'edit-asset' && this.dashboardTabsService.editAssetId) {
           finalPath = `/kjusys/asset-management/edit-asset/${this.dashboardTabsService.editAssetId}`;
+        }
+        if (tabId === 'edit-warranty-licenses' && this.dashboardTabsService.warrantyLicensesAssetId) {
+          finalPath = `/kjusys/asset-management/edit-warranty-licenses/${this.dashboardTabsService.warrantyLicensesAssetId}`;
         }
         this.router.navigate([finalPath], { replaceUrl: true });
       }

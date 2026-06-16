@@ -8,6 +8,7 @@ export class DashboardTabsService {
 
   // Parameter state passed between tabs
   public editAssetId = '';
+  public warrantyLicensesAssetId = '';
   public filterCategoryId = '';
 
   // For Issue Asset tab
