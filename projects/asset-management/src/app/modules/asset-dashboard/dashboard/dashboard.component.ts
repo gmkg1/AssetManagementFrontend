@@ -226,11 +226,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   navigateToDeptAssets(deptId: string): void {
+    const dept = this.departments.find(d => d.id === deptId);
+    const deptName = dept?.name ?? '';
     if (this.dashboardTabsService) {
       this.dashboardTabsService.filterCategoryId = deptId;
+      this.dashboardTabsService.filterCategoryName = deptName;
       this.dashboardTabsService.changeTab('view-assets');
     } else {
-      this.router.navigate(['/kjusys/asset-management/view-assets'], { queryParams: { category: deptId } });
+      this.router.navigate(['/kjusys/asset-management/view-assets'], { queryParams: { category: deptId, categoryName: deptName } });
     }
   }
 

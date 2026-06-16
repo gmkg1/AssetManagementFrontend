@@ -5,7 +5,7 @@
   <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 mb-4">
     <div class="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between">
       <div>
-        <p class="text-[10px] text-slate-400">Total Assets</p>
+        <p class="text-[10px] text-slate-400">{{ activeCategoryName ? activeCategoryName + ' Assets' : 'Total Assets' }}</p>
         <p class="text-xl font-bold text-[#242731]">{{ totalCount }}</p>
       </div>
       <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
@@ -14,7 +14,7 @@
     </div>
     <div class="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between">
       <div>
-        <p class="text-[10px] text-slate-400">Ready to Deploy</p>
+        <p class="text-[10px] text-slate-400">{{ activeCategoryName ? activeCategoryName + ' – Ready to Deploy' : 'Ready to Deploy' }}</p>
         <p class="text-xl font-bold text-[#242731]">{{ availableCount }}</p>
       </div>
       <div class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
@@ -23,7 +23,7 @@
     </div>
     <div class="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between">
       <div>
-        <p class="text-[10px] text-slate-400">Deployed</p>
+        <p class="text-[10px] text-slate-400">{{ activeCategoryName ? activeCategoryName + ' – Deployed' : 'Deployed' }}</p>
         <p class="text-xl font-bold text-[#242731]">{{ deployedCount }}</p>
       </div>
       <div class="w-8 h-8 rounded-full bg-sky-50 flex items-center justify-center">
@@ -32,7 +32,7 @@
     </div>
     <div class="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between">
       <div>
-        <p class="text-[10px] text-slate-400">Under Maintenance</p>
+        <p class="text-[10px] text-slate-400">{{ activeCategoryName ? activeCategoryName + ' – Under Maintenance' : 'Under Maintenance' }}</p>
         <p class="text-xl font-bold text-[#242731]">{{ maintenanceCount }}</p>
       </div>
       <div class="w-8 h-8 rounded-full bg-yellow-50 flex items-center justify-center">
