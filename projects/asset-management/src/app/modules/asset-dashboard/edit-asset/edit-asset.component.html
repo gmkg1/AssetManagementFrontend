@@ -83,33 +83,18 @@
           class="h-8 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors placeholder:text-slate-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"/>
       </div>
 
-      <!-- Status & Asset Category -->
-      <div class="grid grid-cols-2 gap-3">
-        <div class="flex flex-col gap-1">
-          <label class="text-[10px] text-slate-500 font-medium">Status <span class="text-red-400">*</span></label>
-          <div class="relative">
-            <select [(ngModel)]="status"
-              class="w-full h-8 border border-slate-200 rounded-lg pl-3 pr-8 text-xs text-slate-800 outline-none focus:border-blue-500 appearance-none bg-white cursor-pointer transition-colors">
-              <option value="" disabled>Select a Status</option>
-              <option *ngFor="let s of statuses" [value]="s.id">{{ s.name }}</option>
-            </select>
-            <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
-            </svg>
-          </div>
-        </div>
-        <div class="flex flex-col gap-1">
-          <label class="text-[10px] text-slate-500 font-medium">Asset Category <span class="text-red-400">*</span></label>
-          <div class="relative">
-            <select [(ngModel)]="category"
-              class="w-full h-8 border border-slate-200 rounded-lg pl-3 pr-8 text-xs text-slate-800 outline-none focus:border-blue-500 appearance-none bg-white cursor-pointer transition-colors">
-              <option value="" disabled>Select a Category</option>
-              <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
-            </select>
-            <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
-            </svg>
-          </div>
+      <!-- Status -->
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] text-slate-500 font-medium">Status <span class="text-red-400">*</span></label>
+        <div class="relative">
+          <select [(ngModel)]="status"
+            class="w-full h-8 border border-slate-200 rounded-lg pl-3 pr-8 text-xs text-slate-800 outline-none focus:border-blue-500 appearance-none bg-white cursor-pointer transition-colors">
+            <option value="" disabled>Select a Status</option>
+            <option *ngFor="let s of statuses" [value]="s.id">{{ s.name }}</option>
+          </select>
+          <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+          </svg>
         </div>
       </div>
 
@@ -161,16 +146,8 @@
           class="h-8 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors placeholder:text-slate-400"/>
       </div>
 
-      <!-- Warranty / Purchase Date / EOL Date -->
-      <div class="grid grid-cols-3 gap-3">
-        <div class="flex flex-col gap-1">
-          <label class="text-[10px] text-slate-500 font-medium">Warranty</label>
-          <div class="relative flex items-center">
-            <input type="text" [(ngModel)]="warranty" placeholder=""
-              class="w-full h-8 border border-slate-200 rounded-lg pl-3 pr-14 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors"/>
-            <span class="absolute right-3 text-[10px] text-slate-400 font-medium pointer-events-none">Months</span>
-          </div>
-        </div>
+      <!-- Purchase Date / EOL Date -->
+      <div class="grid grid-cols-2 gap-3">
         <div class="flex flex-col gap-1">
           <label class="text-[10px] text-slate-500 font-medium">Purchase Date</label>
           <input type="date" [(ngModel)]="purchaseDate"
@@ -183,25 +160,26 @@
         </div>
       </div>
 
-      <!-- Supplier -->
-      <div class="flex flex-col gap-1">
-        <label class="text-[10px] text-slate-500 font-medium">Supplier</label>
-        <div class="flex items-center gap-2">
-          <div class="relative flex-1">
-            <select [(ngModel)]="supplier"
+      <!-- Quantity & Unit of Measure -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] text-slate-500 font-medium">Quantity</label>
+          <input type="text" inputmode="numeric" [(ngModel)]="quantity" (keydown)="blockNonIntegers($event)"
+            placeholder="e.g. 1" pattern="[0-9]*"
+            class="h-8 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors placeholder:text-slate-400"/>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] text-slate-500 font-medium">Unit of Measure</label>
+          <div class="relative">
+            <select [(ngModel)]="unitOfMeasure"
               class="w-full h-8 border border-slate-200 rounded-lg pl-3 pr-8 text-xs text-slate-800 outline-none focus:border-blue-500 appearance-none bg-white cursor-pointer transition-colors">
-              <option value="" disabled>Select a Supplier</option>
-              <option *ngFor="let s of suppliers" [value]="s">{{ s }}</option>
+              <option value="" disabled>Select Unit</option>
+              <option *ngFor="let u of unitsOfMeasure" [value]="u">{{ u }}</option>
             </select>
             <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
             </svg>
           </div>
-          <button class="w-8 h-8 border border-slate-200 rounded-lg flex items-center justify-center text-slate-500 hover:border-blue-400 hover:text-blue-600 transition-colors flex-shrink-0">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="w-3.5 h-3.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-            </svg>
-          </button>
         </div>
       </div>
 

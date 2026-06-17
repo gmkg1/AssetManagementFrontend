@@ -29,11 +29,11 @@ export class EditAssetComponent implements OnInit {
   locations: any[] = [];
   assetName = '';
   orderNumber = '';
-  warranty = '';
   purchaseDate = '';
   eolDate = '';
-  supplier = '';
-  suppliers = ['Dell', 'HP', 'Apple', 'BenQ', 'Logitech'];
+  quantity = '';
+  unitOfMeasure = '';
+  unitsOfMeasure = ['Each', 'Set', 'Box', 'Pair', 'Pack', 'Kit', 'Unit'];
   purchaseCost = '';
   billFile: File | null = null;
   isReturnable = false;
@@ -218,6 +218,14 @@ export class EditAssetComponent implements OnInit {
 
   blockNonNumbers(event: KeyboardEvent): void {
     if (['.', ',', 'e', 'E', '-', '+'].includes(event.key)) {
+      event.preventDefault();
+    }
+  }
+
+  blockNonIntegers(event: KeyboardEvent): void {
+    const allowed = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+    if (allowed.includes(event.key)) return;
+    if (!/^\d$/.test(event.key)) {
       event.preventDefault();
     }
   }
