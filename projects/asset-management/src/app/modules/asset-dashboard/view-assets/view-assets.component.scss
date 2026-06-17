@@ -12,15 +12,14 @@
 .table-cols {
   display: grid;
   grid-template-columns:
-    minmax(72px,  90px)
+    minmax(100px, 200px)
     minmax(90px,  1fr)
     minmax(120px, 1.8fr)
     minmax(90px,  1fr)
     minmax(90px,  1fr)
     minmax(110px, 1.3fr)
     minmax(110px, 1.3fr)
-    minmax(100px, 1.1fr)
-    minmax(90px,  1fr);
+    minmax(100px, 1.1fr);
   align-items: center;
   gap: 0 clamp(4px, 0.5vw, 10px);
 }
