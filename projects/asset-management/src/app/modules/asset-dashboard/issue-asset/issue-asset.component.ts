@@ -40,6 +40,8 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
   expectedReturnTime = '';
   notes = '';
 
+  today = new Date().toISOString().slice(0, 10);
+
   showSuccess = false;
   isSubmitting = false;
   submitError: string | null = null;
