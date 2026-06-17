@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, Optional } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { Subject, Subscription, forkJoin, of } from 'rxjs';
+import { debounceTime, catchError } from 'rxjs/operators';
 import { AssetService } from '../../../services/asset.service';
 import { DashboardTabsService } from '../dashboard-tabs.service';
 
@@ -197,12 +197,69 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
         this.assets = raw.map((item, i) => this.mapToAsset(item, i));
         this.isLoading = false;
         this.cdr.detectChanges();
+        this.loadAssignedTo();
       },
       error: (err: any) => {
         console.error('Failed to load assets:', err);
         this.apiError = 'Could not load assets from the server.';
         this.isLoading = false;
       }
+    });
+  }
+
+  /**
+   * For each loaded asset, fetch its history and determine the active assignee.
+   * An asset is "actively issued" when it has more issues than returns — the
+   * most recent issue without a paired return is the current assignment.
+   */
+  private loadAssignedTo(): void {
+    const assetsWithId = this.assets.filter(a => a._id);
+    if (!assetsWithId.length) return;
+
+    const requests = assetsWithId.map(asset =>
+      this.assetService.getAssetHistory(asset._id!).pipe(
+        catchError(() => of(null))
+      )
+    );
+
+    forkJoin(requests).subscribe((results: any[]) => {
+      results.forEach((res, idx) => {
+        const asset = assetsWithId[idx];
+        const targetAsset = this.assets.find(a => a._id === asset._id);
+        if (!targetAsset || !res) return;
+
+        const issues: any[] = res?.responseData?.data?.issues ?? [];
+        const returns: any[] = res?.responseData?.data?.returns ?? [];
+
+        // Sort issues descending by date to get the latest first
+        const sortedIssues = [...issues].sort(
+          (a, b) => new Date(b.issueDate).getTime() - new Date(a.issueDate).getTime()
+        );
+
+        // An asset is actively issued if there are more issues than returns,
+        // or if the latest issue date is after the latest return date.
+        const isActivelyIssued = (() => {
+          if (!sortedIssues.length) return false;
+          if (returns.length < issues.length) return true;
+          const latestIssue = new Date(sortedIssues[0].issueDate).getTime();
+          const latestReturn = returns.length
+            ? Math.max(...returns.map((r: any) => new Date(r.returnDate).getTime()))
+            : 0;
+          return latestIssue > latestReturn;
+        })();
+
+        if (isActivelyIssued && sortedIssues[0]) {
+          const issue = sortedIssues[0];
+          const isValid = (val: any) => val && val !== 'N/A' && val !== 'n/a';
+          targetAsset.assignedTo =
+            isValid(issue.issuedToAsset) ? issue.issuedToAsset :
+            isValid(issue.personId)      ? issue.personId :
+            isValid(issue.location)      ? issue.location : '—';
+        } else {
+          targetAsset.assignedTo = '—';
+        }
+      });
+      this.cdr.detectChanges();
     });
   }
 
