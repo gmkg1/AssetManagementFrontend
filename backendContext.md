@@ -65,6 +65,7 @@ Error responses:
 - `quantity`: Int
 - `campusId`: ObjectId → `campuses`
 - `blockId`: String
+- `unitOfMeasureId`: ObjectId → `units`
 
 ### `issueto`
 Tracks active issues and returns in the same collection.
@@ -112,6 +113,15 @@ Tracks active issues and returns in the same collection.
 - `startDate`: Date
 - `endDate`: Date
 - `ActiveStatus`: Boolean
+
+### `units`
+- `_id`: ObjectId
+- `unitOfMeasure`: String
+- `acronym`: String
+- `hierarchy`: Array of Objects:
+  - `childNode`: String
+  - `childNodeName`: String
+  - `conversionFactor`: Int
 
 ---
 
@@ -196,7 +206,9 @@ Payload:
   "serial": "string",
   "purchaseCost": "string|int",
   "purchaseDate": "YYYY-MM-DD",
-  "isReturnable": true
+  "isReturnable": true,
+  "quantity": 1,
+  "unitOfMeasureId": "ObjectId"
 }
 ```
 Response: `{ message: "Asset created successfully", _id: "ObjectId" }`
@@ -302,6 +314,18 @@ Response content type: `text/csv`
 Response header: `content-disposition: attachment; filename="report.csv"`
 
 **Used by**: `ReportsComponent` (for Export and Bulk Export actions)
+
+---
+
+#### GET `/export-assets`
+Export assets list data as a CSV download.
+
+Query params: same filters as `GET /assets` (e.g. `assetName`, `categoryId`, `locationId`, `statusId`, etc.) but runs without pagination boundaries.
+
+Response content type: `text/csv`
+Response header: `content-disposition: attachment; filename="assets.csv"`
+
+**Used by**: `ViewAssetsComponent` (for Export CSV action)
 
 ---
 
@@ -464,6 +488,31 @@ Response inner key: `data[]`
 
 ---
 
+#### GET `/export-issue-logs`
+Export issue logs data as a CSV download.
+
+Query params: same filters as `GET /issued-assets` (e.g. `assetName`, `category`, `issuedTo`, `type`, `issueDate`) but runs without pagination boundaries.
+
+Response content type: `text/csv`
+Response header: `content-disposition: attachment; filename="issued_assets.csv"`
+
+**Used by**: `IssueLogComponent` (for Export CSV action)
+
+---
+
+#### GET `/export-return-logs`
+Export return logs data as a CSV download.
+
+Query params: same filters as `GET /return-logs` (e.g. `name`, `classification`, `total`, `returnType`, `returnTo`, `returnDate`) but runs without pagination boundaries.
+
+Response content type: `text/csv`
+Response header: `content-disposition: attachment; filename="returned_assets.csv"`
+
+**Used by**: `ReturnLogComponent` (for Export CSV action)
+
+---
+
+
 ### D. Dashboard & Analytics
 
 #### GET `/status`
@@ -582,6 +631,30 @@ Payload:
 
 ---
 
+#### GET `/units-list`
+Response inner key: `units[]`
+```json
+{
+  "units": [
+    {
+      "id": "ObjectId",
+      "unitOfMeasure": "Kilolitre",
+      "acronym": "kL",
+      "hierarchy": [
+        {
+          "childNode": "L",
+          "childNodeName": "Litre",
+          "conversionFactor": 1000
+        }
+      ]
+    }
+  ]
+}
+```
+**Used by**: `CreateAssetComponent`, `EditAssetComponent` — for status dropdown population
+
+---
+
 ## 5. API → Component Quick Reference
 
 | Endpoint | Method | Components |
@@ -606,8 +679,12 @@ Payload:
 | `/statuses-list` | GET | CreateAssetComponent, EditAssetComponent, ViewAssetsComponent |
 | `/asset-tags-list` | GET | CreateAssetComponent, EditAssetComponent |
 | `/create-asset-tag` | POST | CreateAssetTagComponent |
+| `/units-list` | GET | CreateAssetComponent, EditAssetComponent |
 | `/export-reports` | GET | ReportsComponent |
 | `/reports-grouped` | GET | ReportsComponent |
+| `/export-assets` | GET | ViewAssetsComponent |
+| `/export-issue-logs` | GET | IssueLogComponent |
+| `/export-return-logs` | GET | ReturnLogComponent |
 
 ---
 
