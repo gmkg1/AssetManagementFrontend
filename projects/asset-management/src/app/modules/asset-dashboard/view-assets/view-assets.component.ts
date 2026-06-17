@@ -593,4 +593,33 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   }
 
   copyToClipboard(value: string): void { navigator.clipboard?.writeText(value); }
+
+  exportCSV(): void {
+    this.isLoading = true;
+    this.assetService.exportAssets({
+      assetName: this.searchQuery.trim() || undefined,
+      assetTagName: this.assetTagQuery.trim() || undefined,
+      categoryId: this.selectedCategoryId || undefined,
+      locationId: this.selectedLocationId || undefined,
+      statusId: this.selectedStatusId || undefined,
+      purchaseDateFrom: this.purchaseDate || undefined,
+    }).subscribe({
+      next: (blob: Blob) => {
+        this.isLoading = false;
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `assets_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        console.error('Failed to export assets CSV:', err);
+        this.cdr.detectChanges();
+      }
+    });
+  }
 }
+

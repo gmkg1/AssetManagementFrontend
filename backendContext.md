@@ -293,7 +293,18 @@ Response: `{ dispatches: [], issues: [], returns: [] }`
 
 **Used by**: `ViewAssetsComponent` (on row click, for History tab)
 
+#### GET `/export-reports`
+Export reports data as a CSV download.
+
+Query params: `categoryId` (optional), `assetName` (optional), `assetIds` (optional, comma-separated IDs)
+
+Response content type: `text/csv`
+Response header: `content-disposition: attachment; filename="report.csv"`
+
+**Used by**: `ReportsComponent` (for Export and Bulk Export actions)
+
 ---
+
 
 ### B. Asset Grouping
 
@@ -325,6 +336,38 @@ Response inner key: `assets[]` — same structure as `/assets` response
 }
 ```
 **Used by**: `ReportsComponent` (category tab selected → `loadGrpData()`)
+
+---
+
+#### GET `/reports-grouped`
+Returns paginated asset tags grouped by model/name, showing their active status count breakdowns (Total, Ready, Deployed, Dead Stock, Service, EOL).
+
+Query params: `page`, `pageSize`, `categoryId` (optional, to filter asset tags by category)
+
+Response:
+```json
+{
+  "reports": [
+    {
+      "displayId": "LPT",
+      "name": "MacBook Pro",
+      "categoryName": "IT",
+      "total": 12,
+      "ready": 8,
+      "deployed": 4,
+      "deadStock": 0,
+      "service": 0,
+      "eol": 0
+    }
+  ],
+  "categoryId": "6a0ffe51d70e831c1c44154e",
+  "totalRecords": 1,
+  "currentPage": 1,
+  "pageSize": 8,
+  "totalPages": 1
+}
+```
+**Used by**: `ReportsComponent` (on tab changes and page clicks)
 
 ---
 
@@ -563,6 +606,8 @@ Payload:
 | `/statuses-list` | GET | CreateAssetComponent, EditAssetComponent, ViewAssetsComponent |
 | `/asset-tags-list` | GET | CreateAssetComponent, EditAssetComponent |
 | `/create-asset-tag` | POST | CreateAssetTagComponent |
+| `/export-reports` | GET | ReportsComponent |
+| `/reports-grouped` | GET | ReportsComponent |
 
 ---
 

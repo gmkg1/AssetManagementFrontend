@@ -202,10 +202,12 @@ All screens are tab components inside `AssetDashboardModule`. Navigation between
 
 | Call | Endpoint | Purpose |
 |------|----------|---------|
-| `getAssetDetails(id)` | `GET /asset-details?id=<id>` | Full asset fields for detail panel |
+| `getAssetDetails(id)` | `GET /asset-details?id=<id>` | Full asset fields including `displayId` for the detail panel |
 | `getLicensesAndWarranty(id)` | `GET /get-licenses/<id>` | Licenses & Warranty tab |
 | `getAssetComponents(id)` | `GET /get-asset-components/<id>` | Components tab |
 | `getAssetHistory(id)` | `GET /asset-history/<id>` | History tab |
+
+**Asset interface note:** The `Asset` interface now includes `displayId: string` mapped from `item.displayId` (the human-readable tag like `RL-II-LPI-004-MC-B-SIN-001`). The Components tab detail panel renders `asset.displayId` — not `asset.serial`.
 
 **On status change (inline dropdown in detail panel):**
 
@@ -300,7 +302,13 @@ All screens are tab components inside `AssetDashboardModule`. Navigation between
 
 | Call | Endpoint | Params |
 |------|----------|--------|
-| `getAssets({ assetName, pageSize:50 })` | `GET /assets?assetName=<q>&pageSize=50` | Asset search autocomplete |
+| `getUnissuedAssetNames(query)` | `GET /unissued-asset-names?q=<query>` | Returns only assets not currently issued — name strings only |
+
+**On asset name selected from dropdown:**
+
+| Call | Endpoint | Purpose |
+|------|----------|---------|
+| `searchAssets(name)` | `GET /assets-search?q=<name>` | Resolve `_id`, `assetTagName`, `category` from the selected name |
 
 **On submit:**
 

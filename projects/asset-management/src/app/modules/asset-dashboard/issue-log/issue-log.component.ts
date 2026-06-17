@@ -186,4 +186,32 @@ export class IssueLogComponent implements OnInit, OnDestroy {
       this.router.navigate(['/kjusys/asset-management/reports']);
     }
   }
+
+  exportCSV(): void {
+    this.isLoading = true;
+    this.assetService.exportIssueLogs({
+      assetName: this.assetNameQuery.trim() || undefined,
+      category: this.categoryQuery.trim() || undefined,
+      issuedTo: this.issuedToQuery.trim() || undefined,
+      type: this.selectedType || undefined,
+      issueDate: this.issueDate || undefined,
+    }).subscribe({
+      next: (blob: Blob) => {
+        this.isLoading = false;
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `issue_log_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        console.error('Failed to export issue log CSV:', err);
+        this.cdr.detectChanges();
+      }
+    });
+  }
 }
+
