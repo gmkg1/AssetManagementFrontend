@@ -13,7 +13,7 @@ export const environment = {
         'asset-management': 'http://localhost:4205',
     },
     publicPath: 'http://localhost:4200/',
-    baseUrl: 'https://lives-mark-interview-thin.trycloudflare.com/api/',
+    baseUrl: 'https://picks-degree-voluntary-centers.trycloudflare.com/api/',
     project: 'shell',
     baseRoute: 'kjusys',
     local: true,

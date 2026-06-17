@@ -23,7 +23,8 @@ export class CreateAssetComponent implements OnInit {
   orderNumber = '';
   purchaseDate = '';
   eolDate = '';
-  supplier = '';
+  quantity = '';
+  unitOfMeasure = '';
   purchaseCost = '';
   isReturnable = true;
 
@@ -32,7 +33,7 @@ export class CreateAssetComponent implements OnInit {
   models: any[] = [];
   statuses: any[] = [];
   locations: any[] = [];
-  suppliers = ['Dell India', 'Apple Reseller', 'HP India', 'Lenovo Store'];
+  unitsOfMeasure = ['Each', 'Set', 'Box', 'Pair', 'Pack', 'Kit', 'Unit'];
 
   // Searchable dropdown properties
   assetTagSearch = '';
@@ -200,6 +201,16 @@ export class CreateAssetComponent implements OnInit {
     }
   }
 
+  blockNonIntegers(event: KeyboardEvent): void {
+    // Allow: backspace, delete, tab, escape, enter, arrow keys, home, end
+    const allowed = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+    if (allowed.includes(event.key)) return;
+    // Block anything that isn't a digit
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault();
+    }
+  }
+
   // Submit
   onSubmit(): void {
     this.errorMessage = '';
@@ -262,7 +273,8 @@ export class CreateAssetComponent implements OnInit {
     this.orderNumber = '';
     this.purchaseDate = '';
     this.eolDate = '';
-    this.supplier = '';
+    this.quantity = '';
+    this.unitOfMeasure = '';
     this.purchaseCost = '';
     this.isReturnable = true;
     this.billFile = null;
