@@ -46,6 +46,7 @@ export class CreateAssetComponent implements OnInit {
   errorMessage = '';
   billFile: File | null = null;
   isCloneMode = false;
+  today = new Date().toISOString().substring(0, 10);
 
   constructor(
     private router: Router,
@@ -239,6 +240,11 @@ export class CreateAssetComponent implements OnInit {
 
     if (this.eolDate && this.purchaseDate && this.eolDate < this.purchaseDate) {
       this.errorMessage = 'EOL Date cannot be before Purchase Date.';
+      return;
+    }
+
+    if (this.purchaseDate && this.purchaseDate > this.today) {
+      this.errorMessage = 'Purchase Date cannot be a future date.';
       return;
     }
 

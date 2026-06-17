@@ -164,7 +164,7 @@
       <div class="grid grid-cols-2 gap-2">
         <div class="flex flex-col gap-0.5">
           <label class="text-[10px] text-slate-500 font-medium">Purchase Date</label>
-          <input type="date" [(ngModel)]="purchaseDate"
+          <input type="date" [(ngModel)]="purchaseDate" [max]="today"
             class="h-8 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors"/>
         </div>
         <div class="flex flex-col gap-0.5">
