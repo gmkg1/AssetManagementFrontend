@@ -40,6 +40,31 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
   expectedReturnTime = '';
   notes = '';
 
+  timePickerOpen = false;
+  selectedHour: number | null = null;
+  selectedMinute: number | null = null;
+  hours: number[] = Array.from({ length: 24 }, (_, i) => i);       // 0–23
+  minutes: number[] = Array.from({ length: 60 }, (_, i) => i); // 0–59
+
+  selectHour(h: number): void {
+    this.selectedHour = h;
+    this._applyTime();
+  }
+
+  selectMinute(m: number): void {
+    this.selectedMinute = m;
+    this._applyTime();
+    if (this.selectedHour !== null) this.timePickerOpen = false;
+  }
+
+  private _applyTime(): void {
+    if (this.selectedHour !== null && this.selectedMinute !== null) {
+      const hh = String(this.selectedHour).padStart(2, '0');
+      const mm = String(this.selectedMinute).padStart(2, '0');
+      this.expectedReturnTime = `${hh}:${mm}`;
+    }
+  }
+
   today = new Date().toISOString().slice(0, 10);
 
   showSuccess = false;
@@ -252,6 +277,7 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
     this.sidebarOpen = false;
     this.receiverDropdownOpen = false;
     this.assetDropdownOpen = false;
+    this.timePickerOpen = false;
   }
 
   onAssetSearchInput(query: string): void {
@@ -445,6 +471,9 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
     this.issueDate = new Date().toISOString().slice(0, 10);
     this.expectedReturn = '';
     this.expectedReturnTime = '';
+    this.selectedHour = null;
+    this.selectedMinute = null;
+    this.timePickerOpen = false;
     this.notes = '';
   }
 }

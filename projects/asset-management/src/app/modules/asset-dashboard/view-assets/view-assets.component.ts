@@ -329,7 +329,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
 
   openDetail(asset: Asset): void {
     this.selectedAsset = asset;
-    this.detailTab = 'components';
+    this.detailTab = 'info';
     this.view = 'detail';
 
     this.assetLicenses = [];
