@@ -12,6 +12,7 @@ import { DashboardTabsService } from './dashboard-tabs.service';
 })
 export class AssetDashboardComponent implements OnInit, OnDestroy {
   activeTabId = 'dashboard';
+  editAssetVisible = true;
   private subscription!: Subscription;
 
   tabs: TabItem[] = [
@@ -34,7 +35,16 @@ export class AssetDashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscription = this.dashboardTabsService.activeTab$.subscribe(tabId => {
-      this.activeTabId = tabId;
+      if (tabId === 'edit-asset') {
+        // Force destroy + recreate the edit-asset component so ngOnInit re-fires
+        // with the new editAssetId, even if we're already on the edit-asset tab.
+        this.editAssetVisible = false;
+        this.activeTabId = tabId;
+        this.cdr.detectChanges();
+        this.editAssetVisible = true;
+      } else {
+        this.activeTabId = tabId;
+      }
       this.cdr.detectChanges();
     });
   }

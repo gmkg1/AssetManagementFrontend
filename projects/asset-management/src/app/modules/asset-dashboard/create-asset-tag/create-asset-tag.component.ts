@@ -187,16 +187,18 @@ export class CreateAssetTagComponent implements OnInit {
 
     this.isLoading = true;
 
-    const payload = {
-      category: this.category,
-      assetTagName: this.assetTagName.trim(),
-      displayId: this.displayId.trim(),
-      classification: this.classification,
-    };
+    const formData = new FormData();
+    formData.append('category', this.category);
+    formData.append('assetTagName', this.assetTagName.trim());
+    formData.append('displayId', this.displayId.trim());
+    formData.append('classification', this.classification);
+    if (this.assetImageFile) {
+      formData.append('assetImage', this.assetImageFile, this.assetImageFile.name);
+    }
 
-    console.log('Create Asset Tag payload:', payload);
+    console.log('Create Asset Tag payload (FormData)');
 
-    this.assetService.createAssetTag(payload).subscribe({
+    this.assetService.createAssetTag(formData).subscribe({
       next: (res: any) => {
         this.isLoading = false;
         this.showSuccess = true;

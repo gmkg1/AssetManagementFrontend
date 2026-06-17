@@ -8,6 +8,7 @@ export class DashboardTabsService {
 
   // Parameter state passed between tabs
   public editAssetId = '';
+  public editAssetKey = 0;  // incremented each time edit-asset is triggered to force component re-init
   public warrantyLicensesAssetId = '';
   public filterCategoryId = '';
   public filterCategoryName = '';
