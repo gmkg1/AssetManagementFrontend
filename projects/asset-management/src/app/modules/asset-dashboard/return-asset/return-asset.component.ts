@@ -1,4 +1,4 @@
-import { Component, OnInit, Optional } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, Optional } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../../services/asset.service';
 import { DashboardTabsService } from '../dashboard-tabs.service';
@@ -20,6 +20,7 @@ export class ReturnAssetComponent implements OnInit {
   constructor(
     public router: Router,
     private assetService: AssetService,
+    private cdr : ChangeDetectorRef,
     @Optional() private dashboardTabsService: DashboardTabsService
   ) { }
 
@@ -129,6 +130,7 @@ export class ReturnAssetComponent implements OnInit {
       next: () => {
         this.isSubmitting = false;
         this.navigate('return-log', '/kjusys/asset-management/return-log');
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         this.isSubmitting = false;

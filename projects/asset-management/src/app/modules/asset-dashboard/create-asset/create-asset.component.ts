@@ -306,6 +306,7 @@ export class CreateAssetComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         this.isLoading = false;
         this.showSuccess = true;
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         this.isLoading = false;

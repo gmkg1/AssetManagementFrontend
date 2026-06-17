@@ -449,6 +449,7 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
         this.showSuccess = true;
         this.isSubmitting = false;
         this.loadIssueLog();
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error('Failed to issue asset:', err);
