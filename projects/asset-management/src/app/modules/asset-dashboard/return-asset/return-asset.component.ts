@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, OnInit, Optional } from '@angular/core';
-import { ChangeDetectorRef, Component, OnInit, Optional } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../../services/asset.service';
 import { DashboardTabsService } from '../dashboard-tabs.service';
