@@ -38,5 +38,15 @@
 /* Row hover Ã¢â‚¬â€œ Tailwind's hover:bg-blue-50 handles it, but keep a fallback */
 .hover\:bg-blue-50:hover { background-color: #eff6ff; }
 
-/* Action button hover Ã¢â‚¬â€œ icon stroke colour swap */
+/* Action button hover – icon stroke colour swap */
 .group:hover svg { stroke: white; }
+
+/* Hide scrollbar on overflow-x-auto tab strip */
+.tab-strip {
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.tab-strip::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
