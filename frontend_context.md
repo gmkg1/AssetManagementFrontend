@@ -223,16 +223,19 @@ All screens are tab components inside `AssetDashboardModule`. Navigation between
 
 | Call | Endpoint | Purpose |
 |------|----------|---------|
-| `getCategories()` | `GET /categories` | Category dropdown |
 | `getLocations()` | `GET /locations-list` | Default location dropdown |
 | `getStatuses()` | `GET /statuses-list` | Status dropdown |
 | `getAssetTags()` | `GET /asset-tags-list` | Model/asset-tag searchable dropdown |
+
+Note: `getCategories()` is **not** called on this page — category is inferred from the selected asset tag.
 
 **On submit:**
 
 | Call | Endpoint | Payload |
 |------|----------|---------|
 | `createAsset(payload)` | `POST /create-asset` | `{ assetName, assetTagId, statusId, defaultLocation, serial, purchaseCost, purchaseDate, isReturnable }` |
+
+**Form fields:** Asset Name (required), Asset Tag/Model (required, searchable dropdown), Status (required), Default Location, Serial, Purchase Cost, Purchase Date, EOL Date, Quantity, Unit of Measure, Is Returnable toggle. Clone mode pre-fills all fields from `DashboardTabsService.cloneAssetData`.
 
 ---
 

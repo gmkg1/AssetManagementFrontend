@@ -324,6 +324,12 @@ export class AssetService {
     if (filters.categoryId) params = params.set('categoryId', filters.categoryId);
     return this.http.get<any>(`${this.baseUrl}/reports-grouped`, { params });
   }
+
+  /** GET /units-list — get units and child units list */
+  getUnits() {
+    return this.http.get<any>(`${this.baseUrl}/units-list`);
+  }
 }
+
 
 

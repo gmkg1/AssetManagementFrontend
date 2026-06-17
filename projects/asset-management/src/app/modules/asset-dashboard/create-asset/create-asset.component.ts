@@ -33,7 +33,7 @@ export class CreateAssetComponent implements OnInit {
   models: any[] = [];
   statuses: any[] = [];
   locations: any[] = [];
-  unitsOfMeasure = ['Each', 'Set', 'Box', 'Pair', 'Pack', 'Kit', 'Unit'];
+  unitsOfMeasure: any[] = [];
 
   // Searchable dropdown properties
   assetTagSearch = '';
@@ -59,7 +59,7 @@ export class CreateAssetComponent implements OnInit {
   }
 
   loadDropdowns(): void {
-    let pending = 3; // number of dropdown calls
+    let pending = 4; // number of dropdown calls
 
     const tryApplyClone = () => {
       pending--;
@@ -89,6 +89,15 @@ export class CreateAssetComponent implements OnInit {
         const tags = res?.responseData?.data?.assetTags ?? [];
         this.models = tags.map((t: any) => ({ id: t.id, name: t.assetTagName }));
         this.filteredModels = this.models;
+        tryApplyClone();
+      },
+      error: () => tryApplyClone()
+    });
+
+    this.assetService.getUnits().subscribe({
+      next: (res: any) => {
+        const rows = res?.responseData?.data?.units ?? [];
+        this.unitsOfMeasure = rows.map((u: any) => ({ id: u.id, name: u.unitOfMeasure }));
         tryApplyClone();
       },
       error: () => tryApplyClone()
@@ -244,6 +253,8 @@ export class CreateAssetComponent implements OnInit {
       purchaseCost: this.purchaseCost != null ? this.purchaseCost.toString().trim() : '',
       purchaseDate: this.purchaseDate ? this.purchaseDate.trim() : '',
       isReturnable: this.isReturnable,
+      quantity: this.quantity ? parseInt(this.quantity, 10) : 1,
+      unitOfMeasureId: this.unitOfMeasure || null,
     };
 
     console.log('Create Asset payload:', payload);
