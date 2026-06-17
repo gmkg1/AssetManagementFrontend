@@ -31,16 +31,18 @@ export class EditAssetComponent implements OnInit {
   orderNumber = '';
   purchaseDate = '';
   eolDate = '';
+  purchaseCost = '';
   quantity = '';
   unitOfMeasure = '';
-  unitsOfMeasure = ['Each', 'Set', 'Box', 'Pair', 'Pack', 'Kit', 'Unit'];
-  purchaseCost = '';
+  unitsOfMeasure: any[] = [];
+
   billFile: File | null = null;
   isReturnable = false;
   assetImagePreview: string | ArrayBuffer | null = null;
   assetImageFile: File | null = null;
   isDragOver = false;
   errorMessage = '';
+
   isLoading = false;
   showSuccess = false;
   sidebarOpen = false;
@@ -99,6 +101,13 @@ export class EditAssetComponent implements OnInit {
         this.syncAssetTagSearch();
       }
     });
+
+    this.assetService.getUnits().subscribe({
+      next: (res: any) => {
+        const rows = res?.responseData?.data?.units ?? [];
+        this.unitsOfMeasure = rows.map((u: any) => ({ id: u.id, name: u.unitOfMeasure }));
+      }
+    });
   }
 
   loadAssetDetails(id: string): void {
@@ -118,6 +127,8 @@ export class EditAssetComponent implements OnInit {
           this.serialNumber = data.assetSerialNumber || '';
           this.purchaseCost = data.purchaseCost != null ? data.purchaseCost.toString() : '';
           this.isReturnable = data.isIssuable || false;
+          this.quantity = data.quantity != null ? data.quantity.toString() : '';
+          this.unitOfMeasure = data.unitOfMeasureId || '';
           this.syncAssetTagSearch();
 
           if (data.purchaseDate) {
@@ -233,7 +244,7 @@ export class EditAssetComponent implements OnInit {
   onSubmit(): void {
     this.errorMessage = '';
 
-    if (!this.assetName.trim()) {
+    if (!this.assetName || !this.assetName.trim()) {
       this.errorMessage = 'Asset Name is required.';
       return;
     }
@@ -254,10 +265,12 @@ export class EditAssetComponent implements OnInit {
       assetTagId: this.model,
       statusId: this.status,
       defaultLocation: this.defaultLocation || null,
-      serial: this.serial.trim(),
-      purchaseCost: this.purchaseCost.trim(),
-      purchaseDate: this.purchaseDate.trim(),
-      isReturnable: this.isReturnable
+      serial: this.serial != null ? this.serial.toString().trim() : '',
+      purchaseCost: this.purchaseCost != null ? this.purchaseCost.toString().trim() : '',
+      purchaseDate: this.purchaseDate ? this.purchaseDate.trim() : '',
+      isReturnable: this.isReturnable,
+      quantity: this.quantity ? parseInt(this.quantity.toString(), 10) : 1,
+      unitOfMeasureId: this.unitOfMeasure || null
     };
 
     this.assetService.updateAsset(payload).subscribe({
