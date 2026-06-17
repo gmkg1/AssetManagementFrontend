@@ -355,7 +355,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   private mapToAsset(item: any, index: number): Asset {
     return {
       _id: item._id,
-      id: item.assetSerialNumber ?? `AST-${String(index + 1).padStart(3, '0')}`,
+      id: item.displayId ?? item.assetSerialNumber ?? `AST-${String(index + 1).padStart(3, '0')}`,
       name: item.assetName ?? '—',
       department: item.location ?? '—',
       category: item.category ?? '—',
