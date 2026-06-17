@@ -1,4 +1,4 @@
-import { Component, OnInit, Optional } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, Optional } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../../services/asset.service';
 import { DashboardTabsService } from '../dashboard-tabs.service';
@@ -20,6 +20,7 @@ export class ReturnAssetComponent implements OnInit {
   constructor(
     public router: Router,
     private assetService: AssetService,
+    private cdr: ChangeDetectorRef,
     @Optional() private dashboardTabsService: DashboardTabsService
   ) { }
 
@@ -38,9 +39,11 @@ export class ReturnAssetComponent implements OnInit {
       next: (response: any) => {
         const data = response?.responseData?.data ?? {};
         this.activeIssues = data.assets ?? [];
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error('Failed to load active issues:', err);
+        this.cdr.detectChanges();
       }
     });
   }

@@ -83,6 +83,7 @@ export class EditAssetComponent implements OnInit {
       next: (res: any) => {
         const rows = res?.responseData?.data?.locations ?? [];
         this.locations = rows.map((r: any) => ({ id: r.locationId, name: r.locationName }));
+        this.cdr.detectChanges();
       }
     });
 
@@ -90,6 +91,7 @@ export class EditAssetComponent implements OnInit {
       next: (res: any) => {
         const rows = res?.responseData?.data?.statuses ?? [];
         this.statuses = rows.map((r: any) => ({ id: r.statusId, name: r.statusName }));
+        this.cdr.detectChanges();
       }
     });
 
