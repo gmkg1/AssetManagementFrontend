@@ -1,5 +1,6 @@
-import { ChangeDetectorRef, Component, HostListener, OnInit, Optional } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, Optional } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { AssetService } from '../../../services/asset.service';
 import { DashboardTabsService } from '../dashboard-tabs.service';
 
@@ -8,7 +9,8 @@ import { DashboardTabsService } from '../dashboard-tabs.service';
   templateUrl: './create-asset.component.html',
   styleUrls: ['./create-asset.component.css'],
 })
-export class CreateAssetComponent implements OnInit {
+export class CreateAssetComponent implements OnInit, OnDestroy {
+  private tabSubscription?: Subscription;
 
   // Left column fields
   company = '';
@@ -57,6 +59,29 @@ export class CreateAssetComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadDropdowns();
+
+    // If this tab is already active when clone is triggered (component already alive,
+    // so *ngIf won't recreate it and ngOnInit won't re-run), listen for the tab
+    // becoming active again so we can apply clone data immediately.
+    // We skip the first emission (BehaviorSubject replays current value on subscribe)
+    // because loadDropdowns() already handles the initial clone via tryApplyClone().
+    if (this.dashboardTabsService) {
+      let isFirstEmission = true;
+      this.tabSubscription = this.dashboardTabsService.activeTab$.subscribe(tabId => {
+        if (isFirstEmission) {
+          isFirstEmission = false;
+          return; // skip initial replay — loadDropdowns handles it
+        }
+        if (tabId === 'create-asset' && this.dashboardTabsService?.cloneAssetData) {
+          // Dropdowns are already loaded since component is alive; apply now
+          this.applyCloneDataIfPresent();
+        }
+      });
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.tabSubscription?.unsubscribe();
   }
 
   loadDropdowns(): void {
@@ -100,6 +125,14 @@ export class CreateAssetComponent implements OnInit {
     if (!this.dashboardTabsService?.cloneAssetData) return;
     const d = this.dashboardTabsService.cloneAssetData;
     this.dashboardTabsService.cloneAssetData = null; // consume it
+
+    // Reset any existing form data before prefilling from clone
+    this.orderNumber = '';
+    this.eolDate = '';
+    this.quantity = '';
+    this.unitOfMeasure = '';
+    this.billFile = null;
+    this.errorMessage = '';
 
     this.isCloneMode = true;
     this.assetName = d.assetName;

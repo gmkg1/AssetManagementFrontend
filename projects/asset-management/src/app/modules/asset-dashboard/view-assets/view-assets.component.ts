@@ -499,6 +499,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     const id = asset._id || asset.id;
     if (this.dashboardTabsService) {
       this.dashboardTabsService.editAssetId = id;
+      this.dashboardTabsService.editAssetKey++;  // force edit-asset component to re-init
       this.dashboardTabsService.changeTab('edit-asset');
     } else {
       this.router.navigate(['/kjusys/asset-management/edit-asset', id]);
@@ -520,86 +521,31 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
           try { normalizedPurchaseDate = new Date(data.purchaseDate).toISOString().substring(0, 10); } catch (_) {}
         }
 
-        const rawSerial: string = data?.assetSerialNumber || asset.serial || '';
         const rawCost = (data?.purchaseCost ?? asset.purchaseCost ?? '').toString().replace('Rs. ', '').replace(/,/g, '');
 
-        // Find a unique serial number by checking existing assets
-        const match = rawSerial.match(/^(.*?)(\d+)$/);
-        const resolveSerial = (existingSerials: Set<string>): string => {
-          if (!rawSerial) return rawSerial;
-          if (match) {
-            let num = parseInt(match[2], 10) + 1;
-            const padLen = match[2].length;
-            while (true) {
-              const candidate = match[1] + String(num).padStart(padLen, '0');
-              if (!existingSerials.has(candidate.toLowerCase())) return candidate;
-              num++;
-            }
-          } else {
-            let suffix = 1;
-            while (true) {
-              const candidate = `${rawSerial}-${suffix}`;
-              if (!existingSerials.has(candidate.toLowerCase())) return candidate;
-              suffix++;
-            }
-          }
-        };
+        const assetTagId   = data?.assetTagId  || asset.assetTagId  || '';
+        const statusId     = data?.statusId    || asset.statusId    || '';
+        const locationId   = data?.locationId  || asset.locationId  || '';
+        const isReturnable = data?.isIssuable  ?? asset.isReturnable ?? false;
 
-        // Search for assets sharing the same serial prefix to collect existing serials
-        const prefix = match ? match[1] : rawSerial;
-        this.assetService.searchAssets(prefix || rawSerial).subscribe({
-          next: (searchRes: any) => {
-            const results: any[] = searchRes?.responseData?.data ?? searchRes?.data ?? [];
-            const existingSerials = new Set<string>(
-              results
-                .map((a: any) => (a.assetSerialNumber || a.serial || '').toLowerCase())
-                .filter(Boolean)
-            );
-            const newSerial = resolveSerial(existingSerials);
-
-            if (this.dashboardTabsService) {
-              this.dashboardTabsService.cloneAssetData = {
-                assetName: asset.name,
-                assetTagId: data?.assetTagId || '',
-                assetTagName: asset.assetTag || '',
-                statusId: data?.statusId || '',
-                locationId: data?.locationId || '',
-                serial: newSerial,
-                purchaseCost: rawCost,
-                purchaseDate: normalizedPurchaseDate || '',
-                isReturnable: data?.isIssuable ?? false,
-              };
-              this.dashboardTabsService.changeTab('create-asset');
-            }
-            this.cdr.detectChanges();
-          },
-          error: () => {
-            // If search fails, fall back to simple +1 increment
-            const fallbackSerial = match
-              ? match[1] + String(parseInt(match[2], 10) + 1).padStart(match[2].length, '0')
-              : (rawSerial ? rawSerial + '-1' : rawSerial);
-            if (this.dashboardTabsService) {
-              this.dashboardTabsService.cloneAssetData = {
-                assetName: asset.name,
-                assetTagId: data?.assetTagId || '',
-                assetTagName: asset.assetTag || '',
-                statusId: data?.statusId || '',
-                locationId: data?.locationId || '',
-                serial: fallbackSerial,
-                purchaseCost: rawCost,
-                purchaseDate: normalizedPurchaseDate || '',
-                isReturnable: data?.isIssuable ?? false,
-              };
-              this.dashboardTabsService.changeTab('create-asset');
-            }
-            this.cdr.detectChanges();
-          }
-        });
+        if (this.dashboardTabsService) {
+          this.dashboardTabsService.cloneAssetData = {
+            assetName: asset.name,
+            assetTagId,
+            assetTagName: asset.assetTag || '',
+            statusId,
+            locationId,
+            serial: '', // left blank — serial numbers must be unique, user fills this in
+            purchaseCost: rawCost,
+            purchaseDate: normalizedPurchaseDate || '',
+            isReturnable,
+          };
+          this.dashboardTabsService.changeTab('create-asset');
+        }
       },
       error: (err: any) => {
         this.isLoading = false;
         console.error('Failed to fetch asset details for cloning:', err);
-        this.cdr.detectChanges();
       }
     });
   }
