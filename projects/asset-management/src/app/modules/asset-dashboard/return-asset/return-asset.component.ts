@@ -20,7 +20,7 @@ export class ReturnAssetComponent implements OnInit {
   constructor(
     public router: Router,
     private assetService: AssetService,
-    private cdr: ChangeDetectorRef,
+    private cdr : ChangeDetectorRef,
     @Optional() private dashboardTabsService: DashboardTabsService
   ) { }
 
@@ -132,6 +132,7 @@ export class ReturnAssetComponent implements OnInit {
       next: () => {
         this.isSubmitting = false;
         this.navigate('return-log', '/kjusys/asset-management/return-log');
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         this.isSubmitting = false;

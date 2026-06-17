@@ -97,6 +97,7 @@ export class EditAssetComponent implements OnInit {
         this.models = tags.map((t: any) => ({ id: t.id, name: t.assetTagName, categoryId: t.categoryId }));
         this.filteredModels = this.models;
         this.syncAssetTagSearch();
+        this.cdr.detectChanges();
       }
     });
 
@@ -104,6 +105,7 @@ export class EditAssetComponent implements OnInit {
       next: (res: any) => {
         const rows = res?.responseData?.data?.units ?? [];
         this.unitsOfMeasure = rows.map((u: any) => ({ id: u._id ?? u.id, name: u.name ?? u.unitOfMeasure ?? u.acronym ?? '—' }));
+      this.cdr.detectChanges();
       }
     });
   }
@@ -128,17 +130,19 @@ export class EditAssetComponent implements OnInit {
           this.quantity = data.quantity != null ? data.quantity.toString() : '';
           this.unitOfMeasure = data.unitOfMeasureId || '';
           this.syncAssetTagSearch();
-
+          
           if (data.purchaseDate) {
             // Convert to YYYY-MM-DD
             try {
               this.purchaseDate = new Date(data.purchaseDate).toISOString().substring(0, 10);
             } catch (e) {
               this.purchaseDate = '';
+              
             }
           }
         }
         this.cdr.detectChanges();
+        
       },
       error: (err: any) => {
         this.isLoading = false;
@@ -275,6 +279,7 @@ export class EditAssetComponent implements OnInit {
       next: (res: any) => {
         this.isLoading = false;
         this.showSuccess = true;
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         this.isLoading = false;
