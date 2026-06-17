@@ -149,6 +149,7 @@ The data array is always under `responseData.data.<key>` where `<key>` varies by
 - `/statuses-list` → `responseData.data.statuses[]`
 - `/status` → `responseData.data.assets[]` (with `statusId`, `statusName`, `assetCount`)
 - `/asset-tags-list` → `responseData.data.assetTags[]`
+- `/units-list` → `responseData.data.units[]`
 - `/return-logs` → `responseData.data.data[]`
 - `/asset-details` → `responseData.data` (single object)
 - `/get-licenses/:id` → `responseData.data.licenses[]` + `responseData.data.warranty[]`
@@ -215,6 +216,12 @@ All screens are tab components inside `AssetDashboardModule`. Navigation between
 |------|----------|---------|
 | `updateAsset(payload)` | `PUT /edit-asset` | `{ _id, assetName, assetTagId, statusId, defaultLocation, serial, purchaseCost, purchaseDate, isReturnable }` |
 
+**On Export CSV action:**
+
+| Call | Endpoint | Params |
+|------|----------|--------|
+| `exportAssets(filters)` | `GET /export-assets` | Same filters as `getAssets` but runs without pagination bounds |
+
 ---
 
 ### Create Asset (`app-create-asset`)
@@ -226,6 +233,7 @@ All screens are tab components inside `AssetDashboardModule`. Navigation between
 | `getLocations()` | `GET /locations-list` | Default location dropdown |
 | `getStatuses()` | `GET /statuses-list` | Status dropdown |
 | `getAssetTags()` | `GET /asset-tags-list` | Model/asset-tag searchable dropdown |
+| `getUnits()` | `GET /units-list` | Dynamic units dropdown options |
 
 Note: `getCategories()` is **not** called on this page — category is inferred from the selected asset tag.
 
@@ -233,7 +241,7 @@ Note: `getCategories()` is **not** called on this page — category is inferred 
 
 | Call | Endpoint | Payload |
 |------|----------|---------|
-| `createAsset(payload)` | `POST /create-asset` | `{ assetName, assetTagId, statusId, defaultLocation, serial, purchaseCost, purchaseDate, isReturnable }` |
+| `createAsset(payload)` | `POST /create-asset` | `{ assetName, assetTagId, statusId, defaultLocation, serial, purchaseCost, purchaseDate, isReturnable, quantity, unitOfMeasureId }` |
 
 **Form fields:** Asset Name (required), Asset Tag/Model (required, searchable dropdown), Status (required), Default Location, Serial, Purchase Cost, Purchase Date, EOL Date, Quantity, Unit of Measure, Is Returnable toggle. Clone mode pre-fills all fields from `DashboardTabsService.cloneAssetData`.
 
@@ -266,12 +274,13 @@ Note: `getCategories()` is **not** called on this page — category is inferred 
 | `getLocations()` | `GET /locations-list` | Location dropdown |
 | `getStatuses()` | `GET /statuses-list` | Status dropdown |
 | `getAssetTags()` | `GET /asset-tags-list` | Model/asset-tag searchable dropdown |
+| `getUnits()` | `GET /units-list` | Dynamic units dropdown options |
 
 **On submit:**
 
 | Call | Endpoint | Payload |
 |------|----------|---------|
-| `updateAsset(payload)` | `PUT /edit-asset` | `{ _id, assetName, assetTagId, statusId, defaultLocation, serial, purchaseCost, purchaseDate, isReturnable }` |
+| `updateAsset(payload)` | `PUT /edit-asset` | `{ _id, assetName, assetTagId, statusId, defaultLocation, serial, purchaseCost, purchaseDate, isReturnable, quantity, unitOfMeasureId }` |
 
 ---
 
@@ -331,6 +340,12 @@ Note: `getCategories()` is **not** called on this page — category is inferred 
 
 **Response fields used:** `assetName`, `assetCategory`, `issueDate`, `receiverName`, `receiverType`
 
+**On Export CSV action:**
+
+| Call | Endpoint | Params |
+|------|----------|--------|
+| `exportIssueLogs(filters)` | `GET /export-issue-logs` | Same filters as `getIssuedAssets` but runs without pagination bounds |
+
 ---
 
 ### Return Asset (`app-return-asset`)
@@ -358,6 +373,12 @@ Note: `getCategories()` is **not** called on this page — category is inferred 
 | `getReturnLogs(filters)` | `GET /return-logs` | `page`, `pageSize`, `name`, `classification`, `total`, `returnType`, `returnTo`, `returnDate` |
 
 **Response fields used:** `name` (assetName), `classification`, `total`, `returnType`, `returnTo`, `returnDate`
+
+**On Export CSV action:**
+
+| Call | Endpoint | Params |
+|------|----------|--------|
+| `exportReturnLogs(filters)` | `GET /export-return-logs` | Same filters as `getReturnLogs` but runs without pagination bounds |
 
 ---
 
@@ -417,6 +438,10 @@ Note: `getCategories()` is **not** called on this page — category is inferred 
 | `getAssetHistory(id)` | GET | `/asset-history/:id` |
 | `getIssuedDetailByAssetId(id)` | GET | `/issued-asset-details/:id` |
 | `getCategoryCount(page, size)` | GET | `/categories` |
+| `getUnits()` | GET | `/units-list` |
+| `exportAssets(filters)` | GET | `/export-assets` |
+| `exportIssueLogs(filters)` | GET | `/export-issue-logs` |
+| `exportReturnLogs(filters)` | GET | `/export-return-logs` |
 
 ---
 
