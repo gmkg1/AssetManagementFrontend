@@ -123,7 +123,7 @@ export class CreateAssetComponent implements OnInit, OnDestroy {
     this.assetService.getUnits().subscribe({
       next: (res: any) => {
         const rows = res?.responseData?.data?.units ?? [];
-        this.unitsOfMeasure = rows.map((u: any) => ({ id: u.id, name: u.unitOfMeasure }));
+        this.unitsOfMeasure = rows.map((u: any) => ({ id: u._id ?? u.id, name: u.name ?? u.unitOfMeasure ?? u.acronym ?? '—' }));
         tryApplyClone();
       },
       error: () => tryApplyClone()
