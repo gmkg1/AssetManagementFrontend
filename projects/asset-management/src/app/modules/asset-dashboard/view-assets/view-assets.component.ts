@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, Optional } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { Subject, Subscription, forkJoin, of } from 'rxjs';
+import { debounceTime, catchError } from 'rxjs/operators';
 import { AssetService } from '../../../services/asset.service';
 import { DashboardTabsService } from '../dashboard-tabs.service';
 
@@ -93,7 +93,6 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     { key: 'info', label: 'Info', icon: 'M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z' },
     { key: 'licenses', label: 'Licenses', icon: 'M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z' },
     { key: 'components', label: 'Components', icon: 'M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z' },
-    { key: 'files', label: 'File', icon: 'M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z' },
     { key: 'history', label: 'History', icon: 'M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z' },
   ];
 
@@ -198,12 +197,69 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
         this.assets = raw.map((item, i) => this.mapToAsset(item, i));
         this.isLoading = false;
         this.cdr.detectChanges();
+        this.loadAssignedTo();
       },
       error: (err: any) => {
         console.error('Failed to load assets:', err);
         this.apiError = 'Could not load assets from the server.';
         this.isLoading = false;
       }
+    });
+  }
+
+  /**
+   * For each loaded asset, fetch its history and determine the active assignee.
+   * An asset is "actively issued" when it has more issues than returns — the
+   * most recent issue without a paired return is the current assignment.
+   */
+  private loadAssignedTo(): void {
+    const assetsWithId = this.assets.filter(a => a._id);
+    if (!assetsWithId.length) return;
+
+    const requests = assetsWithId.map(asset =>
+      this.assetService.getAssetHistory(asset._id!).pipe(
+        catchError(() => of(null))
+      )
+    );
+
+    forkJoin(requests).subscribe((results: any[]) => {
+      results.forEach((res, idx) => {
+        const asset = assetsWithId[idx];
+        const targetAsset = this.assets.find(a => a._id === asset._id);
+        if (!targetAsset || !res) return;
+
+        const issues: any[] = res?.responseData?.data?.issues ?? [];
+        const returns: any[] = res?.responseData?.data?.returns ?? [];
+
+        // Sort issues descending by date to get the latest first
+        const sortedIssues = [...issues].sort(
+          (a, b) => new Date(b.issueDate).getTime() - new Date(a.issueDate).getTime()
+        );
+
+        // An asset is actively issued if there are more issues than returns,
+        // or if the latest issue date is after the latest return date.
+        const isActivelyIssued = (() => {
+          if (!sortedIssues.length) return false;
+          if (returns.length < issues.length) return true;
+          const latestIssue = new Date(sortedIssues[0].issueDate).getTime();
+          const latestReturn = returns.length
+            ? Math.max(...returns.map((r: any) => new Date(r.returnDate).getTime()))
+            : 0;
+          return latestIssue > latestReturn;
+        })();
+
+        if (isActivelyIssued && sortedIssues[0]) {
+          const issue = sortedIssues[0];
+          const isValid = (val: any) => val && val !== 'N/A' && val !== 'n/a';
+          targetAsset.assignedTo =
+            isValid(issue.issuedToAsset) ? issue.issuedToAsset :
+            isValid(issue.personId)      ? issue.personId :
+            isValid(issue.location)      ? issue.location : '—';
+        } else {
+          targetAsset.assignedTo = '—';
+        }
+      });
+      this.cdr.detectChanges();
     });
   }
 

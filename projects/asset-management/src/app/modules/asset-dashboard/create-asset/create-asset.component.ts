@@ -270,6 +270,10 @@ export class CreateAssetComponent implements OnInit, OnDestroy {
       this.errorMessage = 'Asset Name is required.';
       return;
     }
+    if (this.isCloneMode && !this.serial.trim()) {
+      this.errorMessage = 'Serial Number is required for cloned assets.';
+      return;
+    }
 
     if (this.eolDate && this.purchaseDate && this.eolDate < this.purchaseDate) {
       this.errorMessage = 'EOL Date cannot be before Purchase Date.';
