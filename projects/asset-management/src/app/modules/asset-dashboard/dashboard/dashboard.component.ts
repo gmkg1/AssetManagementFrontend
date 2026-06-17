@@ -151,7 +151,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.assetService.getIssuedAssets({ page: 1, pageSize: 3 }).subscribe({
       next: (response: any) => {
         const issued: any[] = response?.responseData?.data?.assets ?? [];
-        this.cdr.detectChanges();
+        
         this.issueHistory = issued.slice(0, 3).map(item => ({
           receiverName: item.receiverName ?? 'Unknown',
           department: item.receiverType ?? '—',
@@ -160,6 +160,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             : '—',
           assetDept: item.assetCategory ?? '—'
         }));
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Failed to load issued assets:', err);

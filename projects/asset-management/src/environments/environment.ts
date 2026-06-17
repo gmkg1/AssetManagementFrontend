@@ -4,3 +4,4 @@ export const environment = {
     appName: 'Asset Management',
     version: '1.0.0'
 };
+ 
