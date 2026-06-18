@@ -13,11 +13,8 @@ export const environment = {
         'asset-management': 'http://localhost:4205',
     },
     publicPath: 'http://localhost:4200/',
-<<<<<<< HEAD
+
     baseUrl: 'https://adjustments-plenty-roles-grid.trycloudflare.com/api/',
-=======
-    baseUrl: 'http://localhost:8080/api/',
->>>>>>> origin/finalmerge
     project: 'shell',
     baseRoute: 'kjusys',
     local: true,
