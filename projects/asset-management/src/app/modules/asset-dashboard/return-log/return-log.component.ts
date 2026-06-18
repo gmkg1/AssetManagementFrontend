@@ -10,6 +10,7 @@ export interface ReturnRecord {
   assetTag: string;
   classification: string;
   total: number;
+  unit?: string;
   returnType: string;
   returnTo: string;
   returnDate: string;
@@ -106,6 +107,7 @@ export class ReturnLogComponent implements OnInit, OnDestroy {
           assetTag: item.name ?? item.assetName ?? '—',
           classification: item.classification ?? '—',
           total: item.total ?? 0,
+          unit: item.unit ?? 'Nos',
           returnType: item.returnType ?? '—',
           returnTo: item.returnTo ?? item.issuedFor ?? '—',
           returnDate: item.returnDate
