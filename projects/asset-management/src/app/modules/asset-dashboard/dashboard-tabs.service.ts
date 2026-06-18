@@ -8,8 +8,10 @@ export class DashboardTabsService {
 
   // Parameter state passed between tabs
   public editAssetId = '';
+  public editAssetKey = 0;  // incremented each time edit-asset is triggered to force component re-init
   public warrantyLicensesAssetId = '';
   public filterCategoryId = '';
+  public filterCategoryName = '';
 
   // For Issue Asset tab
   public issueAssetId = '';
@@ -17,6 +19,19 @@ export class DashboardTabsService {
   public issueAssetTag = '';
   public issueAssetModel = '';
   public issueAssetCategory = '';
+
+  // For Clone Asset — prefill data passed to create-asset tab
+  public cloneAssetData: {
+    assetName: string;
+    assetTagId: string;
+    assetTagName: string;
+    statusId: string;
+    locationId: string;
+    serial: string;
+    purchaseCost: string;
+    purchaseDate: string;
+    isReturnable: boolean;
+  } | null = null;
 
   constructor() {}
 

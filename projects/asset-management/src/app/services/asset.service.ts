@@ -133,6 +133,9 @@ export class AssetService {
     locationId?: string | null;
     personId?: string | null;
     issuedToAssetId?: string | null;
+    issueQuantity?: number;
+    unitOfMeasurement?: string;
+    conversionFactor?: number;
   }) {
     return this.http.post<any>(`${this.baseUrl}/issue-asset`, payload);
   }
@@ -143,6 +146,7 @@ export class AssetService {
     issuetoId: string;
     returnDate: string;
     notes?: string;
+    returnQuantity?: number;
   }) {
     return this.http.post<any>(`${this.baseUrl}/return-asset`, payload);
   }
@@ -233,8 +237,103 @@ export class AssetService {
     return this.http.get<any>(`${this.baseUrl}/asset-history/${assetId}`);
   }
 
-  /** PUT /edit-licenses-warranty — update licenses and warranty for an asset */
-  updateLicensesAndWarranty(payload: any) {
-    return this.http.put<any>(`${this.baseUrl}/edit-licenses-warranty`, payload);
+  /** POST /create-licenses — create licenses and warranty for an asset */
+  createLicenses(payload: any) {
+    return this.http.post<any>(`${this.baseUrl}/create-licenses`, payload);
+  }
+
+  /** GET /export-reports — export reports as CSV */
+  exportReports(filters: { categoryId?: string; assetName?: string; assetIds?: string }) {
+    let params = new HttpParams();
+    if (filters.categoryId) params = params.set('categoryId', filters.categoryId);
+    if (filters.assetName) params = params.set('assetName', filters.assetName);
+    if (filters.assetIds) params = params.set('assetIds', filters.assetIds);
+    return this.http.get(`${this.baseUrl}/export-reports`, {
+      params,
+      responseType: 'blob'
+    });
+  }
+
+  /** GET /export-assets — export assets to CSV */
+  exportAssets(filters: {
+    assetName?: string;
+    assetTagName?: string;
+    categoryId?: string;
+    locationId?: string;
+    statusId?: string;
+    purchaseDateFrom?: string;
+    purchaseDateTo?: string;
+  }) {
+    let params = new HttpParams();
+    if (filters.assetName) params = params.set('assetName', filters.assetName);
+    if (filters.assetTagName) params = params.set('assetTagName', filters.assetTagName);
+    if (filters.categoryId) params = params.set('categoryId', filters.categoryId);
+    if (filters.locationId) params = params.set('locationId', filters.locationId);
+    if (filters.statusId) params = params.set('statusId', filters.statusId);
+    if (filters.purchaseDateFrom) params = params.set('purchaseDateFrom', filters.purchaseDateFrom);
+    if (filters.purchaseDateTo) params = params.set('purchaseDateTo', filters.purchaseDateTo);
+    return this.http.get(`${this.baseUrl}/export-assets`, {
+      params,
+      responseType: 'blob'
+    });
+  }
+
+  /** GET /export-issue-logs — export issue logs to CSV */
+  exportIssueLogs(filters: {
+    assetName?: string;
+    category?: string;
+    issuedTo?: string;
+    type?: string;
+    issueDate?: string;
+  }) {
+    let params = new HttpParams();
+    if (filters.assetName) params = params.set('assetName', filters.assetName);
+    if (filters.category) params = params.set('category', filters.category);
+    if (filters.issuedTo) params = params.set('issuedTo', filters.issuedTo);
+    if (filters.type) params = params.set('type', filters.type);
+    if (filters.issueDate) params = params.set('issueDate', filters.issueDate);
+    return this.http.get(`${this.baseUrl}/export-issue-logs`, {
+      params,
+      responseType: 'blob'
+    });
+  }
+
+  /** GET /export-return-logs — export return logs to CSV */
+  exportReturnLogs(filters: {
+    name?: string;
+    classification?: string;
+    total?: string;
+    returnType?: string;
+    returnTo?: string;
+    returnDate?: string;
+  }) {
+    let params = new HttpParams();
+    if (filters.name) params = params.set('name', filters.name);
+    if (filters.classification) params = params.set('classification', filters.classification);
+    if (filters.total) params = params.set('total', filters.total);
+    if (filters.returnType) params = params.set('returnType', filters.returnType);
+    if (filters.returnTo) params = params.set('returnTo', filters.returnTo);
+    if (filters.returnDate) params = params.set('returnDate', filters.returnDate);
+    return this.http.get(`${this.baseUrl}/export-return-logs`, {
+      params,
+      responseType: 'blob'
+    });
+  }
+
+  /** GET /reports-grouped — get paginated grouped reports data */
+  getGroupedReports(filters: { page?: number; pageSize?: number; categoryId?: string } = {}) {
+    let params = new HttpParams()
+      .set('page', (filters.page ?? 1).toString())
+      .set('pageSize', (filters.pageSize ?? 8).toString());
+    if (filters.categoryId) params = params.set('categoryId', filters.categoryId);
+    return this.http.get<any>(`${this.baseUrl}/reports-grouped`, { params });
+  }
+
+  /** GET /units-list — get units and child units list */
+  getUnits() {
+    return this.http.get<any>(`${this.baseUrl}/units-list`);
   }
 }
+
+
+

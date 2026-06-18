@@ -29,18 +29,16 @@ export class EditAssetComponent implements OnInit {
   locations: any[] = [];
   assetName = '';
   orderNumber = '';
-  warranty = '';
   purchaseDate = '';
   eolDate = '';
-  supplier = '';
-  suppliers = ['Dell', 'HP', 'Apple', 'BenQ', 'Logitech'];
   purchaseCost = '';
-  billFile: File | null = null;
+  quantity = '';
+  unitOfMeasure = '';
+  unitsOfMeasure: any[] = [];
+
   isReturnable = false;
-  assetImagePreview: string | ArrayBuffer | null = null;
-  assetImageFile: File | null = null;
-  isDragOver = false;
   errorMessage = '';
+
   isLoading = false;
   showSuccess = false;
   sidebarOpen = false;
@@ -81,6 +79,7 @@ export class EditAssetComponent implements OnInit {
       next: (res: any) => {
         const rows = res?.responseData?.data?.locations ?? [];
         this.locations = rows.map((r: any) => ({ id: r.locationId, name: r.locationName }));
+        this.cdr.detectChanges();
       }
     });
 
@@ -88,6 +87,7 @@ export class EditAssetComponent implements OnInit {
       next: (res: any) => {
         const rows = res?.responseData?.data?.statuses ?? [];
         this.statuses = rows.map((r: any) => ({ id: r.statusId, name: r.statusName }));
+        this.cdr.detectChanges();
       }
     });
 
@@ -97,6 +97,15 @@ export class EditAssetComponent implements OnInit {
         this.models = tags.map((t: any) => ({ id: t.id, name: t.assetTagName, categoryId: t.categoryId }));
         this.filteredModels = this.models;
         this.syncAssetTagSearch();
+        this.cdr.detectChanges();
+      }
+    });
+
+    this.assetService.getUnits().subscribe({
+      next: (res: any) => {
+        const rows = res?.responseData?.data?.units ?? [];
+        this.unitsOfMeasure = rows.map((u: any) => ({ id: u._id ?? u.id, name: u.name ?? u.unitOfMeasure ?? u.acronym ?? '—' }));
+      this.cdr.detectChanges();
       }
     });
   }
@@ -118,18 +127,22 @@ export class EditAssetComponent implements OnInit {
           this.serialNumber = data.assetSerialNumber || '';
           this.purchaseCost = data.purchaseCost != null ? data.purchaseCost.toString() : '';
           this.isReturnable = data.isIssuable || false;
+          this.quantity = data.quantity != null ? data.quantity.toString() : '';
+          this.unitOfMeasure = data.unitOfMeasureId || '';
           this.syncAssetTagSearch();
-
+          
           if (data.purchaseDate) {
             // Convert to YYYY-MM-DD
             try {
               this.purchaseDate = new Date(data.purchaseDate).toISOString().substring(0, 10);
             } catch (e) {
               this.purchaseDate = '';
+              
             }
           }
         }
         this.cdr.detectChanges();
+        
       },
       error: (err: any) => {
         this.isLoading = false;
@@ -222,10 +235,18 @@ export class EditAssetComponent implements OnInit {
     }
   }
 
+  blockNonIntegers(event: KeyboardEvent): void {
+    const allowed = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+    if (allowed.includes(event.key)) return;
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault();
+    }
+  }
+
   onSubmit(): void {
     this.errorMessage = '';
 
-    if (!this.assetName.trim()) {
+    if (!this.assetName || !this.assetName.trim()) {
       this.errorMessage = 'Asset Name is required.';
       return;
     }
@@ -246,76 +267,24 @@ export class EditAssetComponent implements OnInit {
       assetTagId: this.model,
       statusId: this.status,
       defaultLocation: this.defaultLocation || null,
-      serial: this.serial.trim(),
-      purchaseCost: this.purchaseCost.trim(),
-      purchaseDate: this.purchaseDate.trim(),
-      isReturnable: this.isReturnable
+      serial: this.serial != null ? this.serial.toString().trim() : '',
+      purchaseCost: this.purchaseCost != null ? this.purchaseCost.toString().trim() : '',
+      purchaseDate: this.purchaseDate ? this.purchaseDate.trim() : '',
+      isReturnable: this.isReturnable,
+      quantity: this.quantity ? parseInt(this.quantity.toString(), 10) : 1,
+      unitOfMeasureId: this.unitOfMeasure || null
     };
 
     this.assetService.updateAsset(payload).subscribe({
       next: (res: any) => {
         this.isLoading = false;
         this.showSuccess = true;
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         this.isLoading = false;
         this.errorMessage = err?.error?.responseData?.errors?.[0] || err?.error?.error || 'Failed to update asset.';
       }
     });
-  }
-
-  onBillSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-    this.billFile = file;
-  }
-
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-
-    if (!file) {
-      return;
-    }
-
-    this.assetImageFile = file;
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.assetImagePreview = reader.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  removeImage(event: Event): void {
-    event.stopPropagation();
-    this.assetImageFile = null;
-    this.assetImagePreview = null;
-  }
-
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    this.isDragOver = true;
-  }
-
-  onDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    this.isDragOver = false;
-  }
-
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    this.isDragOver = false;
-
-    const file = event.dataTransfer?.files?.[0] ?? null;
-    if (!file) {
-      return;
-    }
-
-    this.assetImageFile = file;
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.assetImagePreview = reader.result;
-    };
-    reader.readAsDataURL(file);
   }
 }

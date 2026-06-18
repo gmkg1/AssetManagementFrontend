@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, Optional } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { Subject, Subscription, forkJoin, of } from 'rxjs';
+import { debounceTime, catchError } from 'rxjs/operators';
 import { AssetService } from '../../../services/asset.service';
 import { DashboardTabsService } from '../dashboard-tabs.service';
 
@@ -21,6 +21,7 @@ export interface Asset {
   condition: string;
   assetTag: string;
   serial: string;
+  displayId: string;
   checkoutDate: string;
   model: string;
   modelNo: string;
@@ -92,7 +93,6 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     { key: 'info', label: 'Info', icon: 'M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z' },
     { key: 'licenses', label: 'Licenses', icon: 'M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z' },
     { key: 'components', label: 'Components', icon: 'M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z' },
-    { key: 'files', label: 'File', icon: 'M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z' },
     { key: 'history', label: 'History', icon: 'M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z' },
   ];
 
@@ -112,6 +112,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   maintenanceCount = 0;
   assetsDropdownOpen = false;
   sidebarOpen = false;
+  activeCategoryName = '';
 
   constructor(
     private router: Router,
@@ -133,11 +134,14 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     this.loadFilterOptions();
     if (this.dashboardTabsService && this.dashboardTabsService.filterCategoryId) {
       this.selectedCategoryId = this.dashboardTabsService.filterCategoryId;
+      this.activeCategoryName = this.dashboardTabsService.filterCategoryName ?? '';
       this.dashboardTabsService.filterCategoryId = '';
+      this.dashboardTabsService.filterCategoryName = '';
       this.loadAssets();
     } else {
       this.route.queryParams.subscribe((params: Record<string, string>) => {
         if (params['category']) this.selectedCategoryId = params['category'];
+        if (params['categoryName']) this.activeCategoryName = params['categoryName'];
         this.loadAssets();
       });
     }
@@ -193,6 +197,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
         this.assets = raw.map((item, i) => this.mapToAsset(item, i));
         this.isLoading = false;
         this.cdr.detectChanges();
+        this.loadAssignedTo();
       },
       error: (err: any) => {
         console.error('Failed to load assets:', err);
@@ -202,8 +207,71 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * For each loaded asset, fetch its history and determine the active assignee.
+   * An asset is "actively issued" when it has more issues than returns — the
+   * most recent issue without a paired return is the current assignment.
+   */
+  private loadAssignedTo(): void {
+    const assetsWithId = this.assets.filter(a => a._id);
+    if (!assetsWithId.length) return;
+
+    const requests = assetsWithId.map(asset =>
+      this.assetService.getAssetHistory(asset._id!).pipe(
+        catchError(() => of(null))
+      )
+    );
+
+    forkJoin(requests).subscribe((results: any[]) => {
+      results.forEach((res, idx) => {
+        const asset = assetsWithId[idx];
+        const targetAsset = this.assets.find(a => a._id === asset._id);
+        if (!targetAsset || !res) return;
+
+        const issues: any[] = res?.responseData?.data?.issues ?? [];
+        const returns: any[] = res?.responseData?.data?.returns ?? [];
+
+        // Sort issues descending by date to get the latest first
+        const sortedIssues = [...issues].sort(
+          (a, b) => new Date(b.issueDate).getTime() - new Date(a.issueDate).getTime()
+        );
+
+        // An asset is actively issued if there are more issues than returns,
+        // or if the latest issue date is after the latest return date.
+        const isActivelyIssued = (() => {
+          if (!sortedIssues.length) return false;
+          if (returns.length < issues.length) return true;
+          const latestIssue = new Date(sortedIssues[0].issueDate).getTime();
+          const latestReturn = returns.length
+            ? Math.max(...returns.map((r: any) => new Date(r.returnDate).getTime()))
+            : 0;
+          return latestIssue > latestReturn;
+        })();
+
+        if (isActivelyIssued && sortedIssues[0]) {
+          const issue = sortedIssues[0];
+          const isValid = (val: any) => val && val !== 'N/A' && val !== 'n/a';
+          targetAsset.assignedTo =
+            isValid(issue.issuedToAsset) ? issue.issuedToAsset :
+            isValid(issue.personId)      ? issue.personId :
+            isValid(issue.location)      ? issue.location : '—';
+        } else {
+          targetAsset.assignedTo = '—';
+        }
+      });
+      this.cdr.detectChanges();
+    });
+  }
+
   onSearch(): void {
     this.currentPage = 1;
+    // If the user manually changed the category dropdown, sync activeCategoryName
+    if (this.selectedCategoryId) {
+      const found = this.categories.find(c => c.id === this.selectedCategoryId);
+      this.activeCategoryName = found?.name ?? '';
+    } else {
+      this.activeCategoryName = '';
+    }
     this.loadAssets();
   }
 
@@ -227,6 +295,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     this.purchaseDate = '';
     this.searchQuery = '';
     this.assetTagQuery = '';
+    this.activeCategoryName = '';
     this.currentPage = 1;
     this.loadAssets();
   }
@@ -234,23 +303,49 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
 
 
   private loadStatusCounts(): void {
-    this.assetService.getStatusSummary().subscribe({
-      next: (response: any) => {
-        const rows: any[] = response?.responseData?.data?.assets ?? [];
-        let total = 0, readyToDeploy = 0, deployed = 0, maintenance = 0;
-        rows.forEach(r => {
-          total += r.assetCount ?? 0;
-          if (r.statusName === 'Ready to Deploy') readyToDeploy = r.assetCount ?? 0;
-          else if (r.statusName === 'Deployed') deployed = r.assetCount ?? 0;
-          else if (r.statusName === 'Under Maintenance') maintenance = r.assetCount ?? 0;
-        });
-        this.totalCount = total;
-        this.availableCount = readyToDeploy;
-        this.deployedCount = deployed;
-        this.maintenanceCount = maintenance;
-        this.cdr.detectChanges();
-      }
-    });
+    if (this.selectedCategoryId) {
+      // Fetch all assets for this category (large page) and derive counts from the result
+      this.assetService.getAssets({
+        page: 1,
+        pageSize: 9999,
+        categoryId: this.selectedCategoryId,
+      }).subscribe({
+        next: (response: any) => {
+          const raw: any[] = response?.responseData?.data?.assets ?? [];
+          let total = 0, readyToDeploy = 0, deployed = 0, maintenance = 0;
+          raw.forEach((r: any) => {
+            total++;
+            const s = r.status ?? '';
+            if (s === 'Ready to Deploy') readyToDeploy++;
+            else if (s === 'Deployed') deployed++;
+            else if (s === 'Under Maintenance') maintenance++;
+          });
+          this.totalCount = total;
+          this.availableCount = readyToDeploy;
+          this.deployedCount = deployed;
+          this.maintenanceCount = maintenance;
+          this.cdr.detectChanges();
+        }
+      });
+    } else {
+      this.assetService.getStatusSummary().subscribe({
+        next: (response: any) => {
+          const rows: any[] = response?.responseData?.data?.assets ?? [];
+          let total = 0, readyToDeploy = 0, deployed = 0, maintenance = 0;
+          rows.forEach(r => {
+            total += r.assetCount ?? 0;
+            if (r.statusName === 'Ready to Deploy') readyToDeploy = r.assetCount ?? 0;
+            else if (r.statusName === 'Deployed') deployed = r.assetCount ?? 0;
+            else if (r.statusName === 'Under Maintenance') maintenance = r.assetCount ?? 0;
+          });
+          this.totalCount = total;
+          this.availableCount = readyToDeploy;
+          this.deployedCount = deployed;
+          this.maintenanceCount = maintenance;
+          this.cdr.detectChanges();
+        }
+      });
+    }
   }
 
   prevPage(): void { if (this.currentPage > 1) { this.currentPage--; this.loadAssets(); } }
@@ -260,7 +355,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   private mapToAsset(item: any, index: number): Asset {
     return {
       _id: item._id,
-      id: item.assetSerialNumber ?? `AST-${String(index + 1).padStart(3, '0')}`,
+      id: item.displayId ?? item.assetSerialNumber ?? `AST-${String(index + 1).padStart(3, '0')}`,
       name: item.assetName ?? '—',
       department: item.location ?? '—',
       category: item.category ?? '—',
@@ -270,6 +365,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
       condition: 'Good',
       assetTag: item.assetTagName ?? '—',
       serial: item.assetSerialNumber ?? '—',
+      displayId: item.displayId ?? item.assetSerialNumber ?? '—',
       checkoutDate: '—',
       model: item.assetTagName ?? '—',
       modelNo: '—',
@@ -289,7 +385,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
 
   openDetail(asset: Asset): void {
     this.selectedAsset = asset;
-    this.detailTab = 'components';
+    this.detailTab = 'info';
     this.view = 'detail';
 
     this.assetLicenses = [];
@@ -318,6 +414,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
               locationId: data.locationId,
               assetTagId: data.assetTagId,
               serial: data.assetSerialNumber || this.selectedAsset.serial,
+              displayId: data.displayId || this.selectedAsset.displayId,
               purchaseCost: data.purchaseCost != null ? data.purchaseCost.toString() : this.selectedAsset.purchaseCost,
               purchaseDate: normalizedPurchaseDate || this.selectedAsset.purchaseDate,
               isReturnable: data.isIssuable || false
@@ -458,9 +555,64 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     const id = asset._id || asset.id;
     if (this.dashboardTabsService) {
       this.dashboardTabsService.editAssetId = id;
+      this.dashboardTabsService.editAssetKey++;  // force edit-asset component to re-init
       this.dashboardTabsService.changeTab('edit-asset');
     } else {
       this.router.navigate(['/kjusys/asset-management/edit-asset', id]);
+    }
+  }
+
+  cloneAsset(asset: Asset): void {
+    if (!asset._id) return;
+
+    this.isLoading = true;
+
+    this.assetService.getAssetDetails(asset._id).subscribe({
+      next: (res: any) => {
+        this.isLoading = false;
+        const data = res?.responseData?.data;
+
+        let normalizedPurchaseDate = '';
+        if (data?.purchaseDate) {
+          try { normalizedPurchaseDate = new Date(data.purchaseDate).toISOString().substring(0, 10); } catch (_) {}
+        }
+
+        const rawCost = (data?.purchaseCost ?? asset.purchaseCost ?? '').toString().replace('Rs. ', '').replace(/,/g, '');
+
+        const assetTagId   = data?.assetTagId  || asset.assetTagId  || '';
+        const statusId     = data?.statusId    || asset.statusId    || '';
+        const locationId   = data?.locationId  || asset.locationId  || '';
+        const isReturnable = data?.isIssuable  ?? asset.isReturnable ?? false;
+
+        if (this.dashboardTabsService) {
+          this.dashboardTabsService.cloneAssetData = {
+            assetName: asset.name,
+            assetTagId,
+            assetTagName: asset.assetTag || '',
+            statusId,
+            locationId,
+            serial: '', // left blank — serial numbers must be unique, user fills this in
+            purchaseCost: rawCost,
+            purchaseDate: normalizedPurchaseDate || '',
+            isReturnable,
+          };
+          this.dashboardTabsService.changeTab('create-asset');
+        }
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        console.error('Failed to fetch asset details for cloning:', err);
+      }
+    });
+  }
+
+  handleAction(label: string): void {
+    if (!this.selectedAsset) return;
+    switch (label) {
+      case 'Edit Asset': this.editAsset(this.selectedAsset); break;
+      case 'Issue Asset': this.issueAsset(this.selectedAsset); break;
+      case 'Edit Licenses and Warranty': this.editWarrantyLicenses(this.selectedAsset); break;
+      case 'Clone Asset': this.cloneAsset(this.selectedAsset); break;
     }
   }
 
@@ -491,4 +643,33 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   }
 
   copyToClipboard(value: string): void { navigator.clipboard?.writeText(value); }
+
+  exportCSV(): void {
+    this.isLoading = true;
+    this.assetService.exportAssets({
+      assetName: this.searchQuery.trim() || undefined,
+      assetTagName: this.assetTagQuery.trim() || undefined,
+      categoryId: this.selectedCategoryId || undefined,
+      locationId: this.selectedLocationId || undefined,
+      statusId: this.selectedStatusId || undefined,
+      purchaseDateFrom: this.purchaseDate || undefined,
+    }).subscribe({
+      next: (blob: Blob) => {
+        this.isLoading = false;
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `assets_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        console.error('Failed to export assets CSV:', err);
+        this.cdr.detectChanges();
+      }
+    });
+  }
 }
+

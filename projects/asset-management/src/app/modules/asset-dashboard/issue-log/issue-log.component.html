@@ -1,4 +1,4 @@
-<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+<div class="bg-white rounded-xl shadow-sm overflow-hidden mb-20">
   <div class="flex flex-wrap gap-2 px-4 py-3 border-b border-slate-100">
     <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[140px] flex-1" type="text" placeholder="Asset name" [(ngModel)]="assetNameQuery" (ngModelChange)="onSearchInput('assetNameQuery')" />
     <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[120px] flex-1" type="text" placeholder="Category" [(ngModel)]="categoryQuery" (ngModelChange)="onSearchInput('categoryQuery')" />
@@ -19,41 +19,50 @@
       <h2 class="text-xs font-semibold text-slate-800">Issue Log</h2>
       <p class="text-[10px] text-slate-400 mt-0.5">{{ totalRecords }} record{{ totalRecords !== 1 ? 's' : '' }} total</p>
     </div>
+    <button type="button" class="h-7 px-3 rounded-lg border border-slate-200 bg-white text-[11px] text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition-all duration-150 active:scale-95 flex items-center gap-1.5" (click)="exportCSV()">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+      Export
+    </button>
   </div>
+
   <div *ngIf="apiError" class="px-4 py-3 text-xs text-red-600 bg-red-50">{{ apiError }}</div>
   <!-- Skeleton rows while loading -->
   <ng-container *ngIf="isLoading && !apiError">
-    <div class="grid grid-cols-5 px-4 py-2 border-b border-slate-100 bg-slate-50">
+    <div class="grid grid-cols-6 px-4 py-2 border-b border-slate-100 bg-slate-50">
       <span class="text-[10px] font-medium text-slate-500">Asset Name</span>
       <span class="text-[10px] font-medium text-slate-500">Category</span>
       <span class="text-[10px] font-medium text-slate-500">Issued To</span>
       <span class="text-[10px] font-medium text-slate-500">Type</span>
+      <span class="text-[10px] font-medium text-slate-500">Quantity</span>
       <span class="text-[10px] font-medium text-slate-500">Issue Date</span>
     </div>
-    <div *ngFor="let s of [1,2,3,4,5,6,7,8]" class="grid grid-cols-5 px-4 py-3 border-b border-slate-50 animate-pulse">
+    <div *ngFor="let s of [1,2,3,4,5,6,7,8]" class="grid grid-cols-6 px-4 py-3 border-b border-slate-50 animate-pulse">
       <div class="h-3 bg-slate-200 rounded w-3/4"></div>
       <div class="h-3 bg-slate-200 rounded w-2/3"></div>
       <div class="h-3 bg-slate-200 rounded w-3/4"></div>
       <div class="h-3 bg-slate-200 rounded w-1/2"></div>
+      <div class="h-3 bg-slate-200 rounded w-1/3"></div>
       <div class="h-3 bg-slate-200 rounded w-2/3"></div>
     </div>
   </ng-container>
-  <div *ngIf="!isLoading && !apiError" class="grid grid-cols-5 px-4 py-2 border-b border-slate-100 bg-slate-50">
+  <div *ngIf="!isLoading && !apiError" class="grid grid-cols-6 px-4 py-2 border-b border-slate-100 bg-slate-50">
     <span class="text-[10px] font-medium text-slate-500">Asset Name</span>
     <span class="text-[10px] font-medium text-slate-500">Category</span>
     <span class="text-[10px] font-medium text-slate-500">Issued To</span>
     <span class="text-[10px] font-medium text-slate-500">Type</span>
+    <span class="text-[10px] font-medium text-slate-500">Quantity</span>
     <span class="text-[10px] font-medium text-slate-500">Issue Date</span>
   </div>
   <div *ngIf="!isLoading && issueLog.length === 0" class="flex flex-col items-center justify-center py-16 gap-2 text-slate-400">
     <span class="text-xs">No issued assets found.</span>
   </div>
   <ng-container *ngIf="!isLoading">
-    <div *ngFor="let row of issueLog; let i = index" class="grid grid-cols-5 px-4 py-2.5 border-b border-slate-50 last:border-0 hover:bg-blue-50 transition-colors" [class.bg-white]="i % 2 === 0" [class.bg-slate-50]="i % 2 !== 0">
+    <div *ngFor="let row of issueLog; let i = index" class="grid grid-cols-6 px-4 py-2.5 border-b border-slate-50 last:border-0 hover:bg-blue-50 transition-colors" [class.bg-white]="i % 2 === 0" [class.bg-slate-50]="i % 2 !== 0">
       <span class="text-xs font-medium text-slate-800 truncate pr-2">{{ row.assetName }}</span>
       <span class="text-xs text-slate-500">{{ row.assetCategory }}</span>
       <span class="text-xs text-slate-700 truncate pr-2">{{ row.receiverName }}</span>
       <span><span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold" [ngClass]="getReceiverTypeClass(row.receiverType)">{{ row.receiverType }}</span></span>
+      <span class="text-xs text-slate-700 font-medium">{{ row.issueQuantity }} {{ row.unit }}</span>
       <span class="text-xs text-slate-400">{{ row.issueDate }}</span>
     </div>
   </ng-container>

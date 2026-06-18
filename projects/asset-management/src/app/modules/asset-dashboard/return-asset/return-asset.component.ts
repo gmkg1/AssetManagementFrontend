@@ -1,4 +1,4 @@
-import { Component, OnInit, Optional } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, Optional } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../../services/asset.service';
 import { DashboardTabsService } from '../dashboard-tabs.service';
@@ -12,6 +12,7 @@ export class ReturnAssetComponent implements OnInit {
   public issueDropdownOpen = false;
   public selectedIssueId = '';
   public selectedIssue: any = null;
+  public returnQuantity = 1;
   public activeIssues: any[] = [];
 
   public returnDate = '';
@@ -20,6 +21,7 @@ export class ReturnAssetComponent implements OnInit {
   constructor(
     public router: Router,
     private assetService: AssetService,
+    private cdr : ChangeDetectorRef,
     @Optional() private dashboardTabsService: DashboardTabsService
   ) { }
 
@@ -38,9 +40,11 @@ export class ReturnAssetComponent implements OnInit {
       next: (response: any) => {
         const data = response?.responseData?.data ?? {};
         this.activeIssues = data.assets ?? [];
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error('Failed to load active issues:', err);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -68,16 +72,19 @@ export class ReturnAssetComponent implements OnInit {
     this.selectedIssue = issue;
     this.selectedIssueId = issue._id;
     this.issueDropdownOpen = false;
+
+    const totalIssued = issue.issueQuantity ?? 1;
+    const totalReturned = issue.returnedQuantity ?? 0;
+    const remaining = totalIssued - totalReturned;
+    this.returnQuantity = remaining > 0 ? remaining : 1;
   }
 
   getSelectedLabel(): string {
     if (!this.selectedIssue) {
       return 'Select Issued Asset';
     }
-    const shortId = this.selectedIssue._id
-      ? this.selectedIssue._id.substring(this.selectedIssue._id.length - 6).toUpperCase()
-      : 'ISS';
-    return `${shortId} — ${this.selectedIssue.assetName || 'Unknown Asset'} (${this.selectedIssue.receiverName || 'Unknown'})`;
+    const serial = this.selectedIssue.assetSerialNumber || '—';
+    return `${serial} — ${this.selectedIssue.assetName || 'Unknown Asset'} (${this.selectedIssue.receiverName || 'Unknown'})`;
   }
 
   getIssueDateMin(): string {
@@ -114,6 +121,20 @@ export class ReturnAssetComponent implements OnInit {
       return;
     }
 
+    const totalIssued = this.selectedIssue.issueQuantity ?? 1;
+    const totalReturned = this.selectedIssue.returnedQuantity ?? 0;
+    const remaining = totalIssued - totalReturned;
+
+    if (!this.returnQuantity || this.returnQuantity <= 0) {
+      alert('Return quantity must be greater than 0.');
+      return;
+    }
+
+    if (this.returnQuantity > remaining) {
+      alert(`Cannot return more than remaining issued quantity (${remaining} ${this.selectedIssue.unit || 'Nos'}).`);
+      return;
+    }
+
     const minDate = this.getIssueDateMin();
     if (minDate && this.returnDate < minDate) {
       alert(`Return date cannot be before the issue date (${minDate}).`);
@@ -124,13 +145,15 @@ export class ReturnAssetComponent implements OnInit {
     const payload = {
       assetId: this.selectedIssue.assetId,
       issuetoId: this.selectedIssue._id,
-      returnDate: this.returnDate
+      returnDate: this.returnDate,
+      returnQuantity: this.returnQuantity
     };
 
     this.assetService.returnAsset(payload).subscribe({
       next: () => {
         this.isSubmitting = false;
         this.navigate('return-log', '/kjusys/asset-management/return-log');
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         this.isSubmitting = false;

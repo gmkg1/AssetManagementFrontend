@@ -3,14 +3,29 @@
 
   <!-- Card header -->
   <div class="flex items-center gap-2 mb-0">
-    <div class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-      <svg fill="none" viewBox="0 0 24 24" stroke="#2B7FFF" stroke-width="1.8" class="w-4 h-4">
+    <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+      [class.bg-blue-50]="!isCloneMode" [class.bg-slate-100]="isCloneMode">
+      <svg *ngIf="!isCloneMode" fill="none" viewBox="0 0 24 24" stroke="#2B7FFF" stroke-width="1.8" class="w-4 h-4">
         <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/>
+      </svg>
+      <svg *ngIf="isCloneMode" fill="none" viewBox="0 0 24 24" stroke="#757575" stroke-width="1.8" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"/>
       </svg>
     </div>
     <div>
-      <h2 class="text-xs font-semibold text-slate-800 leading-none mb-0">Create New Asset</h2>
+      <h2 class="text-xs font-semibold text-slate-800 leading-none mb-0">
+        {{ isCloneMode ? 'Clone Asset' : 'Create New Asset' }}
+      </h2>
+      <p *ngIf="isCloneMode" class="text-[10px] text-slate-400 mt-0.5 leading-none">
+        Prefilled from original — review and save to create the clone
+      </p>
     </div>
+    <span *ngIf="isCloneMode" class="ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 text-[10px] font-medium text-slate-500">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-3 h-3">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"/>
+      </svg>
+      Cloning
+    </span>
   </div>
 
   <!-- Divider -->
@@ -77,38 +92,25 @@
 
       <!-- Serial -->
       <div class="flex flex-col gap-0.5">
-        <label class="text-[10px] text-slate-500 font-medium">Serial</label>
-        <input type="number" [(ngModel)]="serial" (keydown)="blockNonNumbers($event)" min="0" step="1" placeholder="Enter Serial Number"
-          class="h-8 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors placeholder:text-slate-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"/>
+        <label class="text-[10px] text-slate-500 font-medium">
+          Serial <span *ngIf="isCloneMode" class="text-red-400">*</span>
+        </label>
+        <input type="text" [(ngModel)]="serial" placeholder="Enter Serial Number"
+          class="h-8 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors placeholder:text-slate-400"/>
       </div>
 
-      <!-- Status & Asset Category -->
-      <div class="grid grid-cols-2 gap-2">
-        <div class="flex flex-col gap-0.5">
-          <label class="text-[10px] text-slate-500 font-medium">Status <span class="text-red-400">*</span></label>
-          <div class="relative">
-            <select [(ngModel)]="status"
-              class="w-full h-8 border border-slate-200 rounded-lg pl-3 pr-8 text-xs text-slate-800 outline-none focus:border-blue-500 appearance-none bg-white cursor-pointer transition-colors">
-              <option value="" disabled>Select a Status</option>
-              <option *ngFor="let s of statuses" [value]="s.id">{{ s.name }}</option>
-            </select>
-            <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
-            </svg>
-          </div>
-        </div>
-        <div class="flex flex-col gap-0.5">
-          <label class="text-[10px] text-slate-500 font-medium">Asset Category <span class="text-red-400">*</span></label>
-          <div class="relative">
-            <select [(ngModel)]="category"
-              class="w-full h-8 border border-slate-200 rounded-lg pl-3 pr-8 text-xs text-slate-800 outline-none focus:border-blue-500 appearance-none bg-white cursor-pointer transition-colors">
-              <option value="" disabled>Select a Category</option>
-              <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
-            </select>
-            <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
-            </svg>
-          </div>
+      <!-- Status -->
+      <div class="flex flex-col gap-0.5">
+        <label class="text-[10px] text-slate-500 font-medium">Status <span class="text-red-400">*</span></label>
+        <div class="relative">
+          <select [(ngModel)]="status"
+            class="w-full h-8 border border-slate-200 rounded-lg pl-3 pr-8 text-xs text-slate-800 outline-none focus:border-blue-500 appearance-none bg-white cursor-pointer transition-colors">
+            <option value="" disabled>Select a Status</option>
+            <option *ngFor="let s of statuses" [value]="s.id">{{ s.name }}</option>
+          </select>
+          <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+          </svg>
         </div>
       </div>
 
@@ -126,11 +128,6 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
             </svg>
           </div>
-          <button class="w-8 h-8 border border-slate-200 rounded-lg flex items-center justify-center text-slate-500 hover:border-blue-400 hover:text-blue-600 transition-colors flex-shrink-0">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="w-3.5 h-3.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-            </svg>
-          </button>
         </div>
       </div>
 
@@ -160,19 +157,11 @@
         </div>
       </div>
 
-      <!-- Warranty / Purchase Date / EOL Date -->
-      <div class="grid grid-cols-3 gap-2">
-        <div class="flex flex-col gap-0.5">
-          <label class="text-[10px] text-slate-500 font-medium">Warranty</label>
-          <div class="relative flex items-center">
-            <input type="text" [(ngModel)]="warranty" placeholder=""
-              class="w-full h-8 border border-slate-200 rounded-lg pl-3 pr-14 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors"/>
-            <span class="absolute right-3 text-[10px] text-slate-400 font-medium pointer-events-none">Months</span>
-          </div>
-        </div>
+      <!-- Purchase Date / EOL Date -->
+      <div class="grid grid-cols-2 gap-2">
         <div class="flex flex-col gap-0.5">
           <label class="text-[10px] text-slate-500 font-medium">Purchase Date</label>
-          <input type="date" [(ngModel)]="purchaseDate"
+          <input type="date" [(ngModel)]="purchaseDate" [max]="today"
             class="h-8 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors"/>
         </div>
         <div class="flex flex-col gap-0.5">
@@ -182,30 +171,32 @@
         </div>
       </div>
 
-      <!-- Supplier -->
-      <div class="flex flex-col gap-0.5">
-        <label class="text-[10px] text-slate-500 font-medium">Supplier</label>
-        <div class="flex items-center gap-2">
-          <div class="relative flex-1">
-            <select [(ngModel)]="supplier"
+      <!-- Quantity & Unit of Measure -->
+      <div class="grid grid-cols-2 gap-2">
+        <div class="flex flex-col gap-0.5">
+          <label class="text-[10px] text-slate-500 font-medium">Quantity</label>
+          <input type="text" inputmode="numeric" [(ngModel)]="quantity" (keydown)="blockNonIntegers($event)"
+            placeholder="e.g. 1" pattern="[0-9]*"
+            class="h-8 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors placeholder:text-slate-400"/>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <label class="text-[10px] text-slate-500 font-medium">Unit of Measure</label>
+          <div class="relative">
+            <select [(ngModel)]="unitOfMeasure"
               class="w-full h-8 border border-slate-200 rounded-lg pl-3 pr-8 text-xs text-slate-800 outline-none focus:border-blue-500 appearance-none bg-white cursor-pointer transition-colors">
-              <option value="" disabled>Select a Supplier</option>
-              <option *ngFor="let s of suppliers" [value]="s">{{ s }}</option>
+              <option value="" disabled>Select Unit</option>
+              <option *ngFor="let u of unitsOfMeasure" [value]="u.id">{{ u.name }}</option>
+
             </select>
             <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
             </svg>
           </div>
-          <button class="w-8 h-8 border border-slate-200 rounded-lg flex items-center justify-center text-slate-500 hover:border-blue-400 hover:text-blue-600 transition-colors flex-shrink-0">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" class="w-3.5 h-3.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-            </svg>
-          </button>
         </div>
       </div>
 
-      <!-- Purchase Cost / Upload Bill / Returnable -->
-      <div class="grid grid-cols-3 gap-2 items-end">
+      <!-- Purchase Cost / Returnable -->
+      <div class="grid grid-cols-2 gap-2 items-end">
 
         <!-- Purchase Cost -->
         <div class="flex flex-col gap-0.5">
@@ -214,22 +205,6 @@
             <span class="px-2 text-[10px] text-slate-400 border-r border-slate-200 h-full flex items-center bg-slate-50 flex-shrink-0">INR</span>
             <input type="number" [(ngModel)]="purchaseCost" (keydown)="blockNonNumbers($event)" min="0" step="1" placeholder="0"
               class="flex-1 px-2 text-xs text-slate-800 outline-none bg-transparent placeholder:text-slate-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"/>
-          </div>
-        </div>
-
-        <!-- Upload Bill -->
-        <div class="flex flex-col gap-0.5">
-          <label class="text-[10px] text-slate-500 font-medium">Upload Bill</label>
-          <div class="flex items-center gap-2 h-8 border border-dashed border-slate-300 rounded-lg px-2 cursor-pointer bg-slate-50 hover:border-blue-400 transition-colors"
-            (click)="billInput.click()">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" class="w-4 h-4 text-slate-400 flex-shrink-0">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"/>
-            </svg>
-            <div class="flex flex-col leading-none overflow-hidden">
-              <span class="text-[10px] font-medium text-slate-600 truncate">{{ billFile ? billFile.name : 'Select or drag file' }}</span>
-              <span class="text-[10px] text-slate-400">Max 1MB</span>
-            </div>
-            <input #billInput type="file" accept=".pdf,.jpg,.png" class="hidden" (change)="onBillSelected($event)" />
           </div>
         </div>
 
@@ -270,7 +245,7 @@
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
       </svg>
-      {{ isLoading ? 'Creating...' : 'Save Asset' }}
+      {{ isLoading ? 'Saving...' : isCloneMode ? 'Save Clone' : 'Save Asset' }}
     </button>
   </div>
 
@@ -285,8 +260,8 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
       </svg>
     </div>
-    <h2 class="text-xs font-bold text-slate-800 mb-1">Asset Created</h2>
-    <p class="text-[10px] text-slate-500 mb-5"><strong class="text-slate-700">{{ assetName || assetTag }}</strong> has been added to the system.</p>
+    <h2 class="text-xs font-bold text-slate-800 mb-1">{{ isCloneMode ? 'Asset Cloned' : 'Asset Created' }}</h2>
+    <p class="text-[10px] text-slate-500 mb-5"><strong class="text-slate-700">{{ assetName || assetTag }}</strong> has been {{ isCloneMode ? 'cloned and added' : 'added' }} to the system.</p>
     <div class="flex gap-2 w-full">
       <button class="flex-1 h-8 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:border-slate-400 transition-all active:scale-95" (click)="createAnother()">Create Another</button>
       <button class="flex-1 h-8 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all active:scale-95" (click)="goBack()">Back to Assets</button>

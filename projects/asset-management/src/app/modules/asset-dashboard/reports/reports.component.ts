@@ -130,27 +130,27 @@ export class ReportsComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** "All" tab → GET /assets (full paginated list) */
+  /** "All" tab → GET /reports-grouped (paginated) */
   private loadAllAssets(page: number): void {
     this.isLoading = true;
     this.apiError = null;
     this.allChecked = false;
     this.currentPage = page;
 
-    this.assetService.getAssets({ page, pageSize: PAGE_SIZE }).subscribe({
+    this.assetService.getGroupedReports({ page, pageSize: PAGE_SIZE }).subscribe({
       next: (response: any) => {
         const rd = response?.responseData?.data ?? response?.responseData ?? {};
-        const raw: any[] = Array.isArray(rd.assets) ? rd.assets
+        const raw: any[] = Array.isArray(rd.reports) ? rd.reports
           : Array.isArray(rd.data) ? rd.data
           : [];
         this.serverTotalPages = rd.totalPages ?? 1;
         this.serverTotalRecords = rd.totalRecords ?? raw.length;
-        this.assets = this.mapAssetsToReport(raw);
+        this.assets = this.mapGroupedReport(raw);
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (err: any) => {
-        console.error('Failed to load /assets:', err);
+        console.error('Failed to load grouped reports:', err);
         this.apiError = 'Could not load report data from the server.';
         this.assets = [];
         this.isLoading = false;
@@ -159,32 +159,31 @@ export class ReportsComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Category tab → GET /grp?categoryId=<id> */
+  /** Category tab → GET /reports-grouped?categoryId=<id> (paginated) */
   private loadGrpData(page: number): void {
     this.isLoading = true;
     this.apiError = null;
     this.allChecked = false;
     this.currentPage = page;
 
-    this.assetService.getAssetGrouped({
+    this.assetService.getGroupedReports({
       categoryId: this.activeCategoryId!,
       page,
       pageSize: PAGE_SIZE
     }).subscribe({
       next: (response: any) => {
         const rd = response?.responseData?.data ?? response?.responseData ?? {};
-        const raw: any[] = Array.isArray(rd.assets) ? rd.assets
+        const raw: any[] = Array.isArray(rd.reports) ? rd.reports
           : Array.isArray(rd.data) ? rd.data
-          : Array.isArray(rd) ? rd
           : [];
         this.serverTotalPages = rd.totalPages ?? 1;
         this.serverTotalRecords = rd.totalRecords ?? raw.length;
-        this.assets = this.mapAssetsToReport(raw);
+        this.assets = this.mapGroupedReport(raw);
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (err: any) => {
-        console.error('Failed to load /grp:', err);
+        console.error('Failed to load grouped reports by category:', err);
         this.apiError = 'Could not load report data from the server.';
         this.assets = [];
         this.isLoading = false;
@@ -193,39 +192,19 @@ export class ReportsComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Map /assets response items → ReportAsset (flat per-asset rows) */
-  private mapAssetsToReport(raw: any[]): ReportAsset[] {
-    return raw.map((item, index) => {
-      const status: string = (item.status ?? '').toLowerCase();
-      return {
-        id: item._id ?? `ASSET-${index + 1}`,
-        name: item.assetName ?? item.name ?? '—',
-        category: item.category ?? item.categoryName ?? '—',
-        type: 'Asset',
-        total: item.quantity ?? 1,
-        readyToDeploy: status.includes('ready') ? 1 : 0,
-        deployed: status.includes('deployed') ? 1 : 0,
-        deadStock: status.includes('dead') ? 1 : 0,
-        underService: status.includes('maintenance') || status.includes('service') ? 1 : 0,
-        damaged: status.includes('damage') ? 1 : 0,
-        checked: false
-      };
-    });
-  }
-
-  /** Map /grp response items → ReportAsset (grouped status-breakdown rows) */
-  private mapGrpToReport(raw: any[]): ReportAsset[] {
+  /** Map reports-grouped response items → ReportAsset (grouped status-breakdown rows) */
+  private mapGroupedReport(raw: any[]): ReportAsset[] {
     return raw.map((item, index) => ({
-      id: item.assetTagName ?? item._id ?? `TAG-${index + 1}`,
-      name: item.assetTagName ?? item.assetName ?? item.name ?? '—',
-      category: item.category ?? item.categoryName ?? '—',
+      id: item.displayId || `TAG-${index + 1}`,
+      name: item.name ?? '—',
+      category: item.categoryName ?? '—',
       type: 'Asset',
-      total: item.totalAssets ?? item.total ?? item.quantity ?? 0,
-      readyToDeploy: item.ready ?? item.readyToDeploy ?? 0,
+      total: item.total ?? 0,
+      readyToDeploy: item.ready ?? 0,
       deployed: item.deployed ?? 0,
       deadStock: item.deadStock ?? 0,
-      underService: item.underMaintenance ?? item.underService ?? 0,
-      damaged: item.damaged ?? 0,
+      underService: item.service ?? 0,
+      damaged: item.eol ?? 0,
       checked: false
     }));
   }
@@ -255,18 +234,21 @@ export class ReportsComponent implements OnInit, OnDestroy {
   onDocumentClick(): void { this.sidebarOpen = false; }
 
   exportCSV(): void {
-    const headers = ['Name', 'Category', 'Total', 'Ready to Deploy', 'Deployed', 'Dead Stock', 'Under Service', 'Damaged'];
-    const csv = [
-      headers.join(','),
-      ...this.pagedAssets.map(a =>
-        [a.name, a.category, a.total, a.readyToDeploy, a.deployed, a.deadStock, a.underService, a.damaged].join(',')
-      )
-    ].join('\n');
-    this.downloadCSV(csv, `report-${this.activeDept}.csv`);
+    const q = this.searchQuery.toLowerCase().trim();
+    const assetName = (q && q.length >= 3) ? q : undefined;
+    const categoryId = this.activeCategoryId ?? undefined;
+
+    this.assetService.exportReports({ categoryId, assetName }).subscribe({
+      next: (blob: Blob) => {
+        this.downloadCSVBlob(blob, `report-${this.activeDept}.csv`);
+      },
+      error: (err) => {
+        console.error('Failed to export reports:', err);
+      }
+    });
   }
 
-  private downloadCSV(content: string, filename: string): void {
-    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+  private downloadCSVBlob(blob: Blob, filename: string): void {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = filename; a.click();
@@ -295,15 +277,17 @@ export class ReportsComponent implements OnInit, OnDestroy {
   }
 
   bulkExport(): void {
-    const rows = this.pagedAssets.filter(a => a.checked);
-    const headers = ['Name', 'Category', 'Total', 'Ready to Deploy', 'Deployed', 'Dead Stock', 'Under Service', 'Damaged'];
-    const csv = [
-      headers.join(','),
-      ...rows.map(a =>
-        [a.name, a.category, a.total, a.readyToDeploy, a.deployed, a.deadStock, a.underService, a.damaged].join(',')
-      )
-    ].join('\n');
-    this.downloadCSV(csv, `report-${this.activeDept}-selected.csv`);
+    const checkedIds = this.pagedAssets.filter(a => a.checked).map(a => a.id).join(',');
+    if (!checkedIds) return;
+
+    this.assetService.exportReports({ assetIds: checkedIds }).subscribe({
+      next: (blob: Blob) => {
+        this.downloadCSVBlob(blob, `report-${this.activeDept}-selected.csv`);
+      },
+      error: (err) => {
+        console.error('Failed to export selected reports:', err);
+      }
+    });
   }
 
   bulkDelete(): void {

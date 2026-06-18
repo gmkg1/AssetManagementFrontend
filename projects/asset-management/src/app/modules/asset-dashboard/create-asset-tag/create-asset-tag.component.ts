@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, Optional } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, Optional } from '@angular/core';
 import { Router } from '@angular/router';
 import { AssetService } from '../../../services/asset.service';
 import { DashboardTabsService } from '../dashboard-tabs.service';
@@ -16,9 +16,6 @@ export class CreateAssetTagComponent implements OnInit {
   assetTagName = '';
   displayId = '';
   classification = '';
-  assetImageFile: File | null = null;
-  assetImagePreview: string | null = null;
-
   // Dropdown options
   categories: any[] = [];
   displayIds = ['MSE', 'KBD', 'MON', 'LPT', 'PRN', 'SCN', 'PRJ'];
@@ -34,11 +31,11 @@ export class CreateAssetTagComponent implements OnInit {
   showSuccess = false;
   isLoading = false;
   errorMessage = '';
-  isDragOver = false;
 
   constructor(
     private router: Router,
     private assetService: AssetService,
+    private cdr : ChangeDetectorRef,
     @Optional() private dashboardTabsService: DashboardTabsService
   ) { }
 
@@ -88,48 +85,6 @@ export class CreateAssetTagComponent implements OnInit {
       (this as any)[field] = value;
     }
     this.closeAllDropdowns();
-  }
-
-  // Image upload
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      this.loadImageFile(input.files[0]);
-    }
-  }
-
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    this.isDragOver = true;
-  }
-
-  onDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    this.isDragOver = false;
-  }
-
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    this.isDragOver = false;
-    const file = event.dataTransfer?.files[0];
-    if (file && file.type.startsWith('image/')) {
-      this.loadImageFile(file);
-    }
-  }
-
-  private loadImageFile(file: File): void {
-    this.assetImageFile = file;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      this.assetImagePreview = e.target?.result as string;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  removeImage(event: Event): void {
-    event.stopPropagation();
-    this.assetImageFile = null;
-    this.assetImagePreview = null;
   }
 
   // Navigation
@@ -187,19 +142,19 @@ export class CreateAssetTagComponent implements OnInit {
 
     this.isLoading = true;
 
-    const payload = {
-      category: this.category,
-      assetTagName: this.assetTagName.trim(),
-      displayId: this.displayId.trim(),
-      classification: this.classification,
-    };
+    const formData = new FormData();
+    formData.append('category', this.category);
+    formData.append('assetTagName', this.assetTagName.trim());
+    formData.append('displayId', this.displayId.trim());
+    formData.append('classification', this.classification);
 
-    console.log('Create Asset Tag payload:', payload);
+    console.log('Create Asset Tag payload (FormData)');
 
-    this.assetService.createAssetTag(payload).subscribe({
+    this.assetService.createAssetTag(formData).subscribe({
       next: (res: any) => {
         this.isLoading = false;
         this.showSuccess = true;
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         this.isLoading = false;
@@ -215,8 +170,6 @@ export class CreateAssetTagComponent implements OnInit {
     this.assetTagName = '';
     this.displayId = '';
     this.classification = '';
-    this.assetImageFile = null;
-    this.assetImagePreview = null;
     this.errorMessage = '';
   }
 }

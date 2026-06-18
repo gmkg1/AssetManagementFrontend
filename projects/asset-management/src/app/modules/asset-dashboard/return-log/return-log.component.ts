@@ -10,6 +10,7 @@ export interface ReturnRecord {
   assetTag: string;
   classification: string;
   total: number;
+  unit?: string;
   returnType: string;
   returnTo: string;
   returnDate: string;
@@ -106,6 +107,7 @@ export class ReturnLogComponent implements OnInit, OnDestroy {
           assetTag: item.name ?? item.assetName ?? '—',
           classification: item.classification ?? '—',
           total: item.total ?? 0,
+          unit: item.unit ?? 'Nos',
           returnType: item.returnType ?? '—',
           returnTo: item.returnTo ?? item.issuedFor ?? '—',
           returnDate: item.returnDate
@@ -198,19 +200,33 @@ export class ReturnLogComponent implements OnInit, OnDestroy {
   }
 
   exportCSV(): void {
-    const headers = ['Name', 'Classification', 'Total', 'Return Type', 'Return To', 'Return Date'];
-    const csv = [
-      headers.join(','),
-      ...this.allRecords.map(r => [r.assetName, r.classification, r.total, r.returnType, r.returnTo, r.returnDate].join(','))
-    ].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `return-log.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    this.isLoading = true;
+    this.assetService.exportReturnLogs({
+      name: this.nameQuery.trim() || undefined,
+      classification: this.classificationQuery.trim() || undefined,
+      total: this.totalQuery.trim() || undefined,
+      returnType: this.returnTypeQuery.trim() || undefined,
+      returnTo: this.returnToQuery.trim() || undefined,
+      returnDate: this.returnDateQuery || undefined,
+    }).subscribe({
+      next: (blob: Blob) => {
+        this.isLoading = false;
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `return_log_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        console.error('Failed to export return logs CSV:', err);
+        this.cdr.detectChanges();
+      }
+    });
   }
+
 
   getClassClass(c: string): string {
     const map: Record<string, string> = {

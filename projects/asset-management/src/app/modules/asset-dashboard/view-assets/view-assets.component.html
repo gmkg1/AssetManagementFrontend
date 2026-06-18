@@ -5,7 +5,7 @@
   <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 mb-4">
     <div class="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between">
       <div>
-        <p class="text-[10px] text-slate-400">Total Assets</p>
+        <p class="text-[10px] text-slate-400">{{ activeCategoryName ? activeCategoryName + ' Assets' : 'Total Assets' }}</p>
         <p class="text-xl font-bold text-[#242731]">{{ totalCount }}</p>
       </div>
       <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
@@ -14,7 +14,7 @@
     </div>
     <div class="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between">
       <div>
-        <p class="text-[10px] text-slate-400">Ready to Deploy</p>
+        <p class="text-[10px] text-slate-400">{{ activeCategoryName ? activeCategoryName + ' – Ready to Deploy' : 'Ready to Deploy' }}</p>
         <p class="text-xl font-bold text-[#242731]">{{ availableCount }}</p>
       </div>
       <div class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
@@ -23,7 +23,7 @@
     </div>
     <div class="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between">
       <div>
-        <p class="text-[10px] text-slate-400">Deployed</p>
+        <p class="text-[10px] text-slate-400">{{ activeCategoryName ? activeCategoryName + ' – Deployed' : 'Deployed' }}</p>
         <p class="text-xl font-bold text-[#242731]">{{ deployedCount }}</p>
       </div>
       <div class="w-8 h-8 rounded-full bg-sky-50 flex items-center justify-center">
@@ -32,7 +32,7 @@
     </div>
     <div class="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between">
       <div>
-        <p class="text-[10px] text-slate-400">Under Maintenance</p>
+        <p class="text-[10px] text-slate-400">{{ activeCategoryName ? activeCategoryName + ' – Under Maintenance' : 'Under Maintenance' }}</p>
         <p class="text-xl font-bold text-[#242731]">{{ maintenanceCount }}</p>
       </div>
       <div class="w-8 h-8 rounded-full bg-yellow-50 flex items-center justify-center">
@@ -42,44 +42,69 @@
   </div>
 
   <!-- Table card -->
-  <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+  <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-20">
     <!-- Toolbar -->
-    <div class="flex flex-wrap gap-2 px-4 py-3 border-b border-slate-100">
-      <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 h-8 min-w-[160px] flex-1">
-        <svg fill="none" viewBox="0 0 24 24" stroke="#AEAEAE" stroke-width="2" class="w-3.5 h-3.5 flex-shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
-        <input class="flex-1 bg-transparent text-xs text-slate-700 border-0 outline-none ring-0 focus:outline-none focus:ring-0 focus:border-0 placeholder:text-slate-400" type="text" placeholder="Search asset name..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchInput()"/>
+    <div class="flex flex-wrap gap-x-2 gap-y-2 px-4 py-3 border-b border-slate-100 items-end" (keydown.enter)="onSearch()">
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[9px] text-slate-400 font-medium px-0.5">Asset Name</span>
+        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 h-8 w-[150px]">
+          <svg fill="none" viewBox="0 0 24 24" stroke="#AEAEAE" stroke-width="2" class="w-3 h-3 flex-shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+          <input class="flex-1 bg-transparent text-xs text-slate-700 border-0 outline-none ring-0 focus:outline-none focus:ring-0 focus:border-0 placeholder:text-slate-400 w-0" type="text" placeholder="Search name..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchInput()" (keydown.enter)="onSearch()"/>
+        </div>
       </div>
-      <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 h-8 min-w-[160px] flex-1">
-        <input class="flex-1 bg-transparent text-xs text-slate-700 border-0 outline-none ring-0 focus:outline-none focus:ring-0 focus:border-0 placeholder:text-slate-400" type="text" placeholder="Search asset tag..." [(ngModel)]="assetTagQuery" (ngModelChange)="onSearchInput()"/>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[9px] text-slate-400 font-medium px-0.5">Asset Tag</span>
+        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 h-8 w-[140px]">
+          <input class="flex-1 bg-transparent text-xs text-slate-700 border-0 outline-none ring-0 focus:outline-none focus:ring-0 focus:border-0 placeholder:text-slate-400 w-0" type="text" placeholder="Search tag..." [(ngModel)]="assetTagQuery" (ngModelChange)="onSearchInput()" (keydown.enter)="onSearch()"/>
+        </div>
       </div>
-      <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[140px] flex-1" [(ngModel)]="selectedCategoryId">
-        <option value="">All categories</option>
-        <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
-      </select>
-      <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[140px] flex-1" [(ngModel)]="selectedLocationId">
-        <option value="">All departments</option>
-        <option *ngFor="let l of locations" [value]="l.id">{{ l.name }}</option>
-      </select>
-      <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs min-w-[130px] flex-1" [(ngModel)]="selectedStatusId">
-        <option value="">All statuses</option>
-        <option *ngFor="let s of statuses" [value]="s.id">{{ s.name }}</option>
-      </select>
-      <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-3 text-xs w-[130px] flex-shrink-0" type="date" [(ngModel)]="purchaseDate" />
-      <button type="button" class="h-8 px-4 rounded-lg bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 transition-colors flex-shrink-0 ml-1" (click)="onSearch()">Search</button>
-      <button type="button" class="h-8 px-3 rounded-lg border border-slate-200 bg-white text-xs text-slate-600 hover:bg-slate-50 transition-colors flex-shrink-0" (click)="clearFilters()">Clear</button>
-      <span class="text-[10px] text-slate-400 self-center ml-auto">{{ totalRecords }} result{{ totalRecords !== 1 ? 's' : '' }}</span>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[9px] text-slate-400 font-medium px-0.5">Category</span>
+        <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-2 text-xs w-[120px]" [(ngModel)]="selectedCategoryId">
+          <option value="">All</option>
+          <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
+        </select>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[9px] text-slate-400 font-medium px-0.5">Department</span>
+        <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-2 text-xs w-[130px]" [(ngModel)]="selectedLocationId">
+          <option value="">All</option>
+          <option *ngFor="let l of locations" [value]="l.id">{{ l.name }}</option>
+        </select>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[9px] text-slate-400 font-medium px-0.5">Status</span>
+        <select class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-2 text-xs w-[120px]" [(ngModel)]="selectedStatusId">
+          <option value="">All</option>
+          <option *ngFor="let s of statuses" [value]="s.id">{{ s.name }}</option>
+        </select>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[9px] text-slate-400 font-medium px-0.5">Purchase Date</span>
+        <input class="h-8 rounded-lg border border-slate-200 bg-slate-50 px-2 text-xs w-[120px]" type="date" [(ngModel)]="purchaseDate" (keydown.enter)="onSearch()" />
+      </div>
+      <div class="flex items-end gap-2 ml-1">
+        <button type="button" class="h-8 px-4 rounded-lg bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 transition-colors" (click)="onSearch()">Search</button>
+        <button type="button" class="h-8 px-3 rounded-lg border border-slate-200 bg-white text-xs text-slate-600 hover:bg-slate-50 transition-colors" (click)="clearFilters()">Clear</button>
+        <button type="button" class="h-8 px-3 rounded-lg border border-slate-200 bg-white text-xs text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1.5" (click)="exportCSV()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+          Export
+        </button>
+        <span class="text-[10px] text-slate-400 self-center ml-1">{{ totalRecords }} result{{ totalRecords !== 1 ? 's' : '' }}</span>
+      </div>
+
     </div>
 
     <!-- Table header -->
     <div class="grid table-cols px-4 py-2 border-b border-slate-100">
       <span class="text-[10px] text-slate-400">Asset ID</span>
+      <span class="text-[10px] text-slate-400">Serial No.</span>
       <span class="text-[10px] text-slate-400">Asset Name</span>
       <span class="text-[10px] text-slate-400">Department</span>
       <span class="text-[10px] text-slate-400">Category</span>
       <span class="text-[10px] text-slate-400">Status</span>
       <span class="text-[10px] text-slate-400">Assigned To</span>
       <span class="text-[10px] text-slate-400">Purchase Date</span>
-      <span class="text-[10px] text-slate-400">Condition</span>
     </div>
 
     <!-- Skeleton rows -->
@@ -87,12 +112,12 @@
       <div *ngFor="let s of [1,2,3,4,5,6,7,8]" class="grid table-cols px-4 py-3 border-b border-slate-50 animate-pulse">
         <div class="h-3 bg-slate-200 rounded w-2/3"></div>
         <div class="h-3 bg-slate-200 rounded w-3/4"></div>
+        <div class="h-3 bg-slate-200 rounded w-3/4"></div>
         <div class="h-3 bg-slate-200 rounded w-1/2"></div>
         <div class="h-3 bg-slate-200 rounded w-2/3"></div>
         <div class="h-5 bg-slate-200 rounded-full w-24"></div>
         <div class="h-3 bg-slate-200 rounded w-1/2"></div>
         <div class="h-3 bg-slate-200 rounded w-2/3"></div>
-        <div class="h-3 bg-slate-200 rounded w-1/3"></div>
       </div>
     </ng-container>
 
@@ -109,7 +134,8 @@
         [class.bg-slate-50]="i % 2 !== 0"
         [class.hover:bg-blue-50]="true"
         (click)="openDetail(asset)">
-        <span class="text-xs text-slate-600">{{ asset.id }}</span>
+        <span class="text-xs text-slate-600">{{ asset.displayId }}</span>
+        <span class="text-xs font-mono text-slate-500">{{ asset.serial }}</span>
         <span class="text-xs font-medium text-slate-800">{{ asset.name }}</span>
         <span class="text-xs text-slate-400">{{ asset.department }}</span>
         <span class="text-xs text-slate-600">{{ asset.category }}</span>
@@ -118,10 +144,6 @@
         </span>
         <span class="text-xs text-slate-400">{{ asset.assignedTo }}</span>
         <span class="text-xs text-slate-400">{{ asset.purchaseDate }}</span>
-        <span class="text-xs text-slate-600 flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full flex-shrink-0" [ngClass]="getConditionClass(asset.condition)"></span>
-          {{ asset.condition }}
-        </span>
       </div>
     </ng-container>
 
@@ -156,15 +178,6 @@
 <ng-container *ngIf="view === 'detail'">
   <ng-container *ngIf="selectedAsset as asset">
 
-  <!-- Breadcrumb + back -->
-  <div class="flex items-center gap-1.5 text-[10px] text-slate-400 mb-2">
-    <span class="cursor-pointer hover:text-slate-700 transition-colors" (click)="backToList()">{{ asset.category }}</span>
-    <span>/</span>
-    <span class="cursor-pointer hover:text-slate-700 transition-colors" (click)="backToList()">Assets</span>
-    <span>/</span>
-    <span class="text-slate-700 font-medium">View Asset</span>
-  </div>
-
   <button class="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 transition-colors mb-3 group" (click)="backToList()">
     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>
     Back to Assets
@@ -179,7 +192,7 @@
 
       <!-- Tabs & Actions -->
       <div class="flex items-center justify-between border-b border-slate-200 mb-4 relative">
-        <div class="flex overflow-x-auto">
+        <div class="flex tab-strip">
           <button *ngFor="let tab of tabs"
             class="flex items-center gap-1 px-3 pb-2 text-[10px] font-medium border-b-2 -mb-px whitespace-nowrap transition-colors duration-150"
             [class.border-slate-800]="detailTab === tab.key"
@@ -297,7 +310,7 @@
           </div>
           <div class="grid grid-cols-2 py-3 px-4 border-b border-slate-200">
             <div class="text-slate-600 text-xs">Display ID</div>
-            <div class="text-slate-800 text-xs">{{ asset.serial || asset.assetTag }}</div>
+            <div class="text-slate-800 text-xs">{{ asset.displayId }}</div>
           </div>
           <div class="grid grid-cols-2 py-3 px-4 border-b border-slate-200">
             <div class="text-slate-600 text-xs">Status</div>
@@ -326,40 +339,6 @@
 
       <!-- History Tab Content -->
       <div *ngIf="detailTab === 'history'" class="flex flex-col gap-6 pt-2 pb-4">
-
-        <!-- DISPATCH Section -->
-        <div>
-          <h3 class="text-xs font-bold text-slate-600 mb-3 uppercase tracking-wider">Dispatch</h3>
-          <div class="border border-slate-300 rounded overflow-hidden">
-            <div class="grid grid-cols-7 px-4 py-3 border-b border-slate-300 bg-white">
-              <span class="text-xs font-semibold text-slate-700">Dispatch Date</span>
-              <span class="text-xs font-semibold text-slate-700">Campus</span>
-              <span class="text-xs font-semibold text-slate-700">Block</span>
-              <span class="text-xs font-semibold text-slate-700">Location</span>
-              <span class="text-xs font-semibold text-slate-700">Quantity</span>
-              <span class="text-xs font-semibold text-slate-700">Unit</span>
-              <span class="text-xs font-semibold text-slate-700">Remarks</span>
-            </div>
-            <div *ngFor="let d of assetDispatches" class="grid grid-cols-7 px-4 py-4 bg-white border-b border-slate-100 last:border-0">
-              <span class="text-xs text-slate-600">{{ d.dispatchDate || 'N/A' }}</span>
-              <span class="text-xs text-slate-600">{{ d.campus || 'N/A' }}</span>
-              <span class="text-xs text-slate-600">{{ d.block || 'N/A' }}</span>
-              <span class="text-xs text-slate-600">{{ d.location || 'N/A' }}</span>
-              <span class="text-xs text-slate-600">{{ d.quantity ?? 'N/A' }}</span>
-              <span class="text-xs text-slate-600">{{ d.unit || 'N/A' }}</span>
-              <span class="text-xs text-slate-600">{{ d.remarks || 'N/A' }}</span>
-            </div>
-            <div *ngIf="assetDispatches.length === 0" class="grid grid-cols-7 px-4 py-4 bg-white">
-              <span class="text-xs text-slate-600">N/A</span>
-              <span class="text-xs text-slate-600">N/A</span>
-              <span class="text-xs text-slate-600">N/A</span>
-              <span class="text-xs text-slate-600">N/A</span>
-              <span class="text-xs text-slate-600">N/A</span>
-              <span class="text-xs text-slate-600">N/A</span>
-              <span class="text-xs text-slate-600">N/A</span>
-            </div>
-          </div>
-        </div>
 
         <!-- ISSUE Section -->
         <div>
@@ -422,31 +401,13 @@
     <!-- RIGHT PANEL -->
     <div class="w-56 xl:w-64 2xl:w-72 flex flex-col gap-3 flex-shrink-0">
 
-      <!-- Image card -->
-      <div class="bg-white rounded-xl shadow-sm p-3 flex flex-col items-center relative">
-        <div class="absolute top-2 right-2 flex gap-1">
-          <button class="w-6 h-6 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center hover:bg-slate-100 transition-colors" title="Upload image">
-            <svg fill="none" viewBox="0 0 24 24" stroke="#64748B" stroke-width="1.8" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"/></svg>
-          </button>
-          <button class="w-6 h-6 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center hover:bg-red-50 hover:border-red-200 transition-colors" title="Delete image">
-            <svg fill="none" viewBox="0 0 24 24" stroke="#64748B" stroke-width="1.8" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
-          </button>
-        </div>
-        <div class="flex items-center justify-center w-full mt-4 mb-1" style="min-height: 80px;">
-          <img src="assets/mouse.png" alt="Asset" class="max-h-20 max-w-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
-          <div class="hidden items-center justify-center w-full h-20 text-slate-300">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1" class="w-12 h-12"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-          </div>
-        </div>
-      </div>
-
       <!-- Actions card -->
       <div class="bg-white rounded-xl shadow-sm p-3">
         <p class="text-[10px] font-bold text-slate-400 tracking-widest uppercase mb-2">Actions</p>
         <div class="flex flex-col gap-0.5">
           <button *ngFor="let action of actions"
             class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-slate-700 hover:bg-blue-600 hover:text-white transition-all duration-150 group w-full text-left"
-            (click)="action.label === 'Issue Asset' ? issueAsset(selectedAsset!) : action.label === 'Edit Asset' ? editAsset(selectedAsset!) : action.label === 'Edit Licenses and Warranty' ? editWarrantyLicenses(selectedAsset!) : null">
+            (click)="handleAction(action.label); $event.stopPropagation()">
             <span class="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors duration-150"
               [style.background]="action.color + '18'">
               <svg fill="none" viewBox="0 0 24 24" [attr.stroke]="action.color" stroke-width="1.8" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" [attr.d]="action.icon"/></svg>

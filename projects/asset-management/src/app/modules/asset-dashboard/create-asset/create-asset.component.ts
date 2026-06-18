@@ -1,5 +1,6 @@
-import { Component, HostListener, OnInit, Optional } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit, Optional } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { AssetService } from '../../../services/asset.service';
 import { DashboardTabsService } from '../dashboard-tabs.service';
 
@@ -8,7 +9,8 @@ import { DashboardTabsService } from '../dashboard-tabs.service';
   templateUrl: './create-asset.component.html',
   styleUrls: ['./create-asset.component.css'],
 })
-export class CreateAssetComponent implements OnInit {
+export class CreateAssetComponent implements OnInit, OnDestroy {
+  private tabSubscription?: Subscription;
 
   // Left column fields
   company = '';
@@ -16,16 +18,15 @@ export class CreateAssetComponent implements OnInit {
   serial = '';
   model = '';
   status = '';
-  category = '';
   defaultLocation = '';
 
   // Right column fields
   assetName = '';
   orderNumber = '';
-  warranty = '';
   purchaseDate = '';
   eolDate = '';
-  supplier = '';
+  quantity = '';
+  unitOfMeasure = '';
   purchaseCost = '';
   isReturnable = true;
 
@@ -33,9 +34,8 @@ export class CreateAssetComponent implements OnInit {
   companies = ['Kristu Jayanti University', 'KJC Trust'];
   models: any[] = [];
   statuses: any[] = [];
-  categories: any[] = [];
   locations: any[] = [];
-  suppliers = ['Dell India', 'Apple Reseller', 'HP India', 'Lenovo Store'];
+  unitsOfMeasure: any[] = [];
 
   // Searchable dropdown properties
   assetTagSearch = '';
@@ -47,37 +47,67 @@ export class CreateAssetComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   billFile: File | null = null;
+  isCloneMode = false;
+  today = new Date().toISOString().substring(0, 10);
 
   constructor(
     private router: Router,
     private assetService: AssetService,
+    private cdr: ChangeDetectorRef,
     @Optional() private dashboardTabsService: DashboardTabsService
   ) { }
 
   ngOnInit(): void {
     this.loadDropdowns();
+
+    // If this tab is already active when clone is triggered (component already alive,
+    // so *ngIf won't recreate it and ngOnInit won't re-run), listen for the tab
+    // becoming active again so we can apply clone data immediately.
+    // We skip the first emission (BehaviorSubject replays current value on subscribe)
+    // because loadDropdowns() already handles the initial clone via tryApplyClone().
+    if (this.dashboardTabsService) {
+      let isFirstEmission = true;
+      this.tabSubscription = this.dashboardTabsService.activeTab$.subscribe(tabId => {
+        if (isFirstEmission) {
+          isFirstEmission = false;
+          return; // skip initial replay — loadDropdowns handles it
+        }
+        if (tabId === 'create-asset' && this.dashboardTabsService?.cloneAssetData) {
+          // Dropdowns are already loaded since component is alive; apply now
+          this.applyCloneDataIfPresent();
+        }
+      });
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.tabSubscription?.unsubscribe();
   }
 
   loadDropdowns(): void {
-    this.assetService.getCategories().subscribe({
-      next: (res: any) => {
-        const rows = res?.responseData?.data?.assets ?? [];
-        this.categories = rows.map((r: any) => ({ id: r.categoryId, name: r.categoryName }));
-      }
-    });
+    let pending = 4; // number of dropdown calls
+
+    const tryApplyClone = () => {
+      pending--;
+      if (pending === 0) this.applyCloneDataIfPresent();
+    };
 
     this.assetService.getLocations().subscribe({
       next: (res: any) => {
         const rows = res?.responseData?.data?.locations ?? [];
         this.locations = rows.map((r: any) => ({ id: r.locationId, name: r.locationName }));
-      }
+        tryApplyClone();
+      },
+      error: () => tryApplyClone()
     });
 
     this.assetService.getStatuses().subscribe({
       next: (res: any) => {
         const rows = res?.responseData?.data?.statuses ?? [];
         this.statuses = rows.map((r: any) => ({ id: r.statusId, name: r.statusName }));
-      }
+        tryApplyClone();
+      },
+      error: () => tryApplyClone()
     });
 
     this.assetService.getAssetTags().subscribe({
@@ -85,8 +115,49 @@ export class CreateAssetComponent implements OnInit {
         const tags = res?.responseData?.data?.assetTags ?? [];
         this.models = tags.map((t: any) => ({ id: t.id, name: t.assetTagName }));
         this.filteredModels = this.models;
-      }
+        tryApplyClone();
+      },
+      error: () => tryApplyClone()
     });
+
+    this.assetService.getUnits().subscribe({
+      next: (res: any) => {
+        const rows = res?.responseData?.data?.units ?? [];
+        this.unitsOfMeasure = rows.map((u: any) => ({ id: u._id ?? u.id, name: u.name ?? u.unitOfMeasure ?? u.acronym ?? '—' }));
+        tryApplyClone();
+      },
+      error: () => tryApplyClone()
+    });
+  }
+
+  private applyCloneDataIfPresent(): void {
+    if (!this.dashboardTabsService?.cloneAssetData) return;
+    const d = this.dashboardTabsService.cloneAssetData;
+    this.dashboardTabsService.cloneAssetData = null; // consume it
+
+    // Reset any existing form data before prefilling from clone
+    this.orderNumber = '';
+    this.eolDate = '';
+    this.quantity = '';
+    this.unitOfMeasure = '';
+    this.billFile = null;
+    this.errorMessage = '';
+
+    this.isCloneMode = true;
+    this.assetName = d.assetName;
+    this.serial = d.serial;
+    this.status = d.statusId;
+    this.defaultLocation = d.locationId;
+    this.purchaseCost = d.purchaseCost;
+    this.purchaseDate = d.purchaseDate;
+    this.isReturnable = d.isReturnable;
+
+    // Set asset tag (model) and its display name in the searchable dropdown
+    this.model = d.assetTagId;
+    const found = this.models.find(m => m.id === d.assetTagId);
+    this.assetTagSearch = found ? found.name : d.assetTagName;
+
+    this.cdr.detectChanges();
   }
 
   // Search filter for dropdown
@@ -173,6 +244,16 @@ export class CreateAssetComponent implements OnInit {
     }
   }
 
+  blockNonIntegers(event: KeyboardEvent): void {
+    // Allow: backspace, delete, tab, escape, enter, arrow keys, home, end
+    const allowed = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+    if (allowed.includes(event.key)) return;
+    // Block anything that isn't a digit
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault();
+    }
+  }
+
   // Submit
   onSubmit(): void {
     this.errorMessage = '';
@@ -189,9 +270,18 @@ export class CreateAssetComponent implements OnInit {
       this.errorMessage = 'Asset Name is required.';
       return;
     }
+    if (this.isCloneMode && !this.serial.trim()) {
+      this.errorMessage = 'Serial Number is required for cloned assets.';
+      return;
+    }
 
     if (this.eolDate && this.purchaseDate && this.eolDate < this.purchaseDate) {
       this.errorMessage = 'EOL Date cannot be before Purchase Date.';
+      return;
+    }
+
+    if (this.purchaseDate && this.purchaseDate > this.today) {
+      this.errorMessage = 'Purchase Date cannot be a future date.';
       return;
     }
 
@@ -206,6 +296,8 @@ export class CreateAssetComponent implements OnInit {
       purchaseCost: this.purchaseCost != null ? this.purchaseCost.toString().trim() : '',
       purchaseDate: this.purchaseDate ? this.purchaseDate.trim() : '',
       isReturnable: this.isReturnable,
+      quantity: this.quantity ? parseInt(this.quantity, 10) : 1,
+      unitOfMeasureId: this.unitOfMeasure || null,
     };
 
     console.log('Create Asset payload:', payload);
@@ -214,6 +306,7 @@ export class CreateAssetComponent implements OnInit {
       next: (res: any) => {
         this.isLoading = false;
         this.showSuccess = true;
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         this.isLoading = false;
@@ -230,14 +323,13 @@ export class CreateAssetComponent implements OnInit {
     this.serial = '';
     this.model = '';
     this.status = '';
-    this.category = '';
     this.defaultLocation = '';
     this.assetName = '';
     this.orderNumber = '';
-    this.warranty = '';
     this.purchaseDate = '';
     this.eolDate = '';
-    this.supplier = '';
+    this.quantity = '';
+    this.unitOfMeasure = '';
     this.purchaseCost = '';
     this.isReturnable = true;
     this.billFile = null;

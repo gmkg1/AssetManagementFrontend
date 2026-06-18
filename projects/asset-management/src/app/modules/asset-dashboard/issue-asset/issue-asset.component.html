@@ -9,7 +9,7 @@
     <div class="flex flex-col gap-4">
       <!-- Asset -->
       <div class="flex flex-col gap-1 relative">
-        <label class="text-[10px] text-slate-500 font-medium">Asset</label>
+        <label class="text-[10px] text-slate-500 font-medium">Asset <span *ngIf="assetId" class="text-blue-600 font-semibold ml-1">(Available: {{ availableQuantity }} {{ selectedUnit ? selectedUnit.acronym : unitOfMeasure }})</span></label>
         <div class="flex items-center h-8 border border-slate-200 rounded-lg px-3 hover:border-blue-400 transition-colors">
           <input type="text" [(ngModel)]="assetSearch"
             (focus)="assetDropdownOpen = true"
@@ -62,6 +62,25 @@
           <div *ngIf="!receiverOptionsLoading && filteredReceiverOptions.length === 0" class="px-3 py-2 text-xs text-slate-400">No {{ issueTo.toLowerCase() }}s found.</div>
         </div>
       </div>
+      <!-- Issue Quantity & Unit -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] text-slate-500 font-medium">Issue Quantity</label>
+          <div class="flex items-center h-8 border border-slate-200 rounded-lg px-3 hover:border-blue-400 transition-colors">
+            <input type="number" [(ngModel)]="issueQuantity" [min]="0.001" [max]="availableQuantity" step="any"
+              class="flex-1 bg-transparent text-xs text-slate-800 border-0 outline-none ring-0 focus:outline-none focus:ring-0 focus:border-0 placeholder:text-slate-400"/>
+          </div>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] text-slate-500 font-medium">Unit</label>
+          <select [(ngModel)]="selectedUnit" (change)="onUnitChange()" [disabled]="!assetId"
+            class="h-8 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors bg-white disabled:opacity-60 disabled:bg-slate-50">
+            <option *ngFor="let opt of unitOptions" [ngValue]="opt">
+              {{ opt.name }} ({{ opt.acronym }})
+            </option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <!-- RIGHT -->
@@ -69,7 +88,7 @@
       <!-- Issue Date -->
       <div class="flex flex-col gap-1">
         <label class="text-[10px] text-slate-500 font-medium">Issue Date</label>
-        <input type="date" [(ngModel)]="issueDate"
+        <input type="date" [(ngModel)]="issueDate" [max]="today"
           class="h-8 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors"/>
       </div>
       <!-- Return Date + Time -->
@@ -79,10 +98,45 @@
           <input type="date" [(ngModel)]="expectedReturn" [min]="issueDate"
             class="h-8 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors"/>
         </div>
-        <div class="flex flex-col gap-1">
+        <!-- Expected Return Time – custom 24h picker -->
+        <div class="flex flex-col gap-1 relative">
           <label class="text-[10px] text-slate-500 font-medium">Expected Return Time</label>
-          <input type="time" [(ngModel)]="expectedReturnTime"
-            class="h-8 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 transition-colors"/>
+          <div class="flex items-center h-8 border border-slate-200 rounded-lg px-3 hover:border-blue-400 transition-colors cursor-pointer select-none"
+               (click)="timePickerOpen = !timePickerOpen; $event.stopPropagation()">
+            <span class="flex-1 text-xs" [class.text-slate-800]="expectedReturnTime" [class.text-slate-400]="!expectedReturnTime">
+              {{ expectedReturnTime || 'Select time' }}
+            </span>
+            <!-- clock icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 6v6l4 2"/>
+            </svg>
+          </div>
+          <!-- dropdown -->
+          <div *ngIf="timePickerOpen"
+               class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 flex overflow-hidden"
+               style="height:160px"
+               (click)="$event.stopPropagation()">
+            <!-- Hours -->
+            <div class="flex-1 overflow-y-auto border-r border-slate-100">
+              <div *ngFor="let h of hours"
+                   class="px-3 py-1.5 text-xs cursor-pointer hover:bg-blue-50 hover:text-blue-600 transition-colors text-center"
+                   [class.bg-blue-100]="selectedHour === h"
+                   [class.text-blue-700]="selectedHour === h"
+                   (click)="selectHour(h)">
+                {{ h | number:'2.0' }}
+              </div>
+            </div>
+            <!-- Minutes -->
+            <div class="flex-1 overflow-y-auto">
+              <div *ngFor="let m of minutes"
+                   class="px-3 py-1.5 text-xs cursor-pointer hover:bg-blue-50 hover:text-blue-600 transition-colors text-center"
+                   [class.bg-blue-100]="selectedMinute === m"
+                   [class.text-blue-700]="selectedMinute === m"
+                   (click)="selectMinute(m)">
+                {{ m | number:'2.0' }}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <!-- Notes -->

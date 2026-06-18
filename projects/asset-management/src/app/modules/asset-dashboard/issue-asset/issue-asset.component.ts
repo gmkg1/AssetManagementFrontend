@@ -9,6 +9,8 @@ export interface IssueRecord {
   issueDate: string;
   receiverName: string;
   receiverType: string;
+  issueQuantity?: number;
+  unit?: string;
 }
 
 type OptionItem = { _id: string; label: string };
@@ -31,6 +33,15 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
   assetDropdownOpen = false;
   assetsList: { _id: string; displayLabel: string; assetName: string; assetTagName: string; assetSerialNumber: string; category: string }[] = [];
 
+  availableQuantity = 1;
+  unitOfMeasure = 'Nos';
+  issueQuantity = 1;
+
+  allUnits: any[] = [];
+  unitOptions: { name: string; acronym: string; conversionFactor: number }[] = [];
+  selectedUnit: { name: string; acronym: string; conversionFactor: number } | null = null;
+  baseQuantity = 0;
+
   issueTo = 'User';
   receiverSearch = '';
   selectedReceiverId = '';
@@ -39,6 +50,33 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
   expectedReturn = '';
   expectedReturnTime = '';
   notes = '';
+
+  timePickerOpen = false;
+  selectedHour: number | null = null;
+  selectedMinute: number | null = null;
+  hours: number[] = Array.from({ length: 24 }, (_, i) => i);       // 0–23
+  minutes: number[] = Array.from({ length: 60 }, (_, i) => i); // 0–59
+
+  selectHour(h: number): void {
+    this.selectedHour = h;
+    this._applyTime();
+  }
+
+  selectMinute(m: number): void {
+    this.selectedMinute = m;
+    this._applyTime();
+    if (this.selectedHour !== null) this.timePickerOpen = false;
+  }
+
+  private _applyTime(): void {
+    if (this.selectedHour !== null && this.selectedMinute !== null) {
+      const hh = String(this.selectedHour).padStart(2, '0');
+      const mm = String(this.selectedMinute).padStart(2, '0');
+      this.expectedReturnTime = `${hh}:${mm}`;
+    }
+  }
+
+  today = new Date().toISOString().slice(0, 10);
 
   showSuccess = false;
   isSubmitting = false;
@@ -128,6 +166,80 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
     this.issueDate = new Date().toISOString().slice(0, 10);
     this.loadIssueOptions();
     this.loadIssueLog();
+
+    this.assetService.getUnits().subscribe({
+      next: (response: any) => {
+        this.allUnits = response?.responseData?.data?.units ?? response?.responseData?.units ?? [];
+        this.resolveAssetQuantityAndUnit();
+      },
+      error: (err) => {
+        console.error('Failed to load units list:', err);
+        this.resolveAssetQuantityAndUnit();
+      }
+    });
+  }
+
+  onUnitChange(): void {
+    if (!this.selectedUnit) return;
+    this.availableQuantity = this.baseQuantity * this.selectedUnit.conversionFactor;
+    if (this.issueQuantity > this.availableQuantity) {
+      this.issueQuantity = this.availableQuantity;
+    }
+  }
+
+  populateUnitOptions(match: any): void {
+    this.unitOptions = [];
+    const unitId = match.unitOfMeasureId;
+    const mainUnit = this.allUnits.find(u => u._id === unitId || u.id === unitId);
+    if (mainUnit) {
+      this.unitOptions.push({
+        name: mainUnit.unitOfMeasure || mainUnit.name,
+        acronym: mainUnit.acronym,
+        conversionFactor: 1
+      });
+      const hierarchy = mainUnit.hierarchy || mainUnit.childUnits || [];
+      hierarchy.forEach((child: any) => {
+        this.unitOptions.push({
+          name: child.childNodeName || child.name,
+          acronym: child.childNode || child.acronym,
+          conversionFactor: child.conversionFactor
+        });
+      });
+    } else {
+      this.unitOptions.push({
+        name: match.unitOfMeasure || 'pieces',
+        acronym: match.unitOfMeasure || 'pieces',
+        conversionFactor: 1
+      });
+    }
+    this.selectedUnit = this.unitOptions[0];
+    this.onUnitChange();
+  }
+
+  resolveAssetQuantityAndUnit(): void {
+    if (!this.assetName) return;
+    this.assetService.searchAssets(this.assetName).subscribe({
+      next: (response: any) => {
+        const rawResults = response?.responseData?.data?.assets ?? response?.responseData?.assets ?? [];
+        const results = Array.isArray(rawResults) ? rawResults : [];
+        const match = results.find((r: any) =>
+          r._id === this.assetId
+        ) ?? results.find((r: any) =>
+          (r.assetName ?? '').toLowerCase() === this.assetName.toLowerCase()
+        ) ?? results[0];
+
+        if (match) {
+          this.baseQuantity = match.quantity ?? 1;
+          this.availableQuantity = match.quantity ?? 1;
+          this.unitOfMeasure = match.unitOfMeasure ?? 'Nos';
+          this.populateUnitOptions(match);
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Failed to resolve asset quantity and unit:', err);
+      }
+    });
   }
 
   ngOnDestroy(): void { }
@@ -200,6 +312,8 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
             : '—',
           receiverName: item.receiverName ?? '—',
           receiverType: item.receiverType ?? '—',
+          issueQuantity: item.issueQuantity ?? 1,
+          unit: item.unit ?? 'Nos',
         }));
 
         this.isLoadingLog = false;
@@ -250,6 +364,7 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
     this.sidebarOpen = false;
     this.receiverDropdownOpen = false;
     this.assetDropdownOpen = false;
+    this.timePickerOpen = false;
   }
 
   onAssetSearchInput(query: string): void {
@@ -261,25 +376,41 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
       return;
     }
     this.assetOptionsLoading = true;
-    this.assetService.getAssets({ assetName: query, pageSize: 50 }).subscribe({
+    // Use /unissued-asset-names for suggestions — only assets not currently issued
+    this.assetService.getUnissuedAssetNames(query).subscribe({
       next: (response: any) => {
-        const raw: any[] = response?.responseData?.data?.assets ?? response?.responseData?.assets ?? [];
-        this.assetsList = raw.map((item: any) => {
-          const serial = item.assetSerialNumber?.trim() ? item.assetSerialNumber : null;
+        const items: any[] =
+          response?.responseData?.data?.assetNames ??
+          response?.responseData?.assetNames ??
+          [];
+        this.assetsList = items.map((item: any) => {
+          if (typeof item === 'string') {
+            return {
+              _id: '',
+              displayLabel: item,
+              assetName: item,
+              assetTagName: '',
+              assetSerialNumber: '',
+              category: '',
+            };
+          }
+          const name = item?.assetName ?? '';
+          const serial = item?.assetSerialNumber ?? '';
+          const display = serial ? `${name} (${serial})` : name;
           return {
-            _id: item._id ?? '',
-            displayLabel: serial ? `${item.assetName} (S/N: ${serial})` : item.assetName,
-            assetName: item.assetName ?? '',
-            assetTagName: item.assetTagName ?? '',
-            assetSerialNumber: item.assetSerialNumber ?? '',
-            category: item.category ?? '',
+            _id: item?._id ?? '',
+            displayLabel: display,
+            assetName: name,
+            assetTagName: '',
+            assetSerialNumber: serial,
+            category: '',
           };
         });
         this.assetOptionsLoading = false;
         this.cdr.detectChanges();
       },
       error: (err: any) => {
-        console.error('Failed to search assets:', err);
+        console.error('Failed to fetch unissued asset names:', err);
         this.assetOptionsLoading = false;
       }
     });
@@ -288,12 +419,43 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
   selectAssetOption(asset: { _id: string; displayLabel: string; assetName: string; assetTagName: string; assetSerialNumber: string; category: string }): void {
     this.assetSearch = asset.displayLabel;
     this.assetDropdownOpen = false;
-    this.assetId = asset._id;
-    this.assetName = asset.assetName;
-    this.assetTag = asset.assetTagName || 'No Tag';
-    this.assetModel = asset.assetTagName || 'No Tag';
-    this.assetCategory = asset.category || 'No Category';
-    this.cdr.detectChanges();
+    this.assetOptionsLoading = true;
+
+    // Resolve full asset details (_id, tag, category) via /assets-search
+    this.assetService.searchAssets(asset.assetName).subscribe({
+      next: (response: any) => {
+        const rawResults = response?.responseData?.data?.assets ?? response?.responseData?.assets ?? [];
+        const results = Array.isArray(rawResults) ? rawResults : [];
+        const match = results.find((r: any) =>
+          (r.assetSerialNumber ?? '') === asset.assetSerialNumber
+        ) ?? results.find((r: any) =>
+          (r.assetName ?? '').toLowerCase() === asset.assetName.toLowerCase()
+        ) ?? results[0];
+
+        if (match) {
+          this.assetId = match._id ?? '';
+          this.assetName = match.assetName ?? asset.assetName;
+          this.assetTag = match.assetTagName ?? 'No Tag';
+          this.assetModel = match.assetTagName ?? 'No Tag';
+          this.assetCategory = match.category ?? 'No Category';
+          this.baseQuantity = match.quantity ?? 1;
+          this.availableQuantity = match.quantity ?? 1;
+          this.unitOfMeasure = match.unitOfMeasure ?? 'Nos';
+          this.issueQuantity = 1;
+          this.populateUnitOptions(match);
+        } else {
+          // Fallback: keep the name but no id (submit will fail validation)
+          this.assetId = '';
+          this.assetName = asset.assetName;
+        }
+        this.assetOptionsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Failed to resolve asset details:', err);
+        this.assetOptionsLoading = false;
+      }
+    });
   }
 
   goBack(): void {
@@ -348,6 +510,24 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const avail = Number(this.availableQuantity);
+    if (isNaN(avail) || avail <= 0) {
+      this.submitError = 'Asset available quantity is invalid or not loaded.';
+      return;
+    }
+
+    const issueQty = Number(this.issueQuantity);
+    if (isNaN(issueQty) || issueQty <= 0) {
+      this.submitError = 'Issue quantity must be greater than 0.';
+      return;
+    }
+
+    if (issueQty > avail + 0.0001) {
+      const uAcronym = this.selectedUnit ? this.selectedUnit.acronym : this.unitOfMeasure;
+      this.submitError = `Cannot issue more than available quantity (${this.availableQuantity} ${uAcronym}).`;
+      return;
+    }
+
     if (this.expectedReturn && this.expectedReturn < this.issueDate) {
       this.submitError = 'Expected return date cannot be before the issue date.';
       return;
@@ -359,12 +539,18 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
       locationId?: string | null;
       personId?: string | null;
       issuedToAssetId?: string | null;
+      issueQuantity?: number;
+      unitOfMeasurement?: string;
+      conversionFactor?: number;
     } = {
       assetId: this.assetId,
       issueDate: this.issueDate,
       locationId: null,
       personId: null,
       issuedToAssetId: null,
+      issueQuantity: this.issueQuantity,
+      unitOfMeasurement: this.selectedUnit ? this.selectedUnit.acronym : this.unitOfMeasure,
+      conversionFactor: this.selectedUnit ? this.selectedUnit.conversionFactor : 1,
     };
 
     if (this.issueTo === 'Location') payload.locationId = this.selectedReceiverId;
@@ -377,6 +563,7 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
         this.showSuccess = true;
         this.isSubmitting = false;
         this.loadIssueLog();
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error('Failed to issue asset:', err);
@@ -399,6 +586,15 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
     this.issueDate = new Date().toISOString().slice(0, 10);
     this.expectedReturn = '';
     this.expectedReturnTime = '';
+    this.selectedHour = null;
+    this.selectedMinute = null;
+    this.timePickerOpen = false;
     this.notes = '';
+    this.availableQuantity = 1;
+    this.unitOfMeasure = 'Nos';
+    this.issueQuantity = 1;
+    this.baseQuantity = 0;
+    this.selectedUnit = null;
+    this.unitOptions = [];
   }
 }

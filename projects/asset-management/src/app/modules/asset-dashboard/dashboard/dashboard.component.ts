@@ -151,7 +151,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.assetService.getIssuedAssets({ page: 1, pageSize: 3 }).subscribe({
       next: (response: any) => {
         const issued: any[] = response?.responseData?.data?.assets ?? [];
-        this.cdr.detectChanges();
+        
         this.issueHistory = issued.slice(0, 3).map(item => ({
           receiverName: item.receiverName ?? 'Unknown',
           department: item.receiverType ?? '—',
@@ -160,6 +160,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             : '—',
           assetDept: item.assetCategory ?? '—'
         }));
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Failed to load issued assets:', err);
@@ -226,11 +227,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   navigateToDeptAssets(deptId: string): void {
+    const dept = this.departments.find(d => d.id === deptId);
+    const deptName = dept?.name ?? '';
     if (this.dashboardTabsService) {
       this.dashboardTabsService.filterCategoryId = deptId;
+      this.dashboardTabsService.filterCategoryName = deptName;
       this.dashboardTabsService.changeTab('view-assets');
     } else {
-      this.router.navigate(['/kjusys/asset-management/view-assets'], { queryParams: { category: deptId } });
+      this.router.navigate(['/kjusys/asset-management/view-assets'], { queryParams: { category: deptId, categoryName: deptName } });
     }
   }
 
