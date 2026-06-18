@@ -11,6 +11,8 @@ export interface IssueRecord {
   issueDate: string;
   receiverName: string;
   receiverType: string;
+  issueQuantity?: number;
+  unit?: string;
 }
 
 @Component({
@@ -95,6 +97,8 @@ export class IssueLogComponent implements OnInit, OnDestroy {
             : '—',
           receiverName: item.receiverName ?? '—',
           receiverType: item.receiverType ?? '—',
+          issueQuantity: item.issueQuantity ?? 1,
+          unit: item.unit ?? 'Nos',
         }));
         this.isLoading = false;
         this.cdr.detectChanges()

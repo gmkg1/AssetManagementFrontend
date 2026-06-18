@@ -133,6 +133,9 @@ export class AssetService {
     locationId?: string | null;
     personId?: string | null;
     issuedToAssetId?: string | null;
+    issueQuantity?: number;
+    unitOfMeasurement?: string;
+    conversionFactor?: number;
   }) {
     return this.http.post<any>(`${this.baseUrl}/issue-asset`, payload);
   }
@@ -143,6 +146,7 @@ export class AssetService {
     issuetoId: string;
     returnDate: string;
     notes?: string;
+    returnQuantity?: number;
   }) {
     return this.http.post<any>(`${this.baseUrl}/return-asset`, payload);
   }

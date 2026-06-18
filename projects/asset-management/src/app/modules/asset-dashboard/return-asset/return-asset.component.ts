@@ -12,6 +12,7 @@ export class ReturnAssetComponent implements OnInit {
   public issueDropdownOpen = false;
   public selectedIssueId = '';
   public selectedIssue: any = null;
+  public returnQuantity = 1;
   public activeIssues: any[] = [];
 
   public returnDate = '';
@@ -71,6 +72,11 @@ export class ReturnAssetComponent implements OnInit {
     this.selectedIssue = issue;
     this.selectedIssueId = issue._id;
     this.issueDropdownOpen = false;
+
+    const totalIssued = issue.issueQuantity ?? 1;
+    const totalReturned = issue.returnedQuantity ?? 0;
+    const remaining = totalIssued - totalReturned;
+    this.returnQuantity = remaining > 0 ? remaining : 1;
   }
 
   getSelectedLabel(): string {
@@ -115,6 +121,20 @@ export class ReturnAssetComponent implements OnInit {
       return;
     }
 
+    const totalIssued = this.selectedIssue.issueQuantity ?? 1;
+    const totalReturned = this.selectedIssue.returnedQuantity ?? 0;
+    const remaining = totalIssued - totalReturned;
+
+    if (!this.returnQuantity || this.returnQuantity <= 0) {
+      alert('Return quantity must be greater than 0.');
+      return;
+    }
+
+    if (this.returnQuantity > remaining) {
+      alert(`Cannot return more than remaining issued quantity (${remaining} ${this.selectedIssue.unit || 'Nos'}).`);
+      return;
+    }
+
     const minDate = this.getIssueDateMin();
     if (minDate && this.returnDate < minDate) {
       alert(`Return date cannot be before the issue date (${minDate}).`);
@@ -125,7 +145,8 @@ export class ReturnAssetComponent implements OnInit {
     const payload = {
       assetId: this.selectedIssue.assetId,
       issuetoId: this.selectedIssue._id,
-      returnDate: this.returnDate
+      returnDate: this.returnDate,
+      returnQuantity: this.returnQuantity
     };
 
     this.assetService.returnAsset(payload).subscribe({
