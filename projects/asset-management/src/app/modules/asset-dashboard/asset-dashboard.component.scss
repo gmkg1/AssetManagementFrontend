@@ -9,7 +9,7 @@
 // Issue history table columns – fluid
 .issue-cols {
   display: grid;
-  grid-template-columns: 38% 20% 25% 17%;
+  grid-template-columns: 2fr 1.2fr 1.4fr 1fr;
   align-items: center;
-  gap: 0 clamp(4px, 0.5vw, 10px);
+  gap: 0 8px;
 }

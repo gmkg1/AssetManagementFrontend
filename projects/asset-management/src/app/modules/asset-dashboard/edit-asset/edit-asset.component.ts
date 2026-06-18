@@ -36,11 +36,7 @@ export class EditAssetComponent implements OnInit {
   unitOfMeasure = '';
   unitsOfMeasure: any[] = [];
 
-  billFile: File | null = null;
   isReturnable = false;
-  assetImagePreview: string | ArrayBuffer | null = null;
-  assetImageFile: File | null = null;
-  isDragOver = false;
   errorMessage = '';
 
   isLoading = false;
@@ -290,60 +286,5 @@ export class EditAssetComponent implements OnInit {
         this.errorMessage = err?.error?.responseData?.errors?.[0] || err?.error?.error || 'Failed to update asset.';
       }
     });
-  }
-
-  onBillSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-    this.billFile = file;
-  }
-
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-
-    if (!file) {
-      return;
-    }
-
-    this.assetImageFile = file;
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.assetImagePreview = reader.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  removeImage(event: Event): void {
-    event.stopPropagation();
-    this.assetImageFile = null;
-    this.assetImagePreview = null;
-  }
-
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    this.isDragOver = true;
-  }
-
-  onDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    this.isDragOver = false;
-  }
-
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    this.isDragOver = false;
-
-    const file = event.dataTransfer?.files?.[0] ?? null;
-    if (!file) {
-      return;
-    }
-
-    this.assetImageFile = file;
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.assetImagePreview = reader.result;
-    };
-    reader.readAsDataURL(file);
   }
 }
