@@ -1,13 +1,13 @@
 # Asset Management System — Backend Integration & Context Guide
 
-This document is the authoritative reference for the backend architecture, MongoDB schema, REST API endpoints, actual response envelopes, and where each API is consumed by the frontend.
+This document is the authoritative reference for the backend architecture, MongoDB schema, REST API endpoints, response envelopes, and frontend integration mappings.
 
 ---
 
 ## 1. System Overview
 
-- **Stack**: Java / Vert.x microservice
-- **Database**: MongoDB
+- **Stack**: Java 17 / Vert.x microservice Web toolkit.
+- **Database**: MongoDB.
 - **Base prefix**: `/kjusys-api/asset-management-api`
 - **Default port**: `8080`
 - **Local base URL**: `http://localhost:8080/kjusys-api/asset-management-api`
@@ -16,8 +16,8 @@ This document is the authoritative reference for the backend architecture, Mongo
 
 ## 2. Response Envelope
 
-All responses follow this shape — **note the extra `.data` nesting** inside `responseData`:
-
+### Success Envelope
+All successful requests return a JSON object with this shape. **Note the extra `.data` nesting** inside `responseData`:
 ```json
 {
   "statusCode": 200,
@@ -34,679 +34,186 @@ All responses follow this shape — **note the extra `.data` nesting** inside `r
   }
 }
 ```
+*Note*: The frontend service layers unwrap this via `response?.responseData?.data` (or `response?.responseData`) and bind the target collection.
 
-The frontend always unwraps via `response?.responseData?.data` first, then reads the inner key (e.g. `.assets`, `.categories`, `.locations`, `.statuses`).
-
-Error responses:
+### Error Envelope
+All validation failures, circular loops, or database exceptions return a standard 400/500 code with this shape:
 ```json
 {
   "statusCode": 400,
   "type": "ERROR",
   "responseData": {
-    "error": "Error message"
+    "error": "Insufficient quantity available"
   }
 }
 ```
 
 ---
 
-## 3. Database Collections
+## 3. Database Collections Spec
 
-### `assets`
+### A. Collection: `assets`
+Contains both serialized physical inventory (quantity = 1) and bulk consumables (quantity > 1).
 - `_id`: ObjectId
-- `assetName`: String
-- `assetTagId`: ObjectId → `assettags`
-- `statusId`: ObjectId → `status`
-- `locationId`: ObjectId → `locations`
-- `assetSerialNumber`: String
-- `purchaseCost`: Int
-- `purchaseDate`: Date
-- `isIssuable`: Boolean
-- `quantity`: Int
-- `campusId`: ObjectId → `campuses`
-- `blockId`: String
-- `unitOfMeasureId`: ObjectId → `units`
+- `assetName`: String (e.g. `"Wireless Mic"`)
+- `assetTagId`: ObjectId → references `assettags`
+- `statusId`: ObjectId → references `status`
+- `locationId`: ObjectId → references `locations` (default storage location)
+- `assetSerialNumber`: String (alphanumeric, unique index)
+- `purchaseCost`: NumberInt (represented as whole numbers in cents/dollars)
+- `purchaseDate`: ISODate
+- `isIssuable`: Boolean (determines eligibility for dispatch)
+- `quantity`: NumberInt | Double (the *remaining available* stock level)
+- `unitOfMeasureId`: ObjectId → references `units`
+- `campusId`: ObjectId → references `campuses`
+- `blockId`: String (e.g. `"B002"`)
 
-### `issueto`
-Tracks active issues and returns in the same collection.
+### B. Collection: `issueto`
+Tracks all active outgoings, transactions, and return quantities.
 - `_id`: ObjectId
-- `assetId`: ObjectId → `assets`
-- `issueDate`: Date
-- `locationId`: ObjectId (if issued to location)
-- `personId`: ObjectId (if issued to person)
-- `issuedToAssetId`: ObjectId (if issued to another asset)
-- `ActiveStatus`: Boolean
-- `returnStatus`: Boolean
-- `returnDate`: Date
-- `notes`: String
+- `assetId`: ObjectId → references `assets`
+- `issueDate`: ISODate
+- `locationId`: ObjectId → references `locations` (if assigned to a room/block)
+- `personId`: ObjectId → references users (if assigned to an employee/student)
+- `issuedToAssetId`: ObjectId → references `assets` (if embedded inside another asset)
+- `ActiveStatus`: Boolean (`true` if unreturned balance exists)
+- `returnStatus`: Boolean (`true` only when `returnedQuantity == issueQuantity`)
+- `returnDate`: ISODate (timestamp of the last return transaction)
+- `quantity`: Number (available stock of the asset *before* this issue transaction)
+- `unitOfMeasurement`: String (the chosen transaction unit acronym, e.g., `"L"`)
+- `issueQuantity`: NumberInt | Double (issued quantity in transaction units)
+- `issueUnitId`: ObjectId → references `units` (the unit used for this transaction)
+- `conversionFactor`: Number (acronym conversion factor vs. asset base unit, e.g., `1000`)
+- `returnedQuantity`: NumberInt | Double (cumulative returns in transaction units)
+- `notes`: String (optional remarks)
 
-### `assettags`
+### C. Collection: `units`
+Stores hierarchical measurement conversions.
 - `_id`: ObjectId
-- `assetTagName`: String
-- `categoryId`: ObjectId → `categories`
-- `classificationId`: ObjectId → `classifications`
+- `unitOfMeasure`: String (e.g. `"Kilolitre"`)
+- `acronym`: String (e.g. `"kL"`)
+- `hierarchy`: Array of nested child nodes:
+  - `childNode`: String (acronym, e.g. `"L"`)
+  - `childNodeName`: String (name, e.g. `"Litre"`)
+  - `conversionFactor`: NumberInt (scale factor vs base unit, e.g. `1000`)
 
-### `categories`
+### D. Collection: `assettags`
 - `_id`: ObjectId
-- `categoryName`: String (e.g. `"IT"`, `"Electrical"`, `"Sound"`, `"Stationery"`, `"Housekeeping"`, `"Furniture"`)
-
-### `locations`
-- `_id`: ObjectId
-- `locationName`: String
-
-### `status`
-- `_id`: ObjectId
-- `statusName`: String (`"Ready to Deploy"` | `"Deployed"` | `"Under Maintenance"` | `"Damaged"` | `"Dead Stock"`)
-
-### `licenses`
-- `_id`: ObjectId
-- `assetId`: ObjectId → `assets`
-- `licenseName`: String
-- `licenseKey`: String
-- `expiryDate`: Date
-
-### `warranty`
-- `_id`: ObjectId
-- `assetId`: ObjectId → `assets`
-- `provider`: String
-- `displayId`: String
-- `startDate`: Date
-- `endDate`: Date
-- `ActiveStatus`: Boolean
-
-### `units`
-- `_id`: ObjectId
-- `unitOfMeasure`: String
-- `acronym`: String
-- `hierarchy`: Array of Objects:
-  - `childNode`: String
-  - `childNodeName`: String
-  - `conversionFactor`: Int
+- `assetTagName`: String (model identifier, e.g. `"MacBook Pro 16"`)
+- `categoryId`: ObjectId → references `categories`
 
 ---
 
-## 4. REST API Endpoints
+## 4. REST API Endpoints Reference
 
-### A. Assets
+### A. Assets Management
 
 #### GET `/assets`
-Paginated, filterable asset list (sorted by most recently added by default).
-
-Query params: `page`, `pageSize`, `assetName`, `assetTagName`, `categoryId`, `locationId`, `statusId`, `purchaseDateFrom` (YYYY-MM-DD), `purchaseDateTo`, `sort`
-
-Response inner key: `assets[]`
-```json
-{
-  "assets": [
-    {
-      "_id": "6a1035ba99696f0a7c441534",
-      "assetName": "Wireless Mic",
-      "assetSerialNumber": "MIC-SN-001",
-      "assetTagName": "Wireless Microphone",
-      "category": "Sound",
-      "status": "Dead Stock",
-      "location": "Technician Room",
-      "block": "Admin",
-      "purchaseCost": 8000,
-      "purchaseDate": "2026-05-18T18:30:00Z",
-      "isIssuable": true,
-      "quantity": 1,
-      "issuedTo": "Not Issued"
-    }
-  ],
-  "totalRecords": 48,
-  "currentPage": 1,
-  "pageSize": 8,
-  "totalPages": 6
-}
-```
-**Used by**: `ViewAssetsComponent` (main list + filter/search/pagination), `IssueAssetComponent` (asset receiver dropdown when issueTo=Asset, pageSize=200), `ReportsComponent` (All tab, pageSize=8)
-
----
-
-#### GET `/assets-search`
-Query params: `q` (searches `assetName` case-insensitively)
-
-Response: `{ data: [{ _id, assetName, assetTagName, isIssuable }] }`
-
-**Used by**: Defined in service as `searchAssets()` — not currently called by any component.
-
----
+Paginated, filterable asset list sorted by `_id` descending (most recently added).
+- **Query Params**: `page`, `pageSize`, `assetName`, `assetTagName`, `categoryId`, `locationId`, `statusId`, `purchaseDateFrom`, `purchaseDateTo`, `sort`
+- **Response Key**: `assets`
+- **Frontend Consumed By**: `ViewAssetsComponent`, `IssueAssetComponent`
 
 #### GET `/asset-details`
-Query params: `id` (asset `_id`)
-
-Response inner key: direct object at `responseData.data`
-```json
-{
-  "_id": "...",
-  "assetName": "...",
-  "assetSerialNumber": "...",
-  "purchaseCost": 1200,
-  "purchaseDate": "...",
-  "isIssuable": true,
-  "assetTagId": "...",
-  "categoryId": "...",
-  "statusId": "...",
-  "locationId": "..."
-}
-```
-**Used by**: `EditAssetComponent` (on init, to pre-fill the edit form), `ViewAssetsComponent` (on row click, to enrich selectedAsset with IDs for inline status update)
-
----
+Retrieve specific asset details for editing or detail drawers.
+- **Query Params**: `id` (ObjectId string)
+- **Response Key**: Maps directly to `responseData.data` (no list wrapper)
+- **Frontend Consumed By**: `EditAssetComponent`, `ViewAssetsComponent`
 
 #### POST `/create-asset`
-Payload:
-```json
-{
-  "assetName": "string",
-  "assetTagId": "ObjectId",
-  "statusId": "ObjectId",
-  "defaultLocation": "ObjectId",
-  "serial": "string",
-  "purchaseCost": "string|int",
-  "purchaseDate": "YYYY-MM-DD",
-  "isReturnable": true,
-  "quantity": 1,
-  "unitOfMeasureId": "ObjectId"
-}
-```
-Response: `{ message: "Asset created successfully", _id: "ObjectId" }`
-
-**Used by**: `CreateAssetComponent` (on Submit)
-
----
+Register a new asset.
+- **Payload**:
+  ```json
+  {
+    "assetName": "Wireless Mic",
+    "assetTagId": "6a102c50fdc67fb190441537",
+    "statusId": "6a195d74a35d9b53bb44152e",
+    "defaultLocation": "6a0fe1928c08584d89441544",
+    "serial": "MIC-SN-001",
+    "purchaseCost": 8000,
+    "purchaseDate": "2026-05-22",
+    "isReturnable": true,
+    "quantity": 1,
+    "unitOfMeasureId": "6a1533d11fcf30c131441533"
+  }
+  ```
+- **Frontend Consumed By**: `CreateAssetComponent`
 
 #### PUT `/edit-asset`
-Same payload shape as `/create-asset` plus `_id`.
-
-**Used by**: `EditAssetComponent` (on Save), `ViewAssetsComponent` (inline status change via `selectStatus()`)
-
----
+Update existing asset details. Same payload shape as `/create-asset` with the additional `_id` field.
+- **Frontend Consumed By**: `EditAssetComponent`, `ViewAssetsComponent` (inline status)
 
 #### GET `/unissued-asset-names`
-Query params: `q` (optional, case-insensitive asset name filter)
-
-Response: `{ assetNames: [ { "_id": "ObjectId", "assetName": "MacBook Pro", "assetSerialNumber": "SN12345678" } ] }`
-
-**Used by**: Defined in service — not currently called by any component.
-
----
-
-#### GET `/get-licenses/:assetId`
-Path param: `assetId`
-
-Response inner key: `responseData.data`
-```json
-{
-  "licenses": [{ "licenseName": "...", "licenseKey": "...", "expiryDate": "..." }],
-  "warranty": [{ "provider": "...", "displayId": "...", "startDate": "...", "endDate": "...", "status": "Active" }]
-}
-```
-**Used by**: `EditWarrantyLicensesComponent` (on init, to pre-fill the form), `ViewAssetsComponent` (on row click, for Licenses tab)
+Retrieve names and serials of assets with available stock for auto-complete.
+- **Query Params**: `q` (keypress filter)
+- **Response Key**: `assetNames` (returns assets where `quantity > 1` OR if `quantity <= 1` and has no active issues)
+- **Frontend Consumed By**: `IssueAssetComponent`
 
 ---
 
-#### GET `/asset-history/:assetId`
-Path param: `assetId`
-
-Response inner key: `responseData.data`
-```json
-{
-  "dispatches": [],
-  "issues": [
-    {
-      "issueDate": "2026-05-27T00:00:00Z",
-      "location": "Staff Room 1",
-      "personId": "12345",
-      "issuedToAsset": "N/A"
-    }
-  ],
-  "returns": [
-    {
-      "returnDate": "2026-05-28T00:00:00Z",
-      "location": "Staff Room 1",
-      "personId": "12345",
-      "returnedToAsset": "N/A"
-    }
-  ]
-}
-```
-**Used by**: `ViewAssetsComponent` (on row click, for History tab)
-
----
-
-#### PUT `/edit-licenses-warranty`
-Payload:
-```json
-{
-  "assetId": "ObjectId",
-  "license": { "licenseName": "...", "licenseKey": "...", "expiryDate": "..." },
-  "warranty": { "provider": "...", "displayId": "...", "startDate": "...", "endDate": "...", "status": "Active" }
-}
-```
-**Used by**: `EditWarrantyLicensesComponent` (on Save)
-
----
-
-#### GET `/get-asset-components/:assetId`
-Path param: `assetId`
-
-Response: `{ components: [{ assetId, assetName }] }`
-
-**Used by**: `ViewAssetsComponent` (on row click, for Components tab)
-
----
-
-#### GET `/asset-history/:assetId`
-Path param: `assetId`
-
-Response: `{ dispatches: [], issues: [], returns: [] }`
-
-**Used by**: `ViewAssetsComponent` (on row click, for History tab)
-
-#### GET `/export-reports`
-Export reports data as a CSV download.
-
-Query params: `categoryId` (optional), `assetName` (optional), `assetIds` (optional, comma-separated IDs)
-
-Response content type: `text/csv`
-Response header: `content-disposition: attachment; filename="report.csv"`
-
-**Used by**: `ReportsComponent` (for Export and Bulk Export actions)
-
----
-
-#### GET `/export-assets`
-Export assets list data as a CSV download.
-
-Query params: same filters as `GET /assets` (e.g. `assetName`, `categoryId`, `locationId`, `statusId`, etc.) but runs without pagination boundaries.
-
-Response content type: `text/csv`
-Response header: `content-disposition: attachment; filename="assets.csv"`
-
-**Used by**: `ViewAssetsComponent` (for Export CSV action)
-
----
-
-
-### B. Asset Grouping
+### B. Grouping & Reports
 
 #### GET `/grp`
-Returns assets filtered by category. Same per-asset shape as `/assets`.
-
-Query params: `categoryId` (required for category tabs), `page`, `pageSize`
-
-Response inner key: `assets[]` — same structure as `/assets` response
-```json
-{
-  "assets": [
-    {
-      "_id": "...",
-      "assetName": "Ceiling Fan",
-      "assetTagName": "Ceiling Fan",
-      "category": "Electrical",
-      "status": "Deployed",
-      "location": "Parking Lot",
-      "purchaseCost": 5000,
-      "quantity": 1
-    }
-  ],
-  "categoryId": "6a0ffe51d70e831c1c44154f",
-  "totalRecords": 6,
-  "currentPage": 1,
-  "pageSize": 8,
-  "totalPages": 1
-}
-```
-**Used by**: `ReportsComponent` (category tab selected → `loadGrpData()`)
-
----
+Retrieve assets filtered by a specific category.
+- **Query Params**: `categoryId`, `page`, `pageSize`
+- **Response Key**: `assets`
+- **Frontend Consumed By**: `ReportsComponent`
 
 #### GET `/reports-grouped`
-Returns paginated asset tags grouped by model/name, showing their active status count breakdowns (Total, Ready, Deployed, Dead Stock, Service, EOL).
+Paginated Tag/Model summary list showing count breakdowns by active status.
+- **Query Params**: `page`, `pageSize`, `categoryId` (optional)
+- **Response Key**: `reports`
+- **Frontend Consumed By**: `ReportsComponent`
 
-Query params: `page`, `pageSize`, `categoryId` (optional, to filter asset tags by category)
-
-Response:
-```json
-{
-  "reports": [
-    {
-      "displayId": "LPT",
-      "name": "MacBook Pro",
-      "categoryName": "IT",
-      "total": 12,
-      "ready": 8,
-      "deployed": 4,
-      "deadStock": 0,
-      "service": 0,
-      "eol": 0
-    }
-  ],
-  "categoryId": "6a0ffe51d70e831c1c44154e",
-  "totalRecords": 1,
-  "currentPage": 1,
-  "pageSize": 8,
-  "totalPages": 1
-}
-```
-**Used by**: `ReportsComponent` (on tab changes and page clicks)
+#### GET `/export-reports`
+Export paginated grouped reports data to a CSV stream download.
+- **Query Params**: `categoryId`, `assetName`, `assetIds`
+- **Response Content-Type**: `text/csv`
+- **Frontend Consumed By**: `ReportsComponent`
 
 ---
 
 ### C. Issue & Return
 
 #### GET `/issued-assets`
-Query params: `page`, `pageSize`, `assetName`, `category`, `issuedTo`, `type` (`"Location"` | `"Person"` | `"Asset"`), `issueDate` (YYYY-MM-DD)
-
-Response inner key: `assets[]`
-```json
-{
-  "assets": [
-    {
-      "_id": "ObjectId (issueId)",
-      "assetId": "ObjectId",
-      "assetName": "MacBook Pro",
-      "assetSerialNumber": "SN12345678",
-      "assetCategory": "IT",
-      "issueDate": "2026-05-27T00:00:00Z",
-      "receiverName": "Staff Room 1",
-      "receiverType": "Location",
-      "locationId": "ObjectId",
-      "personId": null,
-      "issuedToAssetId": null
-    }
-  ],
-  "totalRecords": 1,
-  "currentPage": 1,
-  "pageSize": 10,
-  "totalPages": 1
-}
-```
-**Used by**:
-- `DashboardComponent` — `{ page: 1, pageSize: 3 }` for recent issue history table
-- `IssueAssetComponent` — `{ page, pageSize: 3 }` for the issue log table below the form; also `{ page: 1, pageSize: 100 }` pre-loaded for asset receiver dropdown
-- `IssueLogComponent` — `{ page, pageSize: 8, ...filters }` for the full issue log with filters
-- `ReturnAssetComponent` — `{ page: 1, pageSize: 100 }` to populate the active issues dropdown
-
----
+Retrieve filterable logs of issued assets.
+- **Query Params**: `page`, `pageSize`, `assetName`, `category`, `issuedTo`, `type`, `issueDate`
+- **Response Key**: `assets`
+- **Frontend Consumed By**: `DashboardComponent`, `IssueAssetComponent`, `IssueLogComponent`, `ReturnAssetComponent`
 
 #### POST `/issue-asset`
-Payload (one of `locationId`, `personId`, `issuedToAssetId` required):
-```json
-{
-  "assetId": "ObjectId",
-  "issueDate": "YYYY-MM-DD",
-  "locationId": "ObjectId | null",
-  "personId": "ObjectId | null",
-  "issuedToAssetId": "ObjectId | null"
-}
-```
-**Used by**: `IssueAssetComponent` (on Issue button click)
-
----
+Issue full or partial quantity of stock.
+- **Payload**:
+  ```json
+  {
+    "assetId": "6a1035ba99696f0a7c441534",
+    "issueDate": "2026-06-18",
+    "locationId": "6a0fe1928c08584d89441544",
+    "personId": null,
+    "issuedToAssetId": null,
+    "issueQuantity": 1,
+    "unitOfMeasurement": "kL",
+    "conversionFactor": 1
+  }
+  ```
+- **Frontend Consumed By**: `IssueAssetComponent`
 
 #### POST `/return-asset`
-Payload:
-```json
-{
-  "assetId": "ObjectId",
-  "issuetoId": "ObjectId",
-  "returnDate": "YYYY-MM-DD",
-  "notes": "optional string"
-}
-```
-**Used by**: `ReturnAssetComponent` (on Return button click)
-
----
+Process return of full or partial issued balance.
+- **Payload**:
+  ```json
+  {
+    "assetId": "6a1035ba99696f0a7c441534",
+    "issuetoId": "6a2bac052daf9c00d589ff3b",
+    "returnDate": "2026-06-18",
+    "returnQuantity": 1,
+    "notes": "Good condition"
+  }
+  ```
+- **Frontend Consumed By**: `ReturnAssetComponent`
 
 #### GET `/return-logs`
-Query params: `page`, `pageSize`, `name`, `classification`, `total`, `returnType`, `returnTo`, `returnDate`
-
-Response inner key: `data[]`
-```json
-{
-  "data": [
-    {
-      "name": "MacBook Pro",
-      "classification": "IT",
-      "total": 1,
-      "returnType": "Location",
-      "returnTo": "Staff Room 1",
-      "returnDate": "2026-05-27T06:38:33Z",
-      "notes": "Returned in perfect condition"
-    }
-  ],
-  "totalRecords": 1,
-  "currentPage": 1,
-  "pageSize": 10,
-  "totalPages": 1
-}
-```
-**Used by**: `ReturnLogComponent` (on init and all filter/page changes)
-
----
-
-#### GET `/export-issue-logs`
-Export issue logs data as a CSV download.
-
-Query params: same filters as `GET /issued-assets` (e.g. `assetName`, `category`, `issuedTo`, `type`, `issueDate`) but runs without pagination boundaries.
-
-Response content type: `text/csv`
-Response header: `content-disposition: attachment; filename="issued_assets.csv"`
-
-**Used by**: `IssueLogComponent` (for Export CSV action)
-
----
-
-#### GET `/export-return-logs`
-Export return logs data as a CSV download.
-
-Query params: same filters as `GET /return-logs` (e.g. `name`, `classification`, `total`, `returnType`, `returnTo`, `returnDate`) but runs without pagination boundaries.
-
-Response content type: `text/csv`
-Response header: `content-disposition: attachment; filename="returned_assets.csv"`
-
-**Used by**: `ReturnLogComponent` (for Export CSV action)
-
----
-
-
-### D. Dashboard & Analytics
-
-#### GET `/status`
-Returns per-status asset counts for the donut chart.
-
-Response inner key: `assets[]`
-```json
-{
-  "assets": [
-    { "statusId": "...", "statusName": "Ready to Deploy", "assetCount": 8 },
-    { "statusId": "...", "statusName": "Deployed", "assetCount": 5 }
-  ]
-}
-```
-**Used by**:
-- `DashboardComponent` — drives `readyToDeploy` + `deployed` counts for the donut SVG
-- `ViewAssetsComponent` — drives the 4 stat cards (total, available, deployed, maintenance) at the top of the list
-
----
-
-#### GET `/categories`
-Returns per-category asset counts for the dashboard category cards.
-
-Query params: `page`, `size`
-
-Response inner key: `assets[]`
-```json
-{
-  "assets": [
-    { "categoryId": "...", "categoryName": "IT", "assetCount": 15 }
-  ]
-}
-```
-**Used by**:
-- `DashboardComponent` — `getCategoryCount()` to render the category count cards and populate `departments[]`
-
-Note: also called by `ViewAssetsComponent`, `CreateAssetComponent`, `CreateAssetTagComponent`, `EditAssetComponent` via `getCategories()` — same endpoint, used for dropdown population in those cases.
-
----
-
-#### GET `/asset-status-summary`
-Query params: `page`, `pageSize`
-
-Response: per-asset-tag status breakdown (ready, deployed, underMaintenance, damaged, deadStock).
-
-**Used by**: Defined in service as `getAssetStatusSummary()` — not currently called by any component.
-
----
-
-### E. Metadata / Lookup Dropdowns
-
-#### GET `/categories-list`
-Flat list of categories for dropdowns and filter tabs.
-
-Response inner key: `categories[]`
-```json
-{
-  "categories": [
-    { "categoryId": "6a0ffe51d70e831c1c44154e", "categoryName": "IT" },
-    { "categoryId": "6a0ffe51d70e831c1c44154f", "categoryName": "Electrical" }
-  ]
-}
-```
-**Used by**: `ReportsComponent` — on init to build the category filter tab bar
-
----
-
-#### GET `/locations-list`
-Response inner key: `locations[]`
-```json
-{
-  "locations": [
-    { "locationId": "...", "locationName": "Staff Room 1" }
-  ]
-}
-```
-**Used by**: `CreateAssetComponent`, `EditAssetComponent`, `IssueAssetComponent`, `ViewAssetsComponent` — all for location dropdown population
-
----
-
-#### GET `/statuses-list`
-Response inner key: `statuses[]`
-```json
-{
-  "statuses": [
-    { "statusId": "...", "statusName": "Ready to Deploy" }
-  ]
-}
-```
-**Used by**: `CreateAssetComponent`, `EditAssetComponent`, `ViewAssetsComponent` — for status dropdown population
-
----
-
-#### GET `/asset-tags-list`
-Response inner key: `assetTags[]` (or similar — check service)
-```json
-{
-  "data": [
-    { "id": "...", "assetTagName": "MacBook Pro 16", "categoryId": "..." }
-  ]
-}
-```
-**Used by**: `CreateAssetComponent`, `EditAssetComponent` — for the searchable model/asset-tag dropdown
-
----
-
-#### POST `/create-asset-tag`
-Payload:
-```json
-{
-  "assetTagName": "MacBook Pro 16",
-  "category": "ObjectId"
-}
-```
-**Used by**: `CreateAssetTagComponent` (on Submit)
-
----
-
-#### GET `/units-list`
-Response inner key: `units[]`
-```json
-{
-  "units": [
-    {
-      "id": "ObjectId",
-      "unitOfMeasure": "Kilolitre",
-      "acronym": "kL",
-      "hierarchy": [
-        {
-          "childNode": "L",
-          "childNodeName": "Litre",
-          "conversionFactor": 1000
-        }
-      ]
-    }
-  ]
-}
-```
-**Used by**: `CreateAssetComponent`, `EditAssetComponent` — for status dropdown population
-
----
-
-## 5. API → Component Quick Reference
-
-| Endpoint | Method | Components |
-|---|---|---|
-| `/assets` | GET | ViewAssetsComponent, IssueAssetComponent, ReportsComponent |
-| `/asset-details` | GET | EditAssetComponent, ViewAssetsComponent |
-| `/create-asset` | POST | CreateAssetComponent |
-| `/edit-asset` | PUT | EditAssetComponent, ViewAssetsComponent |
-| `/get-licenses/:id` | GET | EditWarrantyLicensesComponent, ViewAssetsComponent |
-| `/edit-licenses-warranty` | PUT | EditWarrantyLicensesComponent |
-| `/get-asset-components/:id` | GET | ViewAssetsComponent |
-| `/asset-history/:id` | GET | ViewAssetsComponent |
-| `/grp` | GET | ReportsComponent |
-| `/issued-assets` | GET | DashboardComponent, IssueAssetComponent, IssueLogComponent, ReturnAssetComponent |
-| `/issue-asset` | POST | IssueAssetComponent |
-| `/return-asset` | POST | ReturnAssetComponent |
-| `/return-logs` | GET | ReturnLogComponent |
-| `/status` | GET | DashboardComponent, ViewAssetsComponent |
-| `/categories` | GET | DashboardComponent, ViewAssetsComponent, CreateAssetComponent, CreateAssetTagComponent, EditAssetComponent |
-| `/categories-list` | GET | ReportsComponent |
-| `/locations-list` | GET | CreateAssetComponent, EditAssetComponent, IssueAssetComponent, ViewAssetsComponent |
-| `/statuses-list` | GET | CreateAssetComponent, EditAssetComponent, ViewAssetsComponent |
-| `/asset-tags-list` | GET | CreateAssetComponent, EditAssetComponent |
-| `/create-asset-tag` | POST | CreateAssetTagComponent |
-| `/units-list` | GET | CreateAssetComponent, EditAssetComponent |
-| `/export-reports` | GET | ReportsComponent |
-| `/reports-grouped` | GET | ReportsComponent |
-| `/export-assets` | GET | ViewAssetsComponent |
-| `/export-issue-logs` | GET | IssueLogComponent |
-| `/export-return-logs` | GET | ReturnLogComponent |
-
----
-
-## 6. Service Methods with No Active Callers
-
-These are defined in `asset.service.ts` but not called by any component:
-
-| Method | Endpoint |
-|---|---|
-| `searchAssets()` | GET `/assets-search` |
-| `getAssetsLegacy()` | GET `/assets` |
-| `getAssetsByCategory()` | GET `/grp` |
-| `getAssetStatusSummary()` | GET `/asset-status-summary` |
-| `getIssuedDetailByAssetId()` | GET `/issued-asset-details/:id` |
-| `getUnissuedAssetNames()` | GET `/unissued-asset-names` |
-
----
-
-## 7. Development Notes
-
-- **Date format**: `YYYY-MM-DD` for input, ISO 8601 for output
-- **ID format**: MongoDB ObjectId (24-char hex)
-- **Pagination**: default page=1, pageSize=10, max=100
-- **CORS**: enabled for all origins with credentials
-- **Content-Type**: `application/json`
+Retrieve filterable return logs.
+- **Query Params**: `page`, `pageSize`, `name`, `classification`, `total`, `returnType`, `returnTo`, `returnDate`
+- **Response Key**: `data`
+- **Frontend Consumed By**: `ReturnLogComponent`
