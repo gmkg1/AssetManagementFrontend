@@ -76,6 +76,13 @@
         </div>
       </div>
 
+      <!-- Serial -->
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] text-slate-500 font-medium">Display ID</label>
+        <input type="text" [(ngModel)]="serial" placeholder="Display ID" [disabled]="true"
+          class="h-8 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none bg-slate-50 transition-colors placeholder:text-slate-400 cursor-not-allowed"/>
+      </div>
+
       <!-- Status -->
       <div class="flex flex-col gap-1">
         <label class="text-[10px] text-slate-500 font-medium">Status <span class="text-red-400">*</span></label>

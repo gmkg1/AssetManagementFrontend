@@ -31,7 +31,7 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
   assets: OptionItem[] = [];
   assetSearch = '';
   assetDropdownOpen = false;
-  assetsList: { _id: string; displayLabel: string; assetName: string; assetTagName: string; assetSerialNumber: string; category: string }[] = [];
+  assetsList: { _id: string; displayLabel: string; assetName: string; assetTagName: string; assetSerialNumber: string; displayId?: string; category: string }[] = [];
 
   availableQuantity = 1;
   unitOfMeasure = 'Nos';
@@ -396,13 +396,15 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
           }
           const name = item?.assetName ?? '';
           const serial = item?.assetSerialNumber ?? '';
-          const display = serial ? `${name} (${serial})` : name;
+          const displayId = item?.displayId ?? '';
+          const display = displayId ? `${name} (${displayId})` : (serial ? `${name} (${serial})` : name);
           return {
             _id: item?._id ?? '',
             displayLabel: display,
             assetName: name,
             assetTagName: '',
             assetSerialNumber: serial,
+            displayId: displayId,
             category: '',
           };
         });
@@ -416,7 +418,7 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
     });
   }
 
-  selectAssetOption(asset: { _id: string; displayLabel: string; assetName: string; assetTagName: string; assetSerialNumber: string; category: string }): void {
+  selectAssetOption(asset: { _id: string; displayLabel: string; assetName: string; assetTagName: string; assetSerialNumber: string; displayId?: string; category: string }): void {
     this.assetSearch = asset.displayLabel;
     this.assetDropdownOpen = false;
     this.assetOptionsLoading = true;
@@ -427,6 +429,7 @@ export class IssueAssetComponent implements OnInit, OnDestroy {
         const rawResults = response?.responseData?.data?.assets ?? response?.responseData?.assets ?? [];
         const results = Array.isArray(rawResults) ? rawResults : [];
         const match = results.find((r: any) =>
+          (asset.displayId && (r.displayId ?? '') === asset.displayId) ||
           (r.assetSerialNumber ?? '') === asset.assetSerialNumber
         ) ?? results.find((r: any) =>
           (r.assetName ?? '').toLowerCase() === asset.assetName.toLowerCase()

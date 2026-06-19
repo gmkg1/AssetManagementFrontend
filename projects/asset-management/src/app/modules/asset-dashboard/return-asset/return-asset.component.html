@@ -25,7 +25,7 @@
           [class.bg-blue-50]="selectedIssueId === issue._id"
           [class.text-blue-600]="selectedIssueId === issue._id"
           (click)="onIssueSelect(issue); $event.stopPropagation()">
-          <div class="font-semibold text-slate-800">{{ issue.assetName }}</div>
+          <div class="font-semibold text-slate-800">{{ issue.assetName }} <span class="text-[10px] text-slate-400 font-normal">({{ issue.displayId || issue.assetSerialNumber }})</span></div>
           <div class="text-[10px] text-slate-400 mt-0.5">
             Issued To: {{ issue.receiverName }} • Date: {{ issue.issueDate | date:'dd MMM yyyy' }}
           </div>
@@ -77,18 +77,37 @@
     </div>
 
     <!-- Return Date & Quantity Inputs -->
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-3 gap-4" *ngIf="selectedIssue; else simpleReturnDate">
       <div class="flex flex-col gap-1">
         <label class="text-[10px] text-slate-500 font-medium">Return Date</label>
         <input type="date" [(ngModel)]="returnDate" [min]="getIssueDateMin()"
           class="w-full h-9 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 focus:bg-white bg-slate-50 transition-all"/>
       </div>
-      <div class="flex flex-col gap-1" *ngIf="selectedIssue">
+      <div class="flex flex-col gap-1">
         <label class="text-[10px] text-slate-500 font-medium">Return Quantity</label>
-        <input type="number" [(ngModel)]="returnQuantity" [min]="1" [max]="(selectedIssue.issueQuantity ?? 1) - (selectedIssue.returnedQuantity ?? 0)"
+        <input type="number" [(ngModel)]="returnQuantity" [min]="0.0001" [max]="remainingInSelectedUnit"
           class="w-full h-9 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 focus:bg-white bg-slate-50 transition-all"/>
       </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] text-slate-500 font-medium">Unit</label>
+        <div class="relative">
+          <select [(ngModel)]="selectedUnit" (change)="onUnitChange()"
+            class="w-full h-9 border border-slate-200 rounded-lg pl-3 pr-8 text-xs text-slate-800 outline-none focus:border-blue-500 appearance-none bg-white cursor-pointer transition-all">
+            <option *ngFor="let u of unitOptions" [ngValue]="u">{{ u.acronym }}</option>
+          </select>
+          <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+          </svg>
+        </div>
+      </div>
     </div>
+    <ng-template #simpleReturnDate>
+      <div class="flex flex-col gap-1 max-w-[50%]">
+        <label class="text-[10px] text-slate-500 font-medium">Return Date</label>
+        <input type="date" [(ngModel)]="returnDate"
+          class="w-full h-9 border border-slate-200 rounded-lg px-3 text-xs text-slate-800 outline-none focus:border-blue-500 focus:bg-white bg-slate-50 transition-all"/>
+      </div>
+    </ng-template>
 
   </div>
 
