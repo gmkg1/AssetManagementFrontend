@@ -18,13 +18,10 @@
     minmax(90px,  1fr)           /* Category   */
     minmax(110px, 1.3fr)         /* Status     */
     minmax(110px, 1.3fr)         /* Assigned To*/
-    minmax(100px, 1.1fr)         /* Purch Date */
-    minmax(90px,  1fr);          /* Condition  */
+    minmax(100px, 1.1fr);        /* Purch Date */
   align-items: center;
   gap: 0 clamp(4px, 0.5vw, 10px);
 }
-
-/* Status badge colours (used via ngClass) */
 .status-available   { background: rgba(0,186,43,0.10);  color: #00BA2B; }
 .status-deployed    { background: rgba(87,168,223,0.12); color: #2B7FFF; }
 .status-maintenance { background: rgba(246,204,13,0.12); color: #B08A00; }

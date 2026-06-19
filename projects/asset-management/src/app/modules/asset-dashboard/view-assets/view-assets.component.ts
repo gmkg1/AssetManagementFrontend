@@ -51,6 +51,9 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
   selectedAsset: Asset | null = null;
   detailTab: 'info' | 'licenses' | 'components' | 'assets' | 'history' | 'maintenances' | 'files' = 'info';
 
+  /** Tracks which detail tabs have already fetched data for the current asset */
+  tabLoaded: Record<string, boolean> = {};
+
   isLoading = true;
   apiError: string | null = null;
 
@@ -388,6 +391,8 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     this.detailTab = 'info';
     this.view = 'detail';
 
+    // Reset all tab data and loaded flags for the new asset
+    this.tabLoaded = {};
     this.assetLicenses = [];
     this.assetWarranties = [];
     this.assetComponents = [];
@@ -395,6 +400,7 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
     this.assetIssues = [];
     this.assetReturns = [];
 
+    // Only load Info tab data on open
     if (asset._id) {
       this.assetService.getAssetDetails(asset._id).subscribe({
         next: (res: any) => {
@@ -419,44 +425,54 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
               purchaseDate: normalizedPurchaseDate || this.selectedAsset.purchaseDate,
               isReturnable: data.isIssuable || false
             };
+            this.tabLoaded['info'] = true;
+            this.cdr.detectChanges();
           }
         }
       });
+    }
+  }
 
-      this.assetService.getLicensesAndWarranty(asset._id).subscribe({
+  switchTab(tab: 'info' | 'licenses' | 'components' | 'assets' | 'history' | 'maintenances' | 'files'): void {
+    this.detailTab = tab;
+    if (!this.selectedAsset?._id || this.tabLoaded[tab]) return;
+
+    const id = this.selectedAsset._id;
+
+    if (tab === 'licenses') {
+      this.assetService.getLicensesAndWarranty(id).subscribe({
         next: (res: any) => {
           const data = res?.responseData?.data || {};
           this.assetLicenses = data.licenses || [];
           this.assetWarranties = data.warranty || [];
+          this.tabLoaded['licenses'] = true;
           this.cdr.detectChanges();
         },
-        error: (err: any) => {
-          console.error('Failed to load licenses and warranty:', err);
-        }
+        error: (err: any) => console.error('Failed to load licenses and warranty:', err)
       });
 
-      this.assetService.getAssetComponents(asset._id).subscribe({
+    } else if (tab === 'components') {
+      this.assetService.getAssetComponents(id).subscribe({
         next: (res: any) => {
           const data = res?.responseData?.data || {};
           this.assetComponents = data.components || [];
+          this.tabLoaded['components'] = true;
           this.cdr.detectChanges();
         },
-        error: (err: any) => {
-          console.error('Failed to load components:', err);
-        }
+        error: (err: any) => console.error('Failed to load components:', err)
       });
 
-      this.assetService.getAssetHistory(asset._id).subscribe({
+    } else if (tab === 'history') {
+      this.assetService.getAssetHistory(id).subscribe({
         next: (res: any) => {
           const data = res?.responseData?.data || {};
           this.assetDispatches = data.dispatches || [];
           this.assetIssues = data.issues || [];
           this.assetReturns = data.returns || [];
+          this.tabLoaded['history'] = true;
           this.cdr.detectChanges();
         },
-        error: (err: any) => {
-          console.error('Failed to load asset history:', err);
-        }
+        error: (err: any) => console.error('Failed to load asset history:', err)
       });
     }
   }

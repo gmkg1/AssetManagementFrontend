@@ -14,7 +14,7 @@ export const environment = {
     },
     publicPath: 'http://localhost:4200/',
 
-    baseUrl: 'https://adjustments-plenty-roles-grid.trycloudflare.com/api/',
+    baseUrl: 'https://amendments-ministries-islands-immigration.trycloudflare.com/api/',
     project: 'shell',
     baseRoute: 'kjusys',
     local: true,
