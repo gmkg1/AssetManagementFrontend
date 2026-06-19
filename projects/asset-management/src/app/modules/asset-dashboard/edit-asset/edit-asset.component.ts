@@ -23,6 +23,7 @@ export class EditAssetComponent implements OnInit {
   filteredModels: any[] = [];
   status = '';
   statuses: any[] = [];
+  allStatuses: any[] = [];
   category = '';
   categories: any[] = [];
   defaultLocation = '';
@@ -86,7 +87,8 @@ export class EditAssetComponent implements OnInit {
     this.assetService.getStatuses().subscribe({
       next: (res: any) => {
         const rows = res?.responseData?.data?.statuses ?? [];
-        this.statuses = rows.map((r: any) => ({ id: r.statusId, name: r.statusName }));
+        this.allStatuses = rows.map((r: any) => ({ id: r.statusId, name: r.statusName }));
+        this.filterStatuses();
         this.cdr.detectChanges();
       }
     });
@@ -110,6 +112,12 @@ export class EditAssetComponent implements OnInit {
     });
   }
 
+  filterStatuses(): void {
+    if (this.allStatuses.length > 0) {
+      this.statuses = this.allStatuses.filter(s => s.name !== 'Deployed' || s.id === this.status);
+    }
+  }
+
   loadAssetDetails(id: string): void {
     this.isLoading = true;
     this.assetService.getAssetDetails(id).subscribe({
@@ -123,13 +131,14 @@ export class EditAssetComponent implements OnInit {
           this.category = data.categoryId || '';
           this.status = data.statusId || '';
           this.defaultLocation = data.locationId || '';
-          this.serial = data.assetSerialNumber || '';
+          this.serial = data.displayId || data.assetSerialNumber || '';
           this.serialNumber = data.assetSerialNumber || '';
           this.purchaseCost = data.purchaseCost != null ? data.purchaseCost.toString() : '';
           this.isReturnable = data.isIssuable || false;
           this.quantity = data.quantity != null ? data.quantity.toString() : '';
           this.unitOfMeasure = data.unitOfMeasureId || '';
           this.syncAssetTagSearch();
+          this.filterStatuses();
           
           if (data.purchaseDate) {
             // Convert to YYYY-MM-DD
@@ -267,7 +276,7 @@ export class EditAssetComponent implements OnInit {
       assetTagId: this.model,
       statusId: this.status,
       defaultLocation: this.defaultLocation || null,
-      serial: this.serial != null ? this.serial.toString().trim() : '',
+      serial: this.serialNumber != null ? this.serialNumber.toString().trim() : '',
       purchaseCost: this.purchaseCost != null ? this.purchaseCost.toString().trim() : '',
       purchaseDate: this.purchaseDate ? this.purchaseDate.trim() : '',
       isReturnable: this.isReturnable,

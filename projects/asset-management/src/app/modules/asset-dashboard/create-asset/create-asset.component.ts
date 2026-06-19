@@ -104,7 +104,9 @@ export class CreateAssetComponent implements OnInit, OnDestroy {
     this.assetService.getStatuses().subscribe({
       next: (res: any) => {
         const rows = res?.responseData?.data?.statuses ?? [];
-        this.statuses = rows.map((r: any) => ({ id: r.statusId, name: r.statusName }));
+        this.statuses = rows
+          .map((r: any) => ({ id: r.statusId, name: r.statusName }))
+          .filter((s: any) => s.name !== 'Deployed');
         tryApplyClone();
       },
       error: () => tryApplyClone()
@@ -270,10 +272,6 @@ export class CreateAssetComponent implements OnInit, OnDestroy {
       this.errorMessage = 'Asset Name is required.';
       return;
     }
-    if (this.isCloneMode && !this.serial.trim()) {
-      this.errorMessage = 'Serial Number is required for cloned assets.';
-      return;
-    }
 
     if (this.eolDate && this.purchaseDate && this.eolDate < this.purchaseDate) {
       this.errorMessage = 'EOL Date cannot be before Purchase Date.';
@@ -287,12 +285,14 @@ export class CreateAssetComponent implements OnInit, OnDestroy {
 
     this.isLoading = true;
 
+    const generatedSerial = 'SN-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
+
     const payload = {
       assetName: this.assetName.trim(),
       assetTagId: this.model,
       statusId: this.status,
       defaultLocation: this.defaultLocation || null,
-      serial: this.serial != null ? this.serial.toString().trim() : '',
+      serial: generatedSerial,
       purchaseCost: this.purchaseCost != null ? this.purchaseCost.toString().trim() : '',
       purchaseDate: this.purchaseDate ? this.purchaseDate.trim() : '',
       isReturnable: this.isReturnable,

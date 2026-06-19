@@ -197,7 +197,6 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
         this.assets = raw.map((item, i) => this.mapToAsset(item, i));
         this.isLoading = false;
         this.cdr.detectChanges();
-        this.loadAssignedTo();
       },
       error: (err: any) => {
         console.error('Failed to load assets:', err);
@@ -360,11 +359,11 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
       department: item.location ?? '—',
       category: item.category ?? '—',
       status: item.status ?? '—',
-      assignedTo: '—',
+      assignedTo: item.issuedTo === 'Not Issued' ? '—' : (item.issuedTo ?? '—'),
       purchaseDate: item.purchaseDate ? new Date(item.purchaseDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—',
       condition: 'Good',
       assetTag: item.assetTagName ?? '—',
-      serial: item.assetSerialNumber ?? '—',
+      serial: item.displayId ?? item.assetSerialNumber ?? '—',
       displayId: item.displayId ?? item.assetSerialNumber ?? '—',
       checkoutDate: '—',
       model: item.assetTagName ?? '—',

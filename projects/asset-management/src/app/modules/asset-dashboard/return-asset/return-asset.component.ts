@@ -18,6 +18,11 @@ export class ReturnAssetComponent implements OnInit {
   public returnDate = '';
   public isSubmitting = false;
 
+  public allUnits: any[] = [];
+  public unitOptions: { name: string; acronym: string; conversionFactor: number }[] = [];
+  public selectedUnit: { name: string; acronym: string; conversionFactor: number } | null = null;
+  public remainingInSelectedUnit = 0;
+
   constructor(
     public router: Router,
     private assetService: AssetService,
@@ -33,6 +38,14 @@ export class ReturnAssetComponent implements OnInit {
     this.returnDate = `${yyyy}-${mm}-${dd}`;
 
     this.loadActiveIssues();
+    this.assetService.getUnits().subscribe({
+      next: (response: any) => {
+        this.allUnits = response?.responseData?.data?.units ?? response?.responseData?.units ?? [];
+      },
+      error: (err) => {
+        console.error('Failed to load units list:', err);
+      }
+    });
   }
 
   loadActiveIssues(): void {
@@ -73,17 +86,62 @@ export class ReturnAssetComponent implements OnInit {
     this.selectedIssueId = issue._id;
     this.issueDropdownOpen = false;
 
-    const totalIssued = issue.issueQuantity ?? 1;
-    const totalReturned = issue.returnedQuantity ?? 0;
-    const remaining = totalIssued - totalReturned;
-    this.returnQuantity = remaining > 0 ? remaining : 1;
+    this.populateUnitOptions(issue);
+  }
+
+  populateUnitOptions(issue: any): void {
+    this.unitOptions = [];
+    const unitId = issue.unitOfMeasureId;
+    const mainUnit = this.allUnits.find(u => u._id === unitId || u.id === unitId);
+    if (mainUnit) {
+      this.unitOptions.push({
+        name: mainUnit.unitOfMeasure || mainUnit.name,
+        acronym: mainUnit.acronym,
+        conversionFactor: 1
+      });
+      const hierarchy = mainUnit.hierarchy || mainUnit.childUnits || [];
+      hierarchy.forEach((child: any) => {
+        this.unitOptions.push({
+          name: child.childNodeName || child.name,
+          acronym: child.childNode || child.acronym,
+          conversionFactor: child.conversionFactor
+        });
+      });
+    } else {
+      this.unitOptions.push({
+        name: issue.unit || 'Nos',
+        acronym: issue.unit || 'Nos',
+        conversionFactor: 1
+      });
+    }
+
+    const match = this.unitOptions.find(u => u.acronym.toLowerCase() === (issue.unit || 'Nos').toLowerCase());
+    this.selectedUnit = match || this.unitOptions[0];
+    this.onUnitChange();
+  }
+
+  onUnitChange(): void {
+    if (!this.selectedIssue || !this.selectedUnit) return;
+
+    const issueUnitAcronym = this.selectedIssue.unit || 'Nos';
+    const issueUnitOpt = this.unitOptions.find(u => u.acronym.toLowerCase() === issueUnitAcronym.toLowerCase());
+    const issueCF = issueUnitOpt ? issueUnitOpt.conversionFactor : 1;
+
+    const totalIssued = this.selectedIssue.issueQuantity ?? 1;
+    const totalReturned = this.selectedIssue.returnedQuantity ?? 0;
+    const remainingInIssueUnit = totalIssued - totalReturned;
+
+    const selectedCF = this.selectedUnit.conversionFactor;
+    this.remainingInSelectedUnit = remainingInIssueUnit * (selectedCF / issueCF);
+
+    this.returnQuantity = this.remainingInSelectedUnit;
   }
 
   getSelectedLabel(): string {
     if (!this.selectedIssue) {
       return 'Select Issued Asset';
     }
-    const serial = this.selectedIssue.assetSerialNumber || '—';
+    const serial = this.selectedIssue.displayId || this.selectedIssue.assetSerialNumber || '—';
     return `${serial} — ${this.selectedIssue.assetName || 'Unknown Asset'} (${this.selectedIssue.receiverName || 'Unknown'})`;
   }
 
@@ -121,17 +179,14 @@ export class ReturnAssetComponent implements OnInit {
       return;
     }
 
-    const totalIssued = this.selectedIssue.issueQuantity ?? 1;
-    const totalReturned = this.selectedIssue.returnedQuantity ?? 0;
-    const remaining = totalIssued - totalReturned;
-
     if (!this.returnQuantity || this.returnQuantity <= 0) {
       alert('Return quantity must be greater than 0.');
       return;
     }
 
-    if (this.returnQuantity > remaining) {
-      alert(`Cannot return more than remaining issued quantity (${remaining} ${this.selectedIssue.unit || 'Nos'}).`);
+    if (this.returnQuantity > this.remainingInSelectedUnit + 0.0001) {
+      const uAcronym = this.selectedUnit ? this.selectedUnit.acronym : (this.selectedIssue.unit || 'Nos');
+      alert(`Cannot return more than remaining issued quantity (${this.remainingInSelectedUnit} ${uAcronym}).`);
       return;
     }
 
@@ -141,12 +196,20 @@ export class ReturnAssetComponent implements OnInit {
       return;
     }
 
+    // Convert return quantity from selected unit back to the issue's unit
+    const issueUnitAcronym = this.selectedIssue.unit || 'Nos';
+    const issueUnitOpt = this.unitOptions.find(u => u.acronym.toLowerCase() === issueUnitAcronym.toLowerCase());
+    const issueCF = issueUnitOpt ? issueUnitOpt.conversionFactor : 1;
+    const selectedCF = this.selectedUnit ? this.selectedUnit.conversionFactor : 1;
+
+    const qtyInIssueUnit = this.returnQuantity * (issueCF / selectedCF);
+
     this.isSubmitting = true;
     const payload = {
       assetId: this.selectedIssue.assetId,
       issuetoId: this.selectedIssue._id,
       returnDate: this.returnDate,
-      returnQuantity: this.returnQuantity
+      returnQuantity: qtyInIssueUnit
     };
 
     this.assetService.returnAsset(payload).subscribe({
