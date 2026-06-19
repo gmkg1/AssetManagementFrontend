@@ -197,7 +197,7 @@
             [class.border-transparent]="detailTab !== tab.key"
             [class.text-slate-400]="detailTab !== tab.key"
             [class.hover:text-slate-600]="detailTab !== tab.key"
-            (click)="detailTab = $any(tab.key)">
+            (click)="switchTab($any(tab.key))">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" [attr.d]="tab.icon"/></svg>
             {{ tab.label }}
           </button>

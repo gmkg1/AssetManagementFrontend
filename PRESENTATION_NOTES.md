@@ -256,61 +256,7 @@ The build is split into stages to handle inter-library dependencies:
 
 ---
 
-## 6. ChangeDetectorRef (CDR) — Forcing the UI to Update
-
-### What is it?
-
-Angular normally updates the UI automatically when data changes — this is called **Change Detection**. But some of our components use `ChangeDetectionStrategy.OnPush` (or are rendered inside a microfrontend shell context), which means Angular only checks for changes when:
-- An `@Input` property changes
-- An event fires from within the template
-- You tell it to manually
-
-When data arrives from an HTTP call (an async operation), Angular sometimes doesn't know the data changed and the screen stays blank or stale. That's where `ChangeDetectorRef` comes in.
-
-### How it's injected
-
-```typescript
-import { ChangeDetectorRef } from '@angular/core';
-
-constructor(
-  private assetService: AssetService,
-  private cdr: ChangeDetectorRef   // inject it here
-) {}
-```
-
-### How it's used
-
-`cdr.detectChanges()` is called right after setting data that came from an API call, to tell Angular "something changed, re-render now":
-
-```typescript
-// From view-assets.component.ts — after assets load from API
-this.assets = raw.map((item, i) => this.mapToAsset(item, i));
-this.isLoading = false;
-this.cdr.detectChanges(); // ← force UI refresh
-```
-
-```typescript
-// From view-assets.component.ts — after licenses/warranty load
-this.assetLicenses = data.licenses || [];
-this.assetWarranties = data.warranty || [];
-this.cdr.detectChanges(); // ← otherwise the detail panel stays empty
-```
-
-```typescript
-// From dashboard.component.ts — after category counts arrive
-this.departments = categories.map(cat => { ... });
-this.cdr.detectChanges(); // ← cards won't render without this
-```
-
-### Why it was needed in this project specifically
-
-All the feature screens live as **tab components** inside `AssetDashboardModule`. The tab shell controls which component is visible. Because components are swapped in and out without a full route navigation, Angular's normal top-down change detection cycle doesn't always reach deeply nested async updates. Calling `cdr.detectChanges()` after every API response was the reliable fix to ensure data always renders on screen immediately.
-
-**Summary:** Any time you see `this.cdr.detectChanges()` in a component, it means "this data came back from an async call and we're telling Angular to re-check this component's view right now."
-
----
-
-## 7. Quick Reference — Where Each Feature Lives
+## 6. Quick Reference — Where Each Feature Lives
 
 | Feature | File |
 |---------|------|
@@ -318,7 +264,6 @@ All the feature screens live as **tab components** inside `AssetDashboardModule`
 | Date display format | Any component → `toLocaleDateString('en-GB', ...)` |
 | Date form pre-fill | `edit-warranty-licenses.component.ts` → `.toISOString().substring(0,10)` |
 | Serial number clone logic | `view-assets.component.ts` → `cloneAsset()` |
-| CDR usage | `view-assets`, `dashboard`, `issue-log` → `this.cdr.detectChanges()` after every API response |
 | All API calls | `asset.service.ts` |
 | Tab navigation (no page reload) | `dashboard-tabs.service.ts` → `changeTab()` |
 | Component generation commands | `ng g c modules/asset-dashboard/<name> --project=asset-management` |
