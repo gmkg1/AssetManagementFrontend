@@ -200,7 +200,6 @@ export class ViewAssetsComponent implements OnInit, OnDestroy {
         this.assets = raw.map((item, i) => this.mapToAsset(item, i));
         this.isLoading = false;
         this.cdr.detectChanges();
-        this.loadAssignedTo();
       },
       error: (err: any) => {
         console.error('Failed to load assets:', err);
