@@ -14,7 +14,7 @@ export const environment = {
     },
     publicPath: 'http://localhost:4200/',
 
-    baseUrl: 'https://amendments-ministries-islands-immigration.trycloudflare.com/api/',
+    baseUrl: 'http://localhost:8080/api/',
     project: 'shell',
     baseRoute: 'kjusys',
     local: true,
